@@ -38,6 +38,7 @@
                             <button id="generate-pdf" class="btn btn-success">
                                 <i class="fas fa-print"></i>
                             </button>
+                            <a href="{{ route('adl.export') }}" class="btn btn-primary btn-sm">Export Excel</a>
                             </div>
                         </div>
                         <div class="card-body px-0 pt-0 pb-2">
@@ -45,6 +46,7 @@
                                 <table id="adlTable" class="table align-items-center mb-0">
                                     <thead>
                                         <tr>
+                                            <th class="text-center">วันที่</th>
                                             <th class="text-center">ชื่อผู้สูงอายุ</th>
                                             <th class="text-center">ชื่อเจ้าหน้าที่</th>
                                             <th class="text-center">คะแนนการประเมิน ADL</th>
@@ -55,6 +57,7 @@
                                     <tbody>
                                         @foreach ($adls as $adl)
                                             <tr>
+                                                <td class="text-center">{{ $adl->created_at ? $adl->created_at->format('Y-m-d') : '' }}</td>
                                                 <td class="text-center">{{ $adl->Name_Elderly }}</td>
                                                 <td class="text-center">{{ $adl->Name_User }}</td>
                                                 <td class="text-center">{{ $adl->Score_ADL }}</td>

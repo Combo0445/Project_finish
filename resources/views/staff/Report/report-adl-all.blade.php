@@ -17,6 +17,7 @@
         <table>
             <thead>
                 <tr>
+                    <th>วันที่</th>
                     <th>ชื่อผู้สูงอายุ</th>
                     <th>ชื่อเจ้าหน้าที่ผู้รับผิดชอบ</th>
                     <th>กลุ่ม ADL</th>
@@ -25,6 +26,7 @@
             <tbody>
                 @foreach ($adls as $adl)
                     <tr>
+                        <td>{{ $adl->created_at->date_format('Y-m-d') }}</td>
                         <td>{{ $adl->elderly ? $adl->elderly->Name_Elderly : 'ไม่มีข้อมูล' }}</td>
                         <td>{{ $adl->Name_User ?: 'ไม่มีข้อมูล' }}</td>
                         <td>{{ $adl->Group_ADL ?: 'ไม่มีข้อมูล' }}</td>

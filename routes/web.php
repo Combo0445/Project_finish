@@ -13,6 +13,7 @@ use App\Http\Controllers\CIController;
 use App\Http\Controllers\DoctorController;
 use App\Models\BarthelAdl;
 use App\Models\CareGiver;
+use App\Http\Controllers\ADLExportController;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -183,6 +184,8 @@ Route::middleware(['CheckLogin', 'IsStaff'])->group(function () {
 
         Route::get('elderly-report', 'showReport')->name('elderly-report');
     });
+    //Expoert
+    Route::get('/export-adl', [ADLExportController::class, 'export'])->name('adl.export');
 });
 
 
@@ -199,4 +202,6 @@ Route::middleware(['CheckLogin', 'IsDoctor'])->group(function () {
         Route::put('/ci/{id}', 'updateCI')->name('ci.update');
         Route::get('/care-instructions/report', 'ReportCI')->name('report.ci');
     });
+
+    
 });
