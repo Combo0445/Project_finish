@@ -14,7 +14,7 @@ class BarthelAdl extends Model
         'Feeding', 'Grooming', 'Transfer', 'Toilet_use', 'Mobility', 'Dressing',
         'Stairs', 'Bathing', 'Bowels', 'Bladder'
     ];
-    public $timestamps = false;
+    public $timestamps = true;
 
     public function elderly()
     {

@@ -130,6 +130,8 @@ class ADLController extends Controller
             'Bathing' => $request->bathing,
             'Bowels' => $request->bowels,
             'Bladder' => $request->bladder,
+            'updated_at' => now(),
+            'created_at' => $adl->created_at,
         ]);
 
         return redirect()->route('adl.index')->with('success', 'อัปเดตการประเมิน ADL สำเร็จแล้ว!');
