@@ -14,6 +14,7 @@ use App\Http\Controllers\DoctorController;
 use App\Models\BarthelAdl;
 use App\Models\CareGiver;
 use App\Http\Controllers\ADLExportController;
+use App\Http\Controllers\CGExportController;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -184,8 +185,10 @@ Route::middleware(['CheckLogin', 'IsStaff'])->group(function () {
 
         Route::get('elderly-report', 'showReport')->name('elderly-report');
     });
-    //Expoert
+    //Expoert ADL
     Route::get('/export-adl', [ADLExportController::class, 'export'])->name('adl.export');
+    //Export CG
+    Route::get('/export-cg', [CGExportController::class, 'export'])->name('cg.export');
 });
 
 
