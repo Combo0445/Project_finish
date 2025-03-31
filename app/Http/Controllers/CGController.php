@@ -76,6 +76,7 @@ class CGController extends Controller
             'Other_problems' => 'nullable|string',
             'Assistance' => 'nullable|string',
             'Reporter' => 'required|string',
+            'Picture' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
 
         $careGiverData = $request->only([
@@ -87,7 +88,7 @@ class CGController extends Controller
             'Swallowing', 'Defecation', 'Urinary_excretion', 'Taking_medicine',
             'Emotional_state', 'Economic_problems', 'Economic_problems_details',
             'Social_problems', 'Social_problems_details', 'Doctor_FU', 'Doctor_FU_details',
-            'Other_problems', 'Assistance', 'Reporter'
+            'Other_problems', 'Assistance', 'Reporter', 'Picture'
         ]);
 
         $id_elderly = BarthelAdl::findOrFail($request->ID_Elderly);
@@ -168,6 +169,7 @@ class CGController extends Controller
             'Other_problems' => 'nullable|string',
             'Assistance' => 'nullable|string',
             'Reporter' => 'required|string',
+            'Picture' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
 
         $careGiverData = $request->only([
@@ -176,7 +178,7 @@ class CGController extends Controller
             'Bedsores', 'Pain', 'Swelling', 'Itchy_rash', 'Stiff_joints',
             'Malnutrition', 'Eating', 'Swallowing', 'Defecation', 'Urinary_excretion',
             'Taking_medicine', 'Emotional_state', 'Economic_problems', 'Social_problems',
-            'Doctor_FU', 'Other_problems', 'Assistance', 'Reporter'
+            'Doctor_FU', 'Other_problems', 'Assistance', 'Reporter', 'Picture'
         ]);
 
         $careGiver = CareGiver::findOrFail($id);

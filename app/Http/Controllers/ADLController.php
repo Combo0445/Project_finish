@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\BarthelAdl;
 use App\Models\Elderly;
+use App\Models\ScoreTAI;
 use Illuminate\Support\Facades\Auth;
 
 class ADLController extends Controller
@@ -46,11 +47,11 @@ class ADLController extends Controller
 
         // Determine the group based on the total score
         if ($totalScore >= 0 && $totalScore <= 4) {
-            $group = 'กลุ่มติดสังคม';
+            $group = 'กลุ่มติดเตียง';
         } elseif ($totalScore >= 5 && $totalScore <= 11) {
             $group = 'กลุ่มติดบ้าน';
         } else {
-            $group = 'กลุ่มติดเตียง';
+            $group = 'กลุ่มติดสังคม';
         }
 
         // Get elderly and user information
@@ -76,6 +77,18 @@ class ADLController extends Controller
             'Bowels' => $request->bowels,
             'Bladder' => $request->bladder,
         ]);
+
+        if ($totalScore >= 0 && $totalScore <= 11) {
+            ScoreTAI::create([
+                'ID_Elderly' => $elderly->ID_Elderly,
+                'ID_User' => $user->ID_User,
+                'mobility' => null,
+                'confuse' => null,
+                'feed' => null,
+                'toilet' => null,
+                'group' => $group,
+            ]);
+        }
 
         return redirect()->back()->with('success', 'ส่งการประเมิน ADL สำเร็จแล้ว!');
     }
@@ -108,11 +121,11 @@ class ADLController extends Controller
         $totalScore = $request->feeding + $request->grooming + $request->transfer + $request->toilet_use + $request->mobility + $request->dressing + $request->stairs + $request->bathing + $request->bowels + $request->bladder;
 
         if ($totalScore >= 0 && $totalScore <= 4) {
-            $group = 'กลุ่มติดสังคม';
+            $group = 'กลุ่มติดเตียง';
         } elseif ($totalScore >= 5 && $totalScore <= 11) {
             $group = 'กลุ่มติดบ้าน';
         } else {
-            $group = 'กลุ่มติดเตียง';
+            $group = 'กลุ่มติดสังคม';
         }
 
         $adl->update([
@@ -133,6 +146,24 @@ class ADLController extends Controller
             'updated_at' => now(),
             'created_at' => $adl->created_at,
         ]);
+
+        if ($totalScore >= 0 && $totalScore <= 11) {
+            $exists = ScoreTAI::where('ID_Elderly', $adl->ID_Elderly)
+                        ->where('ID_User', $adl->ID_User)
+                        ->exists();
+
+            if (!$exists) {
+                ScoreTAI::create([
+                    'ID_Elderly' => $adl->ID_Elderly,
+                    'ID_User' => $adl->ID_User,
+                    'mobility' => null,
+                    'confuse' => null,
+                    'feed' => null,
+                    'toilet' => null,
+                    'group' => $group,
+                ]);
+            }
+        }
 
         return redirect()->route('adl.index')->with('success', 'อัปเดตการประเมิน ADL สำเร็จแล้ว!');
     }
