@@ -15,6 +15,8 @@ use App\Models\BarthelAdl;
 use App\Models\CareGiver;
 use App\Http\Controllers\ADLExportController;
 use App\Http\Controllers\CGExportController;
+use App\Http\Controllers\TAIController;
+
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -154,6 +156,15 @@ Route::middleware(['CheckLogin', 'IsStaff'])->group(function () {
     Route::get('/report-all-cg', [CGController::class, 'ReportCGAll'])->name('report.all.cg');
     Route::get('report-cg/{id}', [CGController::class, 'ReportCG'])->name('report.cg');
 
+    Route::get('tai-show', [TAIController::class, 'index'])->name('tai.index');
+    // Route::get('tai-edit/{id}', [TAIController::class, 'edit'])->name('tai.edit');
+    // Route::put('tai-update/{id}', [TAIController::class, 'update'])->name('tai.update');
+    // Route::delete('tai-destroy/{id}', [TAIController::class, 'destroy'])->name('tai.destroy');
+    // Route::post('tai-store', [TAIController::class, 'store'])->name('tai.store');
+    // Route::get('tai-create', [TAIController::class, 'create'])->name('tai.create');
+    // Route::get('/report-all-tai', [TAIController::class, 'ReportTAIAll'])->name('report.all.tai');
+    // Route::get('report-tai/{id}', [TAIController::class, 'ReportTAI'])->name('report.tai');
+
 
     Route::get('acg-create', [CGController::class, 'createActivity'])->name('activities.create');
     Route::post('/acg-store', [CGController::class, 'storeActivity'])->name('activities.store');
@@ -206,5 +217,5 @@ Route::middleware(['CheckLogin', 'IsDoctor'])->group(function () {
         Route::get('/care-instructions/report', 'ReportCI')->name('report.ci');
     });
 
-    
+
 });

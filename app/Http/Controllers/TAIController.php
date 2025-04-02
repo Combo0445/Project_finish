@@ -9,15 +9,18 @@ use App\Models\User;
 
 class TAIController extends Controller
 {
-    public function index(){
+    public function index(Request $request)
+    {
+        $tai = ScoreTAI::with(['elderly', 'user'])->get();
+
+        return view('staff.TAI.ShowTAI', compact('tai'));
+    }
+
+    public function create() {
 
     }
 
-    public function create(){
-
-    }
-
-    public function auto_store(Request $request){
-
+    public function auto_store(Request $request) {
+        
     }
 }
