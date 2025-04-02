@@ -39,9 +39,6 @@
                         <div class="card-header pb-0 d-flex justify-content-between align-items-center">
                             <h4>รายงานผลการปฏิบัติงานผู้ดูแลผู้สูงอายุ (CG)</h4>
                             <div class="d-flex gap-2">
-                            <a href="{{ route('cg.create') }}" class="btn btn-primary">
-                                <i class="fas fa-plus"></i> เพิ่ม CG
-                            </a>
                             <button id="generate-pdf" class="btn btn-success">
                                 <i class="fas fa-print"></i>
                             </button>
@@ -56,6 +53,7 @@
                                             <th class="text-center">วันที่</th>
                                             <th class="text-center">ชื่อผู้สูงอายุ</th>
                                             <th class="text-center">ชื่อผู้ดูแลผู้สูงอายุ</th>
+                                            <th class="text-center">ประเภทกลุ่ม</th>
                                             <th class="text-center">ประเภทกลุ่มผู้สูงอายุ</th>
                                             <th class="text-center">Actions</th>
                                         </tr>
@@ -64,10 +62,41 @@
                                         @foreach ($tai as $item)
                                             <tr>
                                                 <td class="text-center">{{ $item->Date_tai }}</td>
-                                                <td class="text-center">{{ $item->elderly->name ?? 'ไม่พบข้อมูล' }}</td>
-                                                <td class="text-center">{{ $item->user->name ?? 'ไม่พบข้อมูล' }}</td>
-                                                <td class="text-center">{{ $item->group }}</td>
+                                                <td class="text-center">{{ $item->elderly->Name_Elderly ?? 'ไม่พบข้อมูล' }}</td>
+                                                <td class="text-center">{{ $item->user->Name_User ?? 'ไม่พบข้อมูล' }}</td>
                                                 <td class="text-center">
+                                                    {{ $item->group }}
+                                                </td>
+                                                <td class="text-center">
+                                                    @php
+                                                        $group = $item->group;
+                                                        if (in_array($group, ['B5', 'B4', 'B3'])) {
+                                                            $displayText = 'กลุ่มปกติ';
+                                                        } elseif (in_array($group, ['C4', 'C3', 'C2'])) {
+                                                            $displayText = 'กลุ่มติดบ้าน';
+                                                        } elseif (in_array($group, ['I3', 'I2', 'I1'])) {
+                                                            $displayText = 'กลุ่มติดเตียง';
+                                                        } else {
+                                                            $displayText = '-';
+                                                        }
+                                                    @endphp
+                                                    {{ $displayText }}
+                                                </td>
+
+                                                <td class="text-center">
+                                                    <a href="{{ route('tai.edit', ['id' => $item->id]) }}" class="btn btn-warning btn-sm">
+                                                        <i class="fas fa-edit"></i> เพิ่มแบบประเมิน
+                                                    </a>
+                                                    <form id="delete-tai-form-{{ $item->id }}" action="{{ route('tai.destroy', ['id' => $item->id]) }}" method="POST" style="display:inline-block;">
+                                                        @csrf
+                                                        @method('DELETE')
+                                                        <button type="button" class="btn btn-danger btn-sm" onclick="confirmDelete('{{ $item->id }}')">
+                                                            <i class="fas fa-trash"></i> ลบ
+                                                        </button>
+                                                    </form>
+                                                </td>
+
+                                                {{--  <td class="text-center">
                                                     <a href="javascript:void(0);" class="btn btn-success btn-sm" onclick="generatePdf('{{ $cg->ID_CG }}')">ออกรายงาน</a>
                                                     <a href="{{ route('cg.edit', ['id' => $cg->ID_CG]) }}"
                                                         class="btn btn-warning btn-sm">แก้ไข</a>
@@ -79,7 +108,7 @@
                                                         <button type="button" class="btn btn-danger btn-sm"
                                                             onclick="confirmDelete('{{ $cg->ID_CG }}')">ลบ</button>
                                                     </form>
-                                                </td>
+                                                </td>  --}}
                                             </tr>
                                         @endforeach
                                     </tbody>
@@ -105,6 +134,7 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <!-- DataTables JS -->
     <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+
     <script>
         $(document).ready(function() {
             $('#cgTable').DataTable({
@@ -137,7 +167,7 @@
                 cancelButtonText: 'ยกเลิก'
             }).then((result) => {
                 if (result.isConfirmed) {
-                    document.getElementById('delete-cg-form-' + id).submit();
+                    document.getElementById('delete-tai-form-' + id).submit();
                 }
             });
         }

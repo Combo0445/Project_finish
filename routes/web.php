@@ -157,11 +157,14 @@ Route::middleware(['CheckLogin', 'IsStaff'])->group(function () {
     Route::get('report-cg/{id}', [CGController::class, 'ReportCG'])->name('report.cg');
 
     Route::get('tai-show', [TAIController::class, 'index'])->name('tai.index');
+    Route::get('tai-edit/{id}', [TAIController::class, 'edit'])->name('tai.edit');
+    Route::put('tai-update/{id}', [TAIController::class, 'update'])->name('tai.update');
+    Route::delete('tai-destroy/{id}', [TAIController::class, 'destroy'])->name('tai.destroy');
     // Route::get('tai-edit/{id}', [TAIController::class, 'edit'])->name('tai.edit');
     // Route::put('tai-update/{id}', [TAIController::class, 'update'])->name('tai.update');
     // Route::delete('tai-destroy/{id}', [TAIController::class, 'destroy'])->name('tai.destroy');
-    // Route::post('tai-store', [TAIController::class, 'store'])->name('tai.store');
-    // Route::get('tai-create', [TAIController::class, 'create'])->name('tai.create');
+    // Route::put('tai-store', [TAIController::class, 'store'])->name('tai.store');
+    // Route::get('tai-create/{id}', [TAIController::class, 'create'])->name('tai.create');
     // Route::get('/report-all-tai', [TAIController::class, 'ReportTAIAll'])->name('report.all.tai');
     // Route::get('report-tai/{id}', [TAIController::class, 'ReportTAI'])->name('report.tai');
 

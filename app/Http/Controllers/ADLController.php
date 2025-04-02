@@ -81,12 +81,12 @@ class ADLController extends Controller
         if ($totalScore >= 0 && $totalScore <= 11) {
             ScoreTAI::create([
                 'ID_Elderly' => $elderly->ID_Elderly,
-                'ID_User' => $user->ID_User,
+                'ID_User' => null,
                 'mobility' => null,
                 'confuse' => null,
                 'feed' => null,
                 'toilet' => null,
-                'group' => $group,
+                'group' => null,
             ]);
         }
 
@@ -149,18 +149,17 @@ class ADLController extends Controller
 
         if ($totalScore >= 0 && $totalScore <= 11) {
             $exists = ScoreTAI::where('ID_Elderly', $adl->ID_Elderly)
-                        ->where('ID_User', $adl->ID_User)
-                        ->exists();
+                ->exists();
 
             if (!$exists) {
                 ScoreTAI::create([
                     'ID_Elderly' => $adl->ID_Elderly,
-                    'ID_User' => $adl->ID_User,
+                    'ID_User' => null,
                     'mobility' => null,
                     'confuse' => null,
                     'feed' => null,
                     'toilet' => null,
-                    'group' => $group,
+                    'group' => null,
                 ]);
             }
         }
