@@ -12,6 +12,7 @@ class TAIController extends Controller
     public function index()
     {
         $tai = ScoreTAI::with(['elderly', 'user'])->get();
+        // dd($tai); // ตรวจสอบข้อมูลก่อนส่งไป View
         return view('staff.TAI.ShowTAI', compact('tai'));
     }
 
@@ -20,6 +21,7 @@ class TAIController extends Controller
         $tai = ScoreTAI::findOrFail($id);
         $elderly = Elderly::find($tai->ID_Elderly);
         $user = Auth::user();
+        // dd($user);
 
         return view('staff.TAI.EditTAI', compact('tai', 'elderly', 'user'));
     }
@@ -40,17 +42,17 @@ class TAIController extends Controller
         $tai->feed = $request->input('feed');
         $tai->toilet = $request->input('toilet');
         $tai->group = $request->input('group');
-        $tai->ID_User = Auth::user()->ID_User; // อัปเดต user ล่าสุดที่แก้ไข
-        $tai->save();
+        $tai->ID_User = Auth::id();  // ใช้ Auth::id() เพื่อดึง ID ของผู้ใช้ที่ล็อกอิน
+        $tai->save(); // บันทึกข้อมูลลงฐานข้อมูล
 
         return redirect()->route('tai.index')->with('success', 'แก้ไขข้อมูลเรียบร้อยแล้ว');
     }
 
     public function destroy($id)
-{
-    $tai = ScoreTAI::findOrFail($id);
-    $tai->delete();
+    {
+        $tai = ScoreTAI::findOrFail($id);
+        $tai->delete();
 
-    return redirect()->route('tai.index')->with('success', 'ลบข้อมูลเรียบร้อยแล้ว');
-}
+        return redirect()->route('tai.index')->with('success', 'ลบข้อมูลเรียบร้อยแล้ว');
+    }
 }
