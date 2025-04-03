@@ -158,7 +158,7 @@ Route::middleware(['CheckLogin', 'IsStaff'])->group(function () {
 
     Route::get('tai-show', [TAIController::class, 'index'])->name('tai.index');
     Route::get('tai-edit/{id}', [TAIController::class, 'edit'])->name('tai.edit');
-    Route::put('tai-update/{id}', [TAIController::class, 'update'])->name('tai.update');
+    Route::patch('tai-update/{id}', [TAIController::class, 'update'])->name('tai.update');
     Route::delete('tai-destroy/{id}', [TAIController::class, 'destroy'])->name('tai.destroy');
     // Route::get('tai-edit/{id}', [TAIController::class, 'edit'])->name('tai.edit');
     // Route::put('tai-update/{id}', [TAIController::class, 'update'])->name('tai.update');

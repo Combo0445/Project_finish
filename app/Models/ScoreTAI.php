@@ -30,6 +30,4 @@ class ScoreTAI extends Model
     {
         return $this->belongsTo(User::class, 'ID_User', 'ID_User');
     }
-
 }
-

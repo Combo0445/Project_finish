@@ -26,12 +26,13 @@
 </head>
 
 <body>
-
-    @include('layout.nav')
-
     <main class="main-content position-relative h-100 border-radius-lg">
         <div class="container-fluid py-4">
-
+            @if(session('success'))
+                <div class="alert alert-success">
+                    {{ session('success') }}
+                </div>
+                @endif
             <!-- CG Information Card -->
             <div class="row">
                 <div class="col-12">
@@ -39,10 +40,10 @@
                         <div class="card-header pb-0 d-flex justify-content-between align-items-center">
                             <h4>รายงานผลการปฏิบัติงานผู้ดูแลผู้สูงอายุ (CG)</h4>
                             <div class="d-flex gap-2">
-                            <button id="generate-pdf" class="btn btn-success">
-                                <i class="fas fa-print"></i>
-                            </button>
-                            <a href="{{ route('cg.export') }}" class="btn btn-primary btn-sm">Export Excel</a>
+                                <button id="generate-pdf" class="btn btn-success">
+                                    <i class="fas fa-print"></i>
+                                </button>
+                                <a href="{{ route('cg.export') }}" class="btn btn-primary btn-sm">Export Excel</a>
                             </div>
                         </div>
                         <div class="card-body px-0 pt-0 pb-2">
@@ -62,10 +63,14 @@
                                         @foreach ($tai as $item)
                                             <tr>
                                                 <td class="text-center">{{ $item->Date_tai }}</td>
-                                                <td class="text-center">{{ $item->elderly->Name_Elderly ?? 'ไม่พบข้อมูล' }}</td>
-                                                <td class="text-center">{{ $item->user->Name_User ?? 'ไม่พบข้อมูล' }}</td>
                                                 <td class="text-center">
-                                                    {{ $item->group }}
+                                                    {{ $item->elderly->Name_Elderly ?? 'ยังไม่ได้ประเมิน' }}
+                                                </td>
+                                                <td class="text-center">
+                                                    {{ $item->user->Name_User ?? 'ยังไม่ได้ประเมิน' }}
+                                                </td>
+                                                <td class="text-center">
+                                                    {{ $item->group ?? 'ยังไม่ได้ประเมิน' }}
                                                 </td>
                                                 <td class="text-center">
                                                     @php
@@ -77,38 +82,29 @@
                                                         } elseif (in_array($group, ['I3', 'I2', 'I1'])) {
                                                             $displayText = 'กลุ่มติดเตียง';
                                                         } else {
-                                                            $displayText = '-';
+                                                            $displayText = 'ยังไม่ได้ประเมิน';
                                                         }
                                                     @endphp
                                                     {{ $displayText }}
                                                 </td>
 
                                                 <td class="text-center">
-                                                    <a href="{{ route('tai.edit', ['id' => $item->id]) }}" class="btn btn-warning btn-sm">
-                                                        <i class="fas fa-edit"></i> เพิ่มแบบประเมิน
+                                                    <a href="{{ route('tai.edit', ['id' => $item->id]) }}"
+                                                        class="btn btn-sm {{ is_null($item->group) ? 'btn-success' : 'btn-warning' }}">
+                                                        <i class="fas fa-edit"></i>
+                                                        {{ is_null($item->group) ? 'เพิ่มแบบประเมิน' : 'แก้ไขแบบประเมิน' }}
                                                     </a>
-                                                    <form id="delete-tai-form-{{ $item->id }}" action="{{ route('tai.destroy', ['id' => $item->id]) }}" method="POST" style="display:inline-block;">
-                                                        @csrf
-                                                        @method('DELETE')
-                                                        <button type="button" class="btn btn-danger btn-sm" onclick="confirmDelete('{{ $item->id }}')">
-                                                            <i class="fas fa-trash"></i> ลบ
-                                                        </button>
-                                                    </form>
-                                                </td>
-
-                                                {{--  <td class="text-center">
-                                                    <a href="javascript:void(0);" class="btn btn-success btn-sm" onclick="generatePdf('{{ $cg->ID_CG }}')">ออกรายงาน</a>
-                                                    <a href="{{ route('cg.edit', ['id' => $cg->ID_CG]) }}"
-                                                        class="btn btn-warning btn-sm">แก้ไข</a>
-                                                    <form id="delete-cg-form-{{ $cg->ID_CG }}"
-                                                        action="{{ route('cg.destroy', ['id' => $cg->ID_CG]) }}"
+                                                    <form id="delete-tai-form-{{ $item->id }}"
+                                                        action="{{ route('tai.destroy', ['id' => $item->id]) }}"
                                                         method="POST" style="display:inline-block;">
                                                         @csrf
                                                         @method('DELETE')
                                                         <button type="button" class="btn btn-danger btn-sm"
-                                                            onclick="confirmDelete('{{ $cg->ID_CG }}')">ลบ</button>
+                                                            onclick="confirmDelete('{{ $item->id }}')">
+                                                            <i class="fas fa-trash"></i> ลบ
+                                                        </button>
                                                     </form>
-                                                </td>  --}}
+                                                </td>
                                             </tr>
                                         @endforeach
                                     </tbody>
@@ -175,7 +171,9 @@
 
         document.getElementById('generate-pdf').addEventListener('click', function() {
             // Fetch the filtered data from the DataTable (if any filters are applied)
-            var filteredData = $('#cgTable').DataTable().rows({ filter: 'applied' }).data().toArray();
+            var filteredData = $('#cgTable').DataTable().rows({
+                filter: 'applied'
+            }).data().toArray();
 
             if (filteredData.length === 0) {
                 Swal.fire('ไม่พบข้อมูลที่ตรงกับการค้นหา', '', 'error');
@@ -244,31 +242,40 @@
                     </thead>
                     <tbody>
                         ${filteredData.map((cg, index) => `
-                            ${(index % 12 === 0 && index !== 0) ? `
+                                    ${(index % 12 === 0 && index !== 0) ? `
                                 <tr class="page-break">
                                     <th style="width: 20%;">วันที่</th>
                                     <th style="width: 20%;">ชื่อผู้สูงอายุ</th>
                                     <th style="width: 20%;">ชื่อผู้ดูแลผู้สูงอายุ</th>
                                     <th style="width: 20%;">ประเภทกลุ่มผู้สูงอายุ</th>
                                 </tr>` : ''}
-                            <tr>
-                                <td>${cg[0]}</td>
-                                <td>${cg[1]}</td>
-                                <td>${cg[2]}</td>
-                                <td>${cg[3]}</td>
-                            </tr>`).join('')}
+                                    <tr>
+                                        <td>${cg[0]}</td>
+                                        <td>${cg[1]}</td>
+                                        <td>${cg[2]}</td>
+                                        <td>${cg[3]}</td>
+                                    </tr>`).join('')}
                     </tbody>
                 </table>
             `;
 
-            setTimeout(function () {
+            setTimeout(function() {
                 // Configure options for generating the PDF
                 var opt = {
                     margin: 0.5,
                     filename: 'รายงาน_CG.pdf',
-                    image: { type: 'jpeg', quality: 0.98 },
-                    html2canvas: { scale: 2 },
-                    jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
+                    image: {
+                        type: 'jpeg',
+                        quality: 0.98
+                    },
+                    html2canvas: {
+                        scale: 2
+                    },
+                    jsPDF: {
+                        unit: 'in',
+                        format: 'letter',
+                        orientation: 'portrait'
+                    }
                 };
 
                 // Generate the PDF and open it in a new window
@@ -280,19 +287,19 @@
             });
         });
 
-            function generatePdf(id) {
-                // Fetch the content from the specific report-cg/{id} URL
-                fetch(`{{ route('report.cg', ':id') }}`.replace(':id', id))
-                    .then(response => response.text()) // Fetch HTML as text
-                    .then(data => {
-                        // Convert the fetched HTML into a DOM object
-                        const parser = new DOMParser();
-                        const doc = parser.parseFromString(data, 'text/html');
-                        const element = doc.querySelector('.container'); // Get the content
+        function generatePdf(id) {
+            // Fetch the content from the specific report-cg/{id} URL
+            fetch(`{{ route('report.cg', ':id') }}`.replace(':id', id))
+                .then(response => response.text()) // Fetch HTML as text
+                .then(data => {
+                    // Convert the fetched HTML into a DOM object
+                    const parser = new DOMParser();
+                    const doc = parser.parseFromString(data, 'text/html');
+                    const element = doc.querySelector('.container'); // Get the content
 
-                        // Add CSS to set the font back to the template's original font
-                        const style = document.createElement('style');
-                        style.innerHTML = `
+                    // Add CSS to set the font back to the template's original font
+                    const style = document.createElement('style');
+                    style.innerHTML = `
                             * {
                                 font-family: 'Open Sans', Arial, sans-serif !important;
                                 color: black !important;
@@ -340,28 +347,35 @@
                                 page-break-before: always; /* บังคับขึ้นหน้าใหม่ */
                             }
                         `;
-                        element.appendChild(style);
+                    element.appendChild(style);
 
-                        // Configure options for generating the PDF
-                        var opt = {
-                            margin: 0.5,
-                            filename: 'รายงาน_CG_บุคคล.pdf',
-                            image: { type: 'jpeg', quality: 0.98 },
-                            html2canvas: { scale: 2 },
-                            jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
-                        };
+                    // Configure options for generating the PDF
+                    var opt = {
+                        margin: 0.5,
+                        filename: 'รายงาน_CG_บุคคล.pdf',
+                        image: {
+                            type: 'jpeg',
+                            quality: 0.98
+                        },
+                        html2canvas: {
+                            scale: 2
+                        },
+                        jsPDF: {
+                            unit: 'in',
+                            format: 'letter',
+                            orientation: 'portrait'
+                        }
+                    };
 
-                        // Generate the PDF and open it in a new window
-                        html2pdf().set(opt).from(element).output('blob').then(function (pdfBlob) {
-                            var pdfUrl = URL.createObjectURL(pdfBlob);
-                            var pdfWindow = window.open();
-                            pdfWindow.location.href = pdfUrl;
-                        });
-                    })
-                    .catch(error => console.error('Error fetching report data:', error));
-            }
-
-
+                    // Generate the PDF and open it in a new window
+                    html2pdf().set(opt).from(element).output('blob').then(function(pdfBlob) {
+                        var pdfUrl = URL.createObjectURL(pdfBlob);
+                        var pdfWindow = window.open();
+                        pdfWindow.location.href = pdfUrl;
+                    });
+                })
+                .catch(error => console.error('Error fetching report data:', error));
+        }
     </script>
 </body>
 

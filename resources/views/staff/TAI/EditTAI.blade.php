@@ -30,7 +30,6 @@
         }
     </style>
 </head>
-
 <body>
     @include('layout.nav')
 
@@ -48,7 +47,7 @@
 
                 <form method="POST" action="{{ route('tai.update', $tai->id) }}">
                     @csrf
-                    @method('PUT')
+                    @method('patch')
 
                     <div class="form-group">
                         <label>ชื่อผู้สูงอายุ:</label>
@@ -62,44 +61,68 @@
 
                     <h5>1. Mobility:</h5>
                     <div class="form-group">
-                        @for ($i = 0; $i <= 5; $i++)
-                        <label><input type="radio" name="mobility" value="{{ $i }}" {{ $tai->mobility == $i ? 'checked' : '' }}> {{ $i }}</label><br>
-                        @endfor
+                        @foreach([0 => 'ไม่สามารถเคลื่อนไหวเองได้ (0 คะแนน)',
+                                  1 => 'Roll over (1 คะแนน)',
+                                  2 => 'สามารถยืนได้บางครั้ง (2 คะแนน)',
+                                  3 => 'สามารถเดินเองได้ในระยะสั้น (3 คะแนน)',
+                                  4 => 'สามารถเดินเองได้ในระยะยาว (4 คะแนน)',
+                                  5 => 'สามารถเคลื่อนไหวได้อย่างปกติ (5 คะแนน)'] as $value => $label)
+                            <label>
+                                <input type="radio" name="mobility" value="{{ $value }}" {{ old('mobility', $tai->mobility) == $value ? 'checked' : '' }}> {{ $label }}
+                            </label><br>
+                        @endforeach
                     </div>
 
                     <h5>2. Confuse:</h5>
                     <div class="form-group">
-                        @for ($i = 0; $i <= 5; $i++)
-                        <label><input type="radio" name="confuse" value="{{ $i }}" {{ $tai->confuse == $i ? 'checked' : '' }}> {{ $i }}</label><br>
-                        @endfor
+                        @foreach([0 => 'สับสนมากไม่สามารถทำกิจกรรมได้ (0 คะแนน)',
+                                  1 => 'สับสนเล็กน้อย (1 คะแนน)',
+                                  2 => 'สามารถทำกิจกรรมบางอย่างได้ (2 คะแนน)',
+                                  3 => 'ทำกิจกรรมได้บางประการ (3 คะแนน)',
+                                  4 => 'สามารถทำกิจกรรมได้เกือบทั้งหมด (4 คะแนน)',
+                                  5 => 'ทำกิจกรรมได้ตามปกติ (5 คะแนน)'] as $value => $label)
+                            <label>
+                                <input type="radio" name="confuse" value="{{ $value }}" {{ old('confuse', $tai->confuse) == $value ? 'checked' : '' }}> {{ $label }}
+                            </label><br>
+                        @endforeach
                     </div>
 
                     <h5>3. Feeding:</h5>
                     <div class="form-group">
-                        @for ($i = 0; $i <= 5; $i++)
-                        <label><input type="radio" name="feed" value="{{ $i }}" {{ $tai->feed == $i ? 'checked' : '' }}> {{ $i }}</label><br>
-                        @endfor
+                        @foreach([0 => 'ไม่สามารถทานอาหารเองได้ (0 คะแนน)',
+                                  1 => 'ทานอาหารได้บ้างแต่ต้องการความช่วยเหลือ (1 คะแนน)',
+                                  2 => 'ทานอาหารได้บางประเภทเองได้ (2 คะแนน)',
+                                  3 => 'ทานอาหารได้เกือบทุกประเภทเองได้ (3 คะแนน)',
+                                  4 => 'ทานอาหารเองได้ทุกประเภท (4 คะแนน)',
+                                  5 => 'ทานอาหารเองได้ทั้งหมดอย่างไม่มีปัญหา (5 คะแนน)'] as $value => $label)
+                            <label>
+                                <input type="radio" name="feed" value="{{ $value }}" {{ old('feed', $tai->feed) == $value ? 'checked' : '' }}> {{ $label }}
+                            </label><br>
+                        @endforeach
                     </div>
 
                     <h5>4. Toilet:</h5>
                     <div class="form-group">
-                        @for ($i = 0; $i <= 5; $i++)
-                        <label><input type="radio" name="toilet" value="{{ $i }}" {{ $tai->toilet == $i ? 'checked' : '' }}> {{ $i }}</label><br>
-                        @endfor
+                        @foreach([0 => 'ไม่สามารถใช้ห้องน้ำเองได้ (0 คะแนน)',
+                                  1 => 'ต้องการความช่วยเหลือในการใช้ห้องน้ำ (1 คะแนน)',
+                                  2 => 'สามารถใช้ห้องน้ำได้แต่ต้องการความช่วยเหลือบางอย่าง (2 คะแนน)',
+                                  3 => 'สามารถใช้ห้องน้ำได้เองเกือบทั้งหมด (3 คะแนน)',
+                                  4 => 'สามารถใช้ห้องน้ำเองได้ทั้งหมด (4 คะแนน)',
+                                  5 => 'สามารถใช้ห้องน้ำเองได้โดยไม่มีปัญหา (5 คะแนน)'] as $value => $label)
+                            <label>
+                                <input type="radio" name="toilet" value="{{ $value }}" {{ old('toilet', $tai->toilet) == $value ? 'checked' : '' }}> {{ $label }}
+                            </label><br>
+                        @endforeach
                     </div>
 
                     <div class="total-group">
                         <div>
-                            <h4>คะแนนรวม: <span id="total_score">0</span></h4>
+                            <h4>ประเภทกลุ่ม: <span id="group_code">N/A</span></h4>
                         </div>
                         <div>
-                            <h4>ประเภทกลุ่ม: <span id="group">N/A</span></h4>
-                        </div>
-                        <div>
-                            <h4>Group Code: <span id="group_code">N/A</span></h4>
+                            <h4>ประเภทกลุ่มผู้สูงอายุ: <span id="group">N/A</span></h4>
                         </div>
                     </div>
-
                     <input type="hidden" name="group" id="group_code_input">
 
                     <button type="submit" class="btn btn-success">บันทึก</button>
@@ -112,61 +135,64 @@
     <script>
         function calculateTotalScore() {
             let score = 0;
-            const radios = document.querySelectorAll('input[type="radio"]:checked');
+            let mobility = document.querySelector('input[name="mobility"]:checked');
+            let confuse = document.querySelector('input[name="confuse"]:checked');
+            let feed = document.querySelector('input[name="feed"]:checked');
+            let toilet = document.querySelector('input[name="toilet"]:checked');
 
-            let mobility = null;
-            let confuse = null;
-            let feed = null;
-            let toilet = null;
+            // กำหนดค่าของแต่ละตัวแปรตามค่าใน radio ที่ถูกเลือก
+            mobility = mobility ? mobility.value : null;
+            confuse = confuse ? confuse.value : null;
+            feed = feed ? feed.value : null;
+            toilet = toilet ? toilet.value : null;
 
-            radios.forEach(radio => {
-                score += parseInt(radio.value);
-                if (radio.name === 'mobility') mobility = radio.value;
-                if (radio.name === 'confuse') confuse = radio.value;
-                if (radio.name === 'feed') feed = radio.value;
-                if (radio.name === 'toilet') toilet = radio.value;
-            });
+            // กำหนดค่าของกลุ่มตามคะแนน
+            let groupCode = '', groupText = '';
 
-            document.getElementById('total_score').innerText = score;
-
-            let groupText = '', groupCode = '';
-            if (mobility !== null && confuse !== null && feed !== null && toilet !== null) {
+            // ตรวจสอบค่าของ mobility, confuse, feed และ toilet ว่ามีค่าหรือไม่
+            if (mobility === null || confuse === null || feed === null || toilet === null) {
+                groupCode = 'ไม่สามารถประเมินได้';
+                groupText = 'ยังไม่ได้ประเมิน';
+            } else {
+                // ถ้ามีค่าทั้งหมด
                 if (mobility === '5' && confuse === '5' && feed === '5' && toilet === '5') {
-                    groupText = 'B5 เป็นกลุ่มปกติ';
                     groupCode = 'B5';
                 } else if (mobility >= '3' && confuse >= '4' && feed >= '4' && toilet >= '4') {
-                    groupText = 'B4 เป็นกลุ่มปกติ';
                     groupCode = 'B4';
                 } else if (mobility >= '3' && confuse >= '4' && feed <= '3' && toilet <= '3') {
-                    groupText = 'B3 เป็นกลุ่มปกติ';
                     groupCode = 'B3';
                 } else if (mobility >= '3' && confuse <= '3' && feed >= '4' && toilet >= '4') {
-                    groupText = 'C4 เป็นกลุ่มติดบ้าน';
                     groupCode = 'C4';
                 } else if (mobility >= '3' && confuse <= '3' && feed === '3' && toilet === '4') {
-                    groupText = 'C3 เป็นกลุ่มติดบ้าน';
                     groupCode = 'C3';
                 } else if (mobility >= '3' && confuse <= '3' && feed === '4' && toilet === '3') {
-                    groupText = 'C3 เป็นกลุ่มติดบ้าน';
                     groupCode = 'C3';
                 } else if (mobility >= '3' && confuse <= '3' && feed <= '3' && toilet <= '3') {
-                    groupText = 'C2 เป็นกลุ่มติดบ้าน';
                     groupCode = 'C2';
                 } else if (mobility <= '2' && feed >= '4') {
-                    groupText = 'I3 เป็นกลุ่มติดเตียง';
                     groupCode = 'I3';
                 } else if (mobility <= '2' && feed === '3') {
-                    groupText = 'I2 เป็นกลุ่มติดเตียง';
                     groupCode = 'I2';
                 } else if (mobility <= '2' && feed <= '2') {
-                    groupText = 'I1 เป็นกลุ่มติดเตียง';
                     groupCode = 'I1';
-                } else {
-                    groupText = 'ไม่พบคะแนน';
-                    groupCode = '';
                 }
             }
 
+            // กำหนดประเภทกลุ่มตาม Group Code
+            if (groupCode.startsWith('B')) {
+                groupText = 'กลุ่มปกติ';
+            } else if (groupCode.startsWith('C')) {
+                groupText = 'กลุ่มติดบ้าน';
+            } else if (groupCode.startsWith('I')) {
+                groupText = 'กลุ่มติดเตียง';
+            } else if (groupCode === 'ไม่สามารถประเมินได้') {
+                groupText = 'ยังไม่ได้ประเมิน';
+            } else {
+                groupText = 'ไม่พบคะแนน';
+                groupCode = ''; // เคลียร์ค่า Group Code ถ้าไม่เข้าเงื่อนไขใดเลย
+            }
+
+            // แสดงผลในหน้าจอ
             document.getElementById('group').innerText = groupText;
             document.getElementById('group_code').innerText = groupCode;
             document.getElementById('group_code_input').value = groupCode;
@@ -177,9 +203,11 @@
             radios.forEach(radio => {
                 radio.addEventListener('change', calculateTotalScore);
             });
-            calculateTotalScore(); // <<<<=== สำคัญ ต้องมี
+            calculateTotalScore(); // เรียกใช้งานเพื่อรีเฟรชค่าเริ่มต้น
         });
     </script>
+
 </body>
+
 
 </html>
