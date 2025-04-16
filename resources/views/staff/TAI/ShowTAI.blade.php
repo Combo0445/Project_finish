@@ -26,7 +26,8 @@
 </head>
 
 <body>
-    <main class="main-content position-relative h-100 border-radius-lg">
+    @include('layout.nav')
+
         <div class="container-fluid py-4">
             @if(session('success'))
                 <div class="alert alert-success">
@@ -38,7 +39,7 @@
                 <div class="col-12">
                     <div class="card mb-4">
                         <div class="card-header pb-0 d-flex justify-content-between align-items-center">
-                            <h4>รายงานผลการปฏิบัติงานผู้ดูแลผู้สูงอายุ (CG)</h4>
+                            <h4>รายงานผลการประเมินผู้สูงอายุ (TAI)</h4>
                             <div class="d-flex gap-2">
                                 <button id="generate-pdf" class="btn btn-success">
                                     <i class="fas fa-print"></i>
@@ -62,7 +63,7 @@
                                     <tbody>
                                         @foreach ($tai as $item)
                                             <tr>
-                                                <td class="text-center">{{ $item->Date_tai }}</td>
+                                                <td class="text-center">{{ \Carbon\Carbon::parse($item->updated_at)->locale('th')->translatedFormat('d F Y') }}</td>
                                                 <td class="text-center">
                                                     {{ $item->elderly->Name_Elderly ?? 'ยังไม่ได้ประเมิน' }}
                                                 </td>
@@ -115,7 +116,6 @@
                 </div>
             </div>
         </div>
-    </main>
 
     <!-- Argon Dashboard JS -->
     <script src="{{ url('assets/js/argon-dashboard.js') }}"></script>
