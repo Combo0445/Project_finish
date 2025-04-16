@@ -37,7 +37,7 @@
     <div class="container mt-5">
         <div class="card">
             <div class="card-header">
-                <h4>แก้ไขแบบประเมินความสามารถในการดำเนินชีวิตประจำวัน (TAI)</h4>
+                <h4>แบบประเมินความสามารถในการดำเนินชีวิตประจำวัน (TAI)</h4>
             </div>
             <div class="card-body">
                 @if (session('success'))

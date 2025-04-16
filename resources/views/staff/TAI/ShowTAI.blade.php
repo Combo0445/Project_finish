@@ -39,7 +39,7 @@
                 <div class="col-12">
                     <div class="card mb-4">
                         <div class="card-header pb-0 d-flex justify-content-between align-items-center">
-                            <h4>รายงานผลการปฏิบัติงานผู้ดูแลผู้สูงอายุ (CG)</h4>
+                            <h4>รายงานผลการประเมินผู้สูงอายุ (TAI)</h4>
                             <div class="d-flex gap-2">
                                 <button id="generate-pdf" class="btn btn-success">
                                     <i class="fas fa-print"></i>
