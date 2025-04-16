@@ -13,6 +13,7 @@ class ScoreTAI extends Model
 
     protected $fillable = [
         'ID_Elderly',
+        'ID_ADL',
         'ID_User',
         'mobility',
         'confuse',
@@ -29,5 +30,10 @@ class ScoreTAI extends Model
     public function user()
     {
         return $this->belongsTo(User::class, 'ID_User', 'ID_User');
+    }
+
+    public function barthelAdl()
+    {
+        return $this->belongsTo(BarthelAdl::class, 'ID_ADL', 'ID_ADL');
     }
 }

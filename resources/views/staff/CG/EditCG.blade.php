@@ -204,9 +204,16 @@
                         </div>
                         <div class="form-group">
                             <label for="Rights">สิทธิการรักษา</label>
-                            <input type="text" id="Rights" name="Rights" class="form-control"
-                                value="{{ $caregiver->Rights }}">
-                        </div>
+                            <select id="Rights" name="Rights" class="form-control">
+                                <option value="" disabled selected>-- เลือกสิทธิการรักษา --</option>
+                                <option value="สิทธิข้าราชการ">สิทธิข้าราชการ</option>
+                                <option value="บัตรผู้พิการ">บัตรผู้พิการ</option>
+                                <option value="บัตรทอง">บัตรทอง</option>
+                                <option value="ประกันสุขภาพ">ประกันสุขภาพ</option>
+                                <option value="อปท.">อปท.</option>
+                                <option value="ผู้สูงอายุ">ผู้สูงอายุ</option>
+                            </select>
+                        </div>  
                         </div>
                         <input type="hidden" id="ID_ADL" name="ID_ADL" value="{{ $caregiver->ID_ADL }}">
                         <input type="hidden" id="Name_Elderly_hidden" name="Name_Elderly"
@@ -218,8 +225,7 @@
                     </form>
 
                     <!-- Assessment Form -->
-                    <form id="assessment-form" class="hidden" action="{{ route('cg.update', $caregiver->ID_CG) }}"
-                        method="POST">
+                    <form id="assessment-form" class="hidden" action="{{ route('cg.update', $caregiver->ID_CG) }}" method="POST" enctype="multipart/form-data">
                         @csrf
                         @method('PUT')
                         <!-- Hidden fields to pass caregiver form data -->
@@ -260,9 +266,35 @@
                         </div>
                         <div class="form-group">
                             <label for="Vital_signs">สัญญาณชีพ</label>
-                            <input type="text" id="Vital_signs" name="Vital_signs" class="form-control"
-                                value="{{ $caregiver->Vital_signs }}" required placeholder="BP… PR… RR…. BT…">
-                        </div>
+                            <div style="display: flex; flex-wrap: wrap; gap: 10px;">
+                                <div style="display: flex; flex-direction: column; align-items: center;">
+                                    <span>BP ก่อน</span>
+                                    <input type="number" id="BP_systolic" class="form-control" placeholder="BP ก่อน" style="width: 80px;">
+                                </div>
+                        
+                                <div style="display: flex; flex-direction: column; align-items: center;">
+                                    <span>BP หลัง</span>
+                                    <input type="number" id="BP_diastolic" class="form-control" placeholder="BP หลัง" style="width: 80px;">
+                                </div>
+                        
+                                <div style="display: flex; flex-direction: column; align-items: center;">
+                                    <span>&nbsp;</span>
+                                    <input type="number" id="PR" class="form-control" placeholder="PR..." style="width: 80px;">
+                                </div>
+                        
+                                <div style="display: flex; flex-direction: column; align-items: center;">
+                                    <span>&nbsp;</span>
+                                    <input type="number" id="RR" class="form-control" placeholder="RR..." style="width: 80px;">
+                                </div>
+                        
+                                <div style="display: flex; flex-direction: column; align-items: center;">
+                                    <span>&nbsp;</span>
+                                    <input type="number" id="BT" class="form-control" placeholder="BT..." step="0.01" style="width: 80px;">
+                                </div>
+                            </div>
+                        
+                            <input type="hidden" id="Vital_signs" name="Vital_signs" value="{{ $caregiver->Vital_signs }}">
+                        </div>                        
                         <div class="form-group">
                             <label for="Bedsores">แผลกดทับ</label>
                             <select id="Bedsores" name="Bedsores" class="form-control" required>
@@ -441,6 +473,55 @@
                             <input type="text" id="Reporter" name="Reporter" class="form-control"
                                 value="{{ Auth::user()->Name_User }}" readonly required>
                         </div>
+
+                        <div class="form-group">
+                            <label for="Picture">อัปโหลดรูปภาพ (ไม่เกิน 4 รูป)</label>
+                            <input type="file" name="Picture[]" id="Picture" class="form-control" multiple accept="image/*" onchange="validateAndPreviewImages(this)">
+                            <small class="form-text text-muted">สามารถอัปโหลดได้สูงสุด 4 รูป</small>
+                        
+                            <!-- พื้นที่แสดงรูป preview -->
+                            <div id="imagePreview" style="margin-top: 10px; display: flex; flex-wrap: wrap; gap: 10px;">
+                                @if($caregiver->Picture)
+                                    @foreach(json_decode($caregiver->Picture, true) as $img)
+                                        <div style="position: relative;">
+                                            <img src="{{ asset('storage/' . $img) }}"
+                                                 style="max-width: 120px; max-height: 120px; object-fit: cover; border: 1px solid #ccc; padding: 2px;">
+                                        </div>
+                                    @endforeach
+                                @endif
+                            </div>
+                        </div>
+                        
+                        <script>
+                            function validateAndPreviewImages(input) {
+                                const preview = document.getElementById('imagePreview');
+                                preview.innerHTML = ''; // ล้างรูป preview เดิมออกทั้งหมด
+                        
+                                if (input.files.length > 4) {
+                                    alert('คุณสามารถอัปโหลดรูปภาพได้ไม่เกิน 4 รูป');
+                                    input.value = ''; // รีเซ็ต input
+                                    return;
+                                }
+                        
+                                Array.from(input.files).forEach(file => {
+                                    if (!file.type.startsWith('image/')) return;
+                        
+                                    const reader = new FileReader();
+                                    reader.onload = function(e) {
+                                        const img = document.createElement('img');
+                                        img.src = e.target.result;
+                                        img.style.maxWidth = '120px';
+                                        img.style.maxHeight = '120px';
+                                        img.style.objectFit = 'cover';
+                                        img.style.border = '1px solid #ccc';
+                                        img.style.padding = '2px';
+                                        preview.appendChild(img);
+                                    };
+                                    reader.readAsDataURL(file);
+                                });
+                            }
+                        </script>                        
+
                         <button class="btn btn-success" type="submit">บันทึก</button>
                         <button class="btn btn-danger" type="button" onclick="showCareGiverForm()">กลับ</button>
                     </form>
@@ -449,5 +530,51 @@
         </div>
     </div>
 </body>
+<script>
+    // ฟังก์ชันแยกค่าสัญญาณชีพเดิมมาใส่ในช่อง input
+    function populateVitalSignsFromText(vitalSignsText) {
+        const bpMatch = vitalSignsText.match(/BP (\d+)\/(\d+)/);
+        const prMatch = vitalSignsText.match(/PR (\d+)/);
+        const rrMatch = vitalSignsText.match(/RR (\d+)/);
+        const btMatch = vitalSignsText.match(/BT ([\d.]+)/);
+
+        if (bpMatch) {
+            document.getElementById('BP_systolic').value = bpMatch[1];
+            document.getElementById('BP_diastolic').value = bpMatch[2];
+        }
+        if (prMatch) document.getElementById('PR').value = prMatch[1];
+        if (rrMatch) document.getElementById('RR').value = rrMatch[1];
+        if (btMatch) document.getElementById('BT').value = btMatch[1];
+    }
+
+    // ฟังก์ชันรวมค่าใหม่ไว้ใน hidden input
+    function concatenateVitalSigns() {
+        const bpSys = document.getElementById('BP_systolic').value;
+        const bpDia = document.getElementById('BP_diastolic').value;
+        const pr = document.getElementById('PR').value;
+        const rr = document.getElementById('RR').value;
+        const bt = document.getElementById('BT').value;
+
+        let vitalSigns = '';
+        if (bpSys && bpDia) vitalSigns += `BP ${bpSys}/${bpDia}`;
+        if (pr) vitalSigns += (vitalSigns ? ' - ' : '') + `PR ${pr}`;
+        if (rr) vitalSigns += (vitalSigns ? ' - ' : '') + `RR ${rr}`;
+        if (bt) vitalSigns += (vitalSigns ? ' - ' : '') + `BT ${bt}`;
+
+        document.getElementById('Vital_signs').value = vitalSigns;
+    }
+
+    // โหลดข้อมูลเมื่อหน้าโหลดเสร็จ
+    document.addEventListener('DOMContentLoaded', function () {
+        const vitalText = document.getElementById('Vital_signs').value;
+        populateVitalSignsFromText(vitalText);
+    });
+
+    // เพิ่มการรวมค่าก่อน submit form
+    document.getElementById('assessment-form').addEventListener('submit', function (event) {
+        concatenateVitalSigns();
+    });
+</script>
+
 
 </html>

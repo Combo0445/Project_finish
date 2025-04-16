@@ -133,19 +133,17 @@
 
                 <form method="POST" action="{{ route('adl.update', ['id' => $adl->ID_ADL]) }}">
                     @csrf
-                    @method('PUT')
+                    @method('PATCH')
 
                     <!-- Select Elderly Name -->
-                    <div class="form-group">
-                        <label for="elderly_id">เลือกผู้สูงอายุ:</label>
-                        <select name="elderly_id" id="elderly_id" class="form-control" required>
-                            @foreach($elderlies as $elderly)
-                            <option value="{{ $elderly->ID_Elderly }}" {{ $adl->ID_Elderly == $elderly->ID_Elderly ? 'selected' : '' }}>
-                                {{ $elderly->Name_Elderly }}
-                            </option>
-                            @endforeach
-                        </select>
-                    </div>
+                    <!-- ซ่อนค่า ID_Elderly ที่แท้จริง -->
+<input type="hidden" name="elderly_id" value="{{ $adl->ID_Elderly }}">
+
+<!-- โชว์ชื่อเฉย ๆ ให้ผู้ใช้ดู -->
+<div class="form-group">
+    <label for="elderly_name">ชื่อผู้สูงอายุ:</label>
+    <input type="text" id="elderly_name" class="form-control" value="{{ $adl->Name_Elderly }}" readonly>
+</div>
 
                     <!-- Display Name of User performing the assessment -->
                     <div class="form-group">

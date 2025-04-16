@@ -19,7 +19,7 @@ class CareGiver extends Model
         'Malnutrition', 'Eating', 'Swallowing', 'Defecation',
         'Urinary_excretion', 'Taking_medicine', 'Emotional_state',
         'Economic_problems', 'Social_problems', 'Doctor_FU',
-        'Other_problems', 'Assistance', 'Reporter'
+        'Other_problems', 'Assistance', 'Reporter', 'Picture',
     ];
 
     public $timestamps = false;

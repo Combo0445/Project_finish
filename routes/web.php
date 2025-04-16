@@ -140,7 +140,7 @@ Route::middleware(['CheckLogin', 'IsStaff'])->group(function () {
     Route::get('staff-dashboard', [ElderlyController::class, 'Showelderly'])->name('staff-dashboard');
     Route::get('adl-show', [ADLController::class, 'index'])->name('adl.index');
     Route::get('adl-edit/{id}', [ADLController::class, 'edit'])->name('adl.edit');
-    Route::put('adl-update/{id}', [ADLController::class, 'update'])->name('adl.update');
+    Route::patch('adl-update/{id}', [ADLController::class, 'update'])->name('adl.update');
     Route::delete('adl-destroy/{id}', [ADLController::class, 'destroy'])->name('adl.destroy');
     Route::get('adl-elderly', [ADLController::class, 'create'])->name('adl.create');
     Route::post('/adl/submit', [ADLController::class,  'submitADL'])->name('adl.submit');

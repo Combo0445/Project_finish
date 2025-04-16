@@ -34,6 +34,14 @@
                 </a>
             </li>
             <li class="nav-item">
+                <a class="nav-link text-white {{ Request::is('tai-show') ? 'active bg-gradient-primary' : '' }}" href="{{ route('tai.index') }}">
+                    <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
+                        <i class="material-icons opacity-10">elderly</i>
+                    </div>
+                    <span class="nav-link-text ms-1">การประเมินผู้สูงอายุ (TAI)</span>
+                </a>
+            </li>
+            <li class="nav-item">
                 <a class="nav-link text-white {{ Request::is('cg-show') ? 'active bg-gradient-primary' : '' }}" href="{{ route('cg.index') }}">
                     <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
                         <i class="material-icons opacity-10">assignment</i>
@@ -47,14 +55,6 @@
                         <i class="material-icons opacity-10">elderly</i>
                     </div>
                     <span class="nav-link-text ms-1">กิจกรรมการดูแลผู้สูงอายุ (ACG)</span>
-                </a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link text-white {{ Request::is('tai-show') ? 'active bg-gradient-primary' : '' }}" href="{{ route('tai.index') }}">
-                    <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
-                        <i class="material-icons opacity-10">elderly</i>
-                    </div>
-                    <span class="nav-link-text ms-1">การประเมินผู้สูงอายุ (TAI)</span>
                 </a>
             </li>
             <li class="nav-item">
