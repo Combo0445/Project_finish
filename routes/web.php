@@ -211,6 +211,8 @@ Route::middleware(['CheckLogin', 'IsStaff'])->group(function () {
     Route::get('/export-adl', [ADLExportController::class, 'export'])->name('adl.export');
     //Export CG
     Route::get('/export-cg', [CGExportController::class, 'export'])->name('cg.export');
+     //Export TAI
+     Route::get('/export-tai', [TAIController::class, 'ExportTAI'])->name('tai.export');
 
     Route::get('performance-report', [PerformanceReportController::class, 'index'])->name('performanceReport.index');
     Route::get('performance-report/create', [PerformanceReportController::class, 'create'])->name('performanceReport.create');
