@@ -16,7 +16,7 @@ class ActivityCaregiver extends Model
         'Take_care_medicine', 'Take_care_feeding', 'Environmental', 'Take_exercise',
         'Give_advice_consult', 'Take_to_see_a_doctor', 'Other', 'Take_to_make_merit',
         'Take_to_market', 'Take_to_meet_friends', 'Take_to_allowance', 'Talk_as_friends',
-        'Other_specified', 'Problem'
+        'Other_specified', 'Problem', 'Solution'
     ];
 
     public $timestamps = false;

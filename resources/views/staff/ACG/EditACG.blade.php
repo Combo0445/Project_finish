@@ -127,6 +127,10 @@
                         <a class="nav-link" id="social-tab" data-toggle="tab" href="#social" role="tab"
                             aria-controls="social" aria-selected="false">กิจกรรมด้านสังคม</a>
                     </li>
+                    <li class="nav-item">
+                        <a class="nav-link" id="problem-tab" data-toggle="tab" href="#problem" role="tab"
+                            aria-controls="problem" aria-selected="false">ปัญหาและแนวทางแก้ไข</a>
+                    </li>
                 </ul>
                 <br>
                 <!-- Tab content -->
@@ -135,7 +139,7 @@
                     <div class="tab-pane fade show active" id="date" role="tabpanel" aria-labelledby="date-tab">
                         <form id="activity-form" action="{{ route('acg.update', ['id' => $activity->ID_ACG]) }}" method="POST">
                             @csrf
-                            @method('PUT')
+                            @method('PATCH')
 
                             <div class="form-group">
                                 <label for="ID_Elderly">ชื่อ-สกุลผู้สูงอายุ</label>
@@ -226,6 +230,18 @@
                         <div class="form-group">
                             <label for="other_social_specified">อื่น ๆ ระบุ</label>
                             <input type="text" id="other_social_specified" name="other_social_specified" class="form-control" value="{{ $activity->Other_specified }}">
+                        </div>
+                    </div>
+
+                    <!-- Problem & Solution Tab -->
+                    <div class="tab-pane fade" id="problem" role="tabpanel" aria-labelledby="problem-tab">
+                        <div class="form-group mt-3">
+                            <label for="problem">ปัญหาที่พบ</label>
+                            <textarea id="problem" name="problem" class="form-control" rows="3">{{ $activity->Problem }}</textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="solution">แนวทางการแก้ไข</label>
+                            <textarea id="solution" name="solution" class="form-control" rows="3">{{ $activity->Solution }}</textarea>
                         </div>
                     </div>
                 </div>

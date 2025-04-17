@@ -282,6 +282,30 @@ class CGController extends Controller
 
         $careGiver->update($careGiverData);
 
+        ActivityCaregiver::create([
+            'ID_CG' => $careGiver->ID_CG,
+            'Date_ACG' => Carbon::now()->toDateString(), // วันที่ปัจจุบัน
+            'Evaluate' => null,
+            'Dress_the_wound' => null,
+            'Rehabilitate' => null,
+            'Clean_body' => null,
+            'Take_care_medicine' => null,
+            'Take_care_feeding' => null,
+            'Environmental' => null,
+            'Take_exercise' => null,
+            'Give_advice_consult' => null,
+            'Take_to_see_a_doctor' => null,
+            'Other' => null,
+            'Take_to_make_merit' => null,
+            'Take_to_market' => null,
+            'Take_to_meet_friends' => null,
+            'Take_to_allowance' => null,
+            'Talk_as_friends' => null,
+            'Other_specified' => null,
+            'Problem' => null,
+            'Solution' => null,
+        ]);
+
         return redirect()->route('cg.index')->with('success', 'อัปเดตข้อมูล Care Giver สำเร็จแล้ว!');
     }
 
@@ -334,7 +358,8 @@ class CGController extends Controller
             'take_to_allowance' => 'nullable|string',
             'talk_as_friends' => 'nullable|string',
             'other_social_specified' => 'nullable|string',
-
+            'problem' => 'nullable|string',
+            'solution' => 'nullable|string',
         ]);
 
         $activityData = [
@@ -356,7 +381,8 @@ class CGController extends Controller
             'Take_to_allowance' => $request->take_to_allowance,
             'Talk_as_friends' => $request->talk_as_friends,
             'Other_specified' => $request->other_social_specified,
-
+            'Problem' => $request->problem,
+            'Solution' => $request->solution,
         ];
 
         $activity = ActivityCaregiver::findOrFail($id);
@@ -401,7 +427,8 @@ class CGController extends Controller
             'take_to_allowance' => 'nullable|string',
             'talk_as_friends' => 'nullable|string',
             'other_social_specified' => 'nullable|string',
-
+            'problem' => 'nullable|string',
+            'solution' => 'nullable|string',
         ]);
 
         $careGiverId = $this->getLatestCareGiverId($request->ID_Elderly, $request->activity_date);
@@ -430,7 +457,8 @@ class CGController extends Controller
             'Take_to_allowance' => $request->take_to_allowance,
             'Talk_as_friends' => $request->talk_as_friends,
             'Other_specified' => $request->other_social_specified,
-
+            'Problem' => $request->problem,
+            'Solution' => $request->solution,
         ];
 
         $activity = new ActivityCaregiver();
