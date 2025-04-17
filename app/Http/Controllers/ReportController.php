@@ -495,13 +495,20 @@ foreach ($fieldMap as $label => $field) {
     }
 
     // ฟิลด์ทั่วไป (ติ๊กถูก มี/ไม่มี)
-    $has = false;
-    if ($field && isset($cg->$field)) {
-        $val = trim((string) $cg->$field);
-        if ($val !== '' && $val !== '-') {
-            $has = true;
+    $has = null; // ใช้ null เพื่อให้รู้ว่า "ไม่เข้าเงื่อนไขเลย"
+
+if ($field && isset($cg->$field)) {
+    $val = trim((string) $cg->$field);
+
+    if ($val !== '' && $val !== '-') {
+        if (mb_strtolower($val) === 'ไม่มี') {
+            $has = false; // เจาะจงว่าไม่มี
+        } else {
+            $has = true;  // มีข้อมูลอื่น
         }
     }
+}
+
             
 
             $html .= '
