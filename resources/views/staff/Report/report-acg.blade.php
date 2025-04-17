@@ -111,6 +111,11 @@
                 <td style="width: 50%">{{ $activity->Other_specified ?? 'ไม่มีข้อมูล' }}</td>
             </tr>
         </table>
+        <div class="section-title">ปัญหาที่พบ</div>
+        <span style="font-size: 14px;">{{ $activity->Problem ?? 'ไม่มีข้อมูล' }}</span>
+        <br>
+        <div class="section-title">แนวทางการแก้ไข</div>
+        <span style="font-size: 14px;">{{ $activity->Solution ?? 'ไม่มีข้อมูล' }}</span>
     </div>
 
 </body>

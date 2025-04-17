@@ -128,6 +128,10 @@
                         <a class="nav-link" id="social-tab" data-toggle="tab" href="#social" role="tab"
                             aria-controls="social" aria-selected="false">กิจกรรมด้านสังคม</a>
                     </li>
+                    <li class="nav-item">
+                        <a class="nav-link" id="problem-tab" data-toggle="tab" href="#problem" role="tab"
+                            aria-controls="problem" aria-selected="false">ปัญหาและแนวทางแก้ไข</a>
+                    </li>                    
                 </ul>
 
                 <!-- Tab content -->
@@ -256,6 +260,18 @@
                         </div>
 <br>
                     </div>
+                    <!-- Problem & Solution Tab -->
+                    <div class="tab-pane fade" id="problem" role="tabpanel" aria-labelledby="problem-tab">
+                        <div class="form-group mt-3">
+                            <label for="problem">ปัญหาที่พบ</label>
+                            <input type="text" id="problem" name="problem" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="solution">แนวทางการแก้ไข</label>
+                            <input type="text" id="solution" name="solution" class="form-control" required>
+                        </div>
+                    </div>
+
                 </div>
                 <div class="button-container">
                     <button class="btn btn-success mt-3" type="submit">บันทึก</button>

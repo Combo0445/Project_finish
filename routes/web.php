@@ -16,6 +16,8 @@ use App\Models\CareGiver;
 use App\Http\Controllers\ADLExportController;
 use App\Http\Controllers\CGExportController;
 use App\Http\Controllers\TAIController;
+use App\Http\Controllers\PerformanceReportController;
+use App\Http\Controllers\ReportController;
 
 /*
 |--------------------------------------------------------------------------
@@ -78,13 +80,17 @@ Route::controller(AuthController::class)->group(function () {
 
 
 Route::get('/contact', function () {
-    return view('layout.contact');})->name('contact');
+    return view('layout.contact');
+})->name('contact');
 Route::get('/about', function () {
-    return view('layout.about');})->name('about');
+    return view('layout.about');
+})->name('about');
 Route::get('/about/history', function () {
-    return view('layout.history');})->name('history');
+    return view('layout.history');
+})->name('history');
 Route::get('/about/vision', function () {
-    return view('layout.vision');})->name('vision');
+    return view('layout.vision');
+})->name('vision');
 
 Route::get('/about/personnel', [PersonnelController::class, 'showPersonnel'])->name('personnel');
 
@@ -114,8 +120,8 @@ Route::middleware(['CheckLogin', 'IsAdmin'])->group(function () {
 
     // In your web.php or routes file
     Route::get('/admin/report-user-pdf-content', function () {
-    // Return only the report content without sidebar/layout
-    return view('admin.report-admin');
+        // Return only the report content without sidebar/layout
+        return view('admin.report-admin');
     });
 
 
@@ -155,6 +161,8 @@ Route::middleware(['CheckLogin', 'IsStaff'])->group(function () {
     Route::post('cg-store', [CGController::class, 'store'])->name('cg.store');
     Route::get('/report-all-cg', [CGController::class, 'ReportCGAll'])->name('report.all.cg');
     Route::get('report-cg/{id}', [CGController::class, 'ReportCG'])->name('report.cg');
+    Route::get('cg/{id}/export-pdf', [ReportController::class, 'ReportCG'])
+     ->name('cg.exportPdf');
 
     Route::get('tai-show', [TAIController::class, 'index'])->name('tai.index');
     Route::get('tai-edit/{id}', [TAIController::class, 'edit'])->name('tai.edit');
@@ -173,7 +181,7 @@ Route::middleware(['CheckLogin', 'IsStaff'])->group(function () {
     Route::post('/acg-store', [CGController::class, 'storeActivity'])->name('activities.store');
     Route::get('acg-show', [CGController::class, 'showACG'])->name('acg.index');
     Route::get('acg-edit/{id}', [CGController::class, 'editActivity'])->name('acg.edit');
-    Route::put('/acg-update/{id}', [CGController::class, 'updateActivity'])->name('acg.update');
+    Route::patch('/acg-update/{id}', [CGController::class, 'updateActivity'])->name('acg.update');
     Route::delete('/acg-destroy/{id}', [CGController::class, 'destroyActivity'])->name('acg.destroy');
     Route::get('report-all-acg', [CGController::class, 'ReportACGAll'])->name('report.all.acg');
     Route::get('report-acg/{id}', [CGController::class, 'ReportACG'])->name('report.acg');
@@ -203,6 +211,22 @@ Route::middleware(['CheckLogin', 'IsStaff'])->group(function () {
     Route::get('/export-adl', [ADLExportController::class, 'export'])->name('adl.export');
     //Export CG
     Route::get('/export-cg', [CGExportController::class, 'export'])->name('cg.export');
+
+    Route::get('performance-report', [PerformanceReportController::class, 'index'])->name('performanceReport.index');
+    Route::get('performance-report/create', [PerformanceReportController::class, 'create'])->name('performanceReport.create');
+    Route::post('performance-report/store', [PerformanceReportController::class, 'store'])->name('performanceReport.store');
+    Route::get('performance-report/{id}', [PerformanceReportController::class, 'show'])->name('performanceReport.show');
+    Route::get('performance-report/{id}/edit', [PerformanceReportController::class, 'edit'])->name('performanceReport.edit');
+    Route::put('performance-report/{id}', [PerformanceReportController::class, 'update'])->name('performanceReport.update');
+    Route::delete('performance-report/{id}', [PerformanceReportController::class, 'destroy'])->name('performanceReport.destroy');
+    // routes/web.php
+    Route::get('performance-report/data/{elderly}', [PerformanceReportController::class, 'getPerformanceData'])
+        ->name('performanceReport.data');
+
+    Route::get(
+        'performance-report/{id}/export-pdf',
+        [ReportController::class, 'ReportPerformanceReport']
+    )->name('performanceReport.exportPDF');
 });
 
 
@@ -219,6 +243,4 @@ Route::middleware(['CheckLogin', 'IsDoctor'])->group(function () {
         Route::put('/ci/{id}', 'updateCI')->name('ci.update');
         Route::get('/care-instructions/report', 'ReportCI')->name('report.ci');
     });
-
-
 });

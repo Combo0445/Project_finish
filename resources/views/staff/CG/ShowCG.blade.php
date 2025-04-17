@@ -68,7 +68,12 @@
                                                 <td class="text-center">{{ $cg->Name_CG }}</td>
                                                 <td class="text-center">{{ $cg->Group_ADL }}</td>
                                                 <td class="text-center">
-                                                    <a href="javascript:void(0);" class="btn btn-success btn-sm" onclick="generatePdf('{{ $cg->ID_CG }}')">ออกรายงาน</a>
+                                                    <a href="javascript:void(0);"
+                                                    class="btn btn-success btn-sm"
+                                                    onclick="generatePdf('{{ $cg->ID_CG }}')">
+                                                    ออกรายงาน
+                                                    </a>
+
                                                     <a href="{{ route('cg.edit', ['id' => $cg->ID_CG]) }}"
                                                         class="btn btn-warning btn-sm">แก้ไข</a>
                                                     <form id="delete-cg-form-{{ $cg->ID_CG }}"
@@ -250,87 +255,12 @@
             });
         });
 
-            function generatePdf(id) {
-                // Fetch the content from the specific report-cg/{id} URL
-                fetch(`{{ route('report.cg', ':id') }}`.replace(':id', id))
-                    .then(response => response.text()) // Fetch HTML as text
-                    .then(data => {
-                        // Convert the fetched HTML into a DOM object
-                        const parser = new DOMParser();
-                        const doc = parser.parseFromString(data, 'text/html');
-                        const element = doc.querySelector('.container'); // Get the content
-
-                        // Add CSS to set the font back to the template's original font
-                        const style = document.createElement('style');
-                        style.innerHTML = `
-                            * {
-                                font-family: 'Open Sans', Arial, sans-serif !important;
-                                color: black !important;
-                                background-color: white !important;
-                            }
-
-                            body {
-                                width: 210mm;
-                                height: 297mm;
-                                margin: 0;
-                                padding: 20mm;
-                                font-family: Arial, sans-serif;
-                                font-size: 12px;
-                            }
-
-                            .container {
-                                padding: 10mm;
-                                border-radius: 5px;
-                            }
-
-                            h5 {
-                                text-align: center;
-                                margin-bottom: 20px;
-                                font-size: 24px;
-                            }
-
-                            table {
-                                width: 100%;
-                                border-collapse: collapse;
-                                margin-bottom: 20px;
-                                page-break-inside: avoid;
-                            }
-
-                            th, td {
-                                border: 1px solid black;
-                                padding: 8px;
-                                text-align: left;
-                            }
-
-                            th {
-                                background-color: #f2f2f2;
-                            }
-
-                            .page-break {
-                                page-break-before: always; /* บังคับขึ้นหน้าใหม่ */
-                            }
-                        `;
-                        element.appendChild(style);
-
-                        // Configure options for generating the PDF
-                        var opt = {
-                            margin: 0.5,
-                            filename: 'รายงาน_CG_บุคคล.pdf',
-                            image: { type: 'jpeg', quality: 0.98 },
-                            html2canvas: { scale: 2 },
-                            jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
-                        };
-
-                        // Generate the PDF and open it in a new window
-                        html2pdf().set(opt).from(element).output('blob').then(function (pdfBlob) {
-                            var pdfUrl = URL.createObjectURL(pdfBlob);
-                            var pdfWindow = window.open();
-                            pdfWindow.location.href = pdfUrl;
-                        });
-                    })
-                    .catch(error => console.error('Error fetching report data:', error));
-            }
-
+        
+        function generatePdf(id) {
+            // สร้าง URL จาก named route
+            const url = '{{ url("cg") }}/' + id + '/export-pdf';
+            window.open(url, '_blank');
+        }
 
     </script>
 </body>

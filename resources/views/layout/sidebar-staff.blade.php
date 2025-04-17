@@ -58,6 +58,16 @@
                 </a>
             </li>
             <li class="nav-item">
+                <a 
+                  class="nav-link text-white {{ Request::is('performance-report') ? 'active bg-gradient-primary' : '' }}" 
+                  href="{{ route('performanceReport.index') }}">
+                  <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
+                    <i class="material-icons opacity-10">analytics</i>
+                  </div>
+                  <span class="nav-link-text ms-1">รายงานผลการปฏิบัติงาน</span>
+                </a>
+              </li>
+            <li class="nav-item">
                 <a class="nav-link text-white {{ Request::is('staff-ci') ? 'active bg-gradient-primary' : '' }}" href="{{ route('staff.ci.index') }}">
                     <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
                         <i class="material-icons opacity-10">announcement</i>

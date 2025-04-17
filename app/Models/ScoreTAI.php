@@ -10,7 +10,7 @@ class ScoreTAI extends Model
     use HasFactory;
 
     protected $table = 'score_t_a_i_s';
-
+    protected $primaryKey = 'id';
     protected $fillable = [
         'ID_Elderly',
         'ID_ADL',
