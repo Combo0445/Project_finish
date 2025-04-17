@@ -44,7 +44,7 @@
                                 <button id="generate-pdf" class="btn btn-success">
                                     <i class="fas fa-print"></i>
                                 </button>
-                                <a href="{{ route('cg.export') }}" class="btn btn-primary btn-sm">Export Excel</a>
+                                <a href="{{ route('tai.export') }}" class="btn btn-primary btn-sm">Export Excel</a>
                             </div>
                         </div>
                         <div class="card-body px-0 pt-0 pb-2">

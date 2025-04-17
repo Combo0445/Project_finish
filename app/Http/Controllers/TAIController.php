@@ -7,6 +7,8 @@ use App\Models\ScoreTAI;
 use App\Models\Elderly;
 use App\Models\CareGiver;
 use Illuminate\Support\Facades\Auth;
+use App\Exports\Tai;
+use Maatwebsite\Excel\Facades\Excel;
 
 class TAIController extends Controller
 {
@@ -103,5 +105,9 @@ class TAIController extends Controller
         $tai->delete();
 
         return redirect()->route('tai.index')->with('success', 'ลบข้อมูลเรียบร้อยแล้ว');
+    }
+    public function ExportTAI()
+    {
+        return Excel::download(new Tai, 'Tai.xlsx');
     }
 }

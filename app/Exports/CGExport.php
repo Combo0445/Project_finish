@@ -23,19 +23,31 @@ class CGExport implements FromCollection, WithHeadings, WithMapping, WithStyles
             'วันที่',
             'ชื่อเจ้าหน้าที่',
             'ชื่อผู้สูงอายุ',
-            'ประเภทกลุ่ม ADL'
+            'ประเภทผู้สูงอายุ'
         ];
     }
 
     public function map($cg): array
     {
+        $groupADL = $cg->Group_ADL;
+        if ($groupADL == 'B3') {
+            $groupADL = 'ติดบ้าน กลุ่มที่ 1';
+        } elseif (in_array($groupADL, ['C4', 'C3', 'C2'])) {
+            $groupADL = 'ติดบ้าน กลุ่มที่ 2';
+        } elseif ($groupADL == 'I3') {
+            $groupADL = 'ติดเตียง กลุ่มที่ 1';
+        } elseif (in_array($groupADL, ['I2', 'I1'])) {
+            $groupADL = 'ติดเตียง กลุ่มที่ 2';
+        }
+
         return [
             $cg->Date_CG ? Carbon::parse($cg->Date_CG)->format('Y-m-d') : '0000-00-00',
             $cg->Name_CG,
             $cg->Name_Elderly,
-            $cg->Group_ADL
+            $groupADL
         ];
     }
+
     public function styles(Worksheet $sheet)
     {
         // Making the header bold
@@ -50,3 +62,4 @@ class CGExport implements FromCollection, WithHeadings, WithMapping, WithStyles
         $sheet->getStyle('A')->getNumberFormat()->setFormatCode('yyyy-mm-dd');
     }
 }
+
