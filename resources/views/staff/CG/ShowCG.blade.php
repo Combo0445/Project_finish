@@ -66,7 +66,23 @@
                                                 <td class="text-center">{{ $cg->Date_CG }}</td>
                                                 <td class="text-center">{{ $cg->Name_Elderly }}</td>
                                                 <td class="text-center">{{ $cg->Name_CG }}</td>
-                                                <td class="text-center">{{ $cg->Group_ADL }}</td>
+                                                <td class="text-center">
+                                                    @php
+                                                        $group = $cg->Group_ADL;
+                                                        if (in_array($group, ['B3'])) {
+                                                            $displayText = 'ติดบ้าน กลุ่มที่ 1';
+                                                        } else if (in_array($group, ['C4', 'C3', 'C2'])) {
+                                                            $displayText = 'ติดบ้าน กลุ่มที่ 2';
+                                                        } else if (in_array($group, ['I3'])) {
+                                                            $displayText = 'ติดเตียง กลุ่มที่ 1';
+                                                        } else if (in_array($group, ['I2', 'I1'])){
+                                                            $displayText = 'ติดเตียง กลุ่มที่ 1';
+                                                        } else {
+                                                            $displayText = 'ยังไม่ได้ประเมิน';
+                                                        }
+                                                    @endphp
+                                                    {{ $displayText }}
+                                                </td>
                                                 <td class="text-center">
                                                     <a href="javascript:void(0);"
                                                     class="btn btn-success btn-sm"

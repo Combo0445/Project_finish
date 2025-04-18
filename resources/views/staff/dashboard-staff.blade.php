@@ -202,273 +202,178 @@
     <!-- Include DataTables JS -->
     <script src="https://cdn.datatables.net/1.10.24/js/jquery.dataTables.min.js"></script>
     <script>
+        // Initialize DataTable
         $(document).ready(function() {
-            $('#myTable').DataTable({
-                "language": {
-                    "paginate": {
-                        "previous": "ก่อนหน้า",
-                        "next": "ถัดไป"
-                    },
-                    "search": "ค้นหา : ",
-                    "lengthMenu": "แสดง _MENU_ รายการ",
-                    "zeroRecords": "ไม่พบข้อมูล",
-                    "info": "กำลังแสดงรายการ _START_ ถึง _END_ จากทั้งหมด _TOTAL_ รายการ",
-                    "infoEmpty": "ไม่พบข้อมูล",
-                    "infoFiltered": "(filtered from _MAX_ total records)"
-                },
-                "dom": '<"row"<"col-sm-12 col-md-12"l><"col-sm-12 col-md-12"f>>t<"row"<"col-sm-12 col-md-5"i><"col-sm-12 col-md-3 d-flex justify-content-center"p>>'
-             });
+          $('#myTable').DataTable({
+            language: {
+              paginate: { previous: "ก่อนหน้า", next: "ถัดไป" },
+              search: "ค้นหา : ",
+              lengthMenu: "แสดง _MENU_ รายการ",
+              zeroRecords: "ไม่พบข้อมูล",
+              info: "กำลังแสดงรายการ _START_ ถึง _END_ จากทั้งหมด _TOTAL_ รายการ",
+              infoEmpty: "ไม่พบข้อมูล",
+              infoFiltered: "(filtered from _MAX_ total records)"
+            },
+            dom: '<"row"<"col-sm-12 col-md-12"l><"col-sm-12 col-md-12"f>>t<"row"<"col-sm-12 col-md-5"i><"col-sm-12 col-md-3 d-flex justify-content-center"p>>'
+          });
         });
-
-
+      
+        // Chart.js: อายุ
         document.addEventListener('DOMContentLoaded', function() {
-            var ageGroups = @json($ageGroups);
-
-            var ageBarChartCtx = document.getElementById('ageBarChart').getContext('2d');
-            new Chart(ageBarChartCtx, {
-                type: 'bar',
-                data: {
-                    labels: Object.keys(ageGroups),
-                    datasets: [{
-                        label: 'จำนวนผู้สูงอายุ',
-                        data: Object.values(ageGroups),
-                        backgroundColor: 'rgba(54, 162, 235, 0.2)',
-                        borderColor: 'rgba(54, 162, 235, 1)',
-                        borderWidth: 1
-                    }]
-                },
-                options: {
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            display: false // เอาเส้นพื้นหลังออก
-
-                        }
-                    }
-                }
-            });
-
-            var agePieChartCtx = document.getElementById('agePieChart').getContext('2d');
-            new Chart(agePieChartCtx, {
-                type: 'pie',
-                data: {
-                    labels: Object.keys(ageGroups),
-                    datasets: [{
-                        label: 'สัดส่วนผู้สูงอายุ',
-                        data: Object.values(ageGroups),
-                        backgroundColor: [
-                            'rgba(255, 99, 132, 0.2)',
-                            'rgba(54, 162, 235, 0.2)',
-                            'rgba(255, 206, 86, 0.2)',
-                            'rgba(75, 192, 192, 0.2)'
-                        ],
-                        borderColor: [
-                            'rgba(255, 99, 132, 1)',
-                            'rgba(54, 162, 235, 1)',
-                            'rgba(255, 206, 86, 1)',
-                            'rgba(75, 192, 192, 1)'
-                        ],
-                        borderWidth: 1
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    plugins: {
-                        legend: {
-                            position: 'top',
-                        },
-                    }
-                }
-            });
-
-            var ageLineChartCtx = document.getElementById('ageLineChart').getContext('2d');
-            new Chart(ageLineChartCtx, {
-                type: 'line',
-                data: {
-                    labels: Object.keys(ageGroups),
-                    datasets: [{
-                        label: 'แนวโน้มจำนวนผู้สูงอายุ',
-                        data: Object.values(ageGroups),
-                        backgroundColor: 'rgba(75, 192, 192, 0.2)',
-                        borderColor: 'rgba(75, 192, 192, 1)',
-                        borderWidth: 1
-                    }]
-                },
-                options: {
-                    scales: {
-                        y: {
-                            beginAtZero: true
-                        }
-                    }
-                }
-            });
-
-            var ageDoughnutChartCtx = document.getElementById('ageDoughnutChart').getContext('2d');
-            new Chart(ageDoughnutChartCtx, {
-                type: 'doughnut',
-                data: {
-                    labels: Object.keys(ageGroups),
-                    datasets: [{
-                        label: 'สัดส่วนผู้สูงอายุ (Doughnut)',
-                        data: Object.values(ageGroups),
-                        backgroundColor: [
-                            'rgba(153, 102, 255, 0.2)',
-                            'rgba(255, 159, 64, 0.2)',
-                            'rgba(54, 162, 235, 0.2)',
-                            'rgba(255, 99, 132, 0.2)'
-                        ],
-                        borderColor: [
-                            'rgba(153, 102, 255, 1)',
-                            'rgba(255, 159, 64, 1)',
-                            'rgba(54, 162, 235, 1)',
-                            'rgba(255, 99, 132, 1)'
-                        ],
-                        borderWidth: 1
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    plugins: {
-                        legend: {
-                            position: 'top',
-                        },
-                    }
-                }
-            });
-        });
-
-        @php
-            $elderlyLocations = [];
-            foreach ($elderlies as $elderly) {
-                if ($elderly->addressElderly && $elderly->addressElderly->Latitude_position && $elderly->addressElderly->Longitude_position) {
-                    $elderlyLocations[] = [
-                        'latitude' => $elderly->addressElderly->Latitude_position,
-                        'longitude' => $elderly->addressElderly->Longitude_position,
-                        'name' => $elderly->Name_Elderly,
-                        'address' => $elderly->Address
-                    ];
-                }
+          const ageGroups = @json($ageGroups);
+      
+          new Chart(document.getElementById('ageBarChart'), {
+            type: 'bar',
+            data: {
+              labels: Object.keys(ageGroups),
+              datasets: [{
+                label: 'จำนวนผู้สูงอายุ',
+                data: Object.values(ageGroups),
+                backgroundColor: 'rgba(54,162,235,0.2)',
+                borderColor: 'rgba(54,162,235,1)',
+                borderWidth: 1
+              }]
+            },
+            options: {
+              scales: {
+                y: { beginAtZero: true, display: false }
+              }
             }
-        @endphp
-
-        document.addEventListener('DOMContentLoaded', function() {
-            // ข้อมูลตำแหน่งของผู้สูงอายุ
-            var elderlyLocations = @json($elderlyLocations);
-
-            // ตรวจสอบว่ามีข้อมูลพิกัดหรือไม่
-            if (elderlyLocations.length > 0) {
-                // สร้างแผนที่
-                var map = L.map('map').setView([14.971004543091427, 103.18498849868776], 13); // Set initial position to Buriram
-
-                // เพิ่ม TileLayer เพื่อให้แผนที่แสดงผล
-                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-                }).addTo(map);
-
-                // เพิ่ม Marker สำหรับผู้สูงอายุแต่ละคน
-                elderlyLocations.forEach(function(location) {
-                    if (location.latitude && location.longitude) { // ตรวจสอบว่าค่าละติจูดและลองจิจูดไม่ใช่ null
-                        var marker = L.marker([location.latitude, location.longitude]).addTo(map);
-
-                        // เพิ่มการแสดงที่อยู่ใน popup
-                        marker.bindPopup("<b>" + location.name + "</b><br>ที่อยู่: " + location.address);
-                    }
-                });
-            } else {
-                console.error("ไม่มีข้อมูลตำแหน่งที่จะแสดงบนแผนที่");
+          });
+      
+          new Chart(document.getElementById('agePieChart'), {
+            type: 'pie',
+            data: {
+              labels: Object.keys(ageGroups),
+              datasets: [{
+                data: Object.values(ageGroups),
+                backgroundColor: [
+                  'rgba(255,99,132,0.2)',
+                  'rgba(54,162,235,0.2)',
+                  'rgba(255,206,86,0.2)',
+                  'rgba(75,192,192,0.2)'
+                ],
+                borderColor: [
+                  'rgba(255,99,132,1)',
+                  'rgba(54,162,235,1)',
+                  'rgba(255,206,86,1)',
+                  'rgba(75,192,192,1)'
+                ],
+                borderWidth: 1
+              }]
+            },
+            options: {
+              responsive: true,
+              plugins: { legend: { position: 'top' } }
             }
+          });
         });
-
-
+      
+        // Chart.js: ADL
         document.addEventListener('DOMContentLoaded', function() {
-            // กราฟของ ADL
-            var adlGroups = @json($adlGroups);
-
-            var adlBarChartCtx = document.getElementById('adlBarChart').getContext('2d');
-            new Chart(adlBarChartCtx, {
-                type: 'bar', // ใช้ type 'bar'
-                data: {
-                    labels: Object.keys(adlGroups),
-                    datasets: [{
-                        label: 'จำนวนผู้สูงอายุตามกลุ่ม ADL',
-                        data: Object.values(adlGroups),
-                        backgroundColor: 'rgba(75, 192, 192, 0.2)',
-                        borderColor: 'rgba(75, 192, 192, 1)',
-                        borderWidth: 1
-                    }]
-                },
-                options: {
-                    indexAxis: 'y', // ทำให้กราฟแท่งเป็นแนวนอน
-                    scales: {
-                        x: { // แกน x จะเป็นค่าจำนวน
-                            beginAtZero: true,
-                            grid: {
-                                display: false // เอาเส้นพื้นหลังออก
-                            }
-                        },
-                        y: {
-                            grid: {
-                                display: false // เอาเส้นพื้นหลังออก
-                            }
-                        }
-                    }
-                }
-            });
-
-
-
-            var adlDoughnutChartCtx = document.getElementById('adlPieChart').getContext('2d');
-            new Chart(adlDoughnutChartCtx, {
-                type: 'doughnut', // เปลี่ยนจาก 'pie' เป็น 'doughnut'
-                data: {
-                    labels: Object.keys(adlGroups),
-                    datasets: [{
-                        label: 'สัดส่วนผู้สูงอายุตามกลุ่ม ADL',
-                        data: Object.values(adlGroups),
-                        backgroundColor: [
-                            'rgba(255, 99, 132, 0.2)',
-                            'rgba(54, 162, 235, 0.2)',
-                            'rgba(255, 206, 86, 0.2)',
-                            'rgba(75, 192, 192, 0.2)'
-                        ],
-                        borderColor: [
-                            'rgba(255, 99, 132, 1)',
-                            'rgba(54, 162, 235, 1)',
-                            'rgba(255, 206, 86, 1)',
-                            'rgba(75, 192, 192, 1)'
-                        ],
-                        borderWidth: 1
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    plugins: {
-                        legend: {
-                            position: 'top',
-                        },
-                    }
-                }
-            });
-
+          const adlGroups = @json($adlGroups);
+      
+          new Chart(document.getElementById('adlBarChart'), {
+            type: 'bar',
+            data: {
+              labels: Object.keys(adlGroups),
+              datasets: [{
+                label: 'จำนวนผู้สูงอายุตามกลุ่ม ADL',
+                data: Object.values(adlGroups),
+                backgroundColor: 'rgba(75,192,192,0.2)',
+                borderColor: 'rgba(75,192,192,1)',
+                borderWidth: 1
+              }]
+            },
+            options: {
+              indexAxis: 'y',
+              scales: {
+                x: { beginAtZero: true, grid: { display: false } },
+                y: { grid: { display: false } }
+              }
+            }
+          });
+      
+          new Chart(document.getElementById('adlPieChart'), {
+            type: 'doughnut',
+            data: {
+              labels: Object.keys(adlGroups),
+              datasets: [{
+                data: Object.values(adlGroups),
+                backgroundColor: [
+                  'rgba(255,99,132,0.2)',
+                  'rgba(54,162,235,0.2)',
+                  'rgba(255,206,86,0.2)'
+                ],
+                borderColor: [
+                  'rgba(255,99,132,1)',
+                  'rgba(54,162,235,1)',
+                  'rgba(255,206,86,1)'
+                ],
+                borderWidth: 1
+              }]
+            },
+            options: {
+              responsive: true,
+              plugins: { legend: { position: 'top' } }
+            }
+          });
         });
+      
+        // Leaflet Map with colored circleMarkers by ADL group
+document.addEventListener('DOMContentLoaded', function() {
+  const elderlyLocations = @json($elderlyLocations);
 
+  // 1) กำหนด URL ของไอคอนสีต่างๆ (ใช้จาก leaflet-color-markers)
+  const iconUrls = {
+    'กลุ่มติดสังคม':    'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-blue.png',
+    'กลุ่มติดบ้าน':    'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-green.png',
+    'กลุ่มติดเตียง':  'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-red.png',
+    'ยังไม่ได้ประเมิน': 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-grey.png'
+  };
+
+  // 2) สร้าง Leaflet Icon object สำหรับแต่ละกลุ่ม
+  const icons = {};
+  Object.entries(iconUrls).forEach(([group, url]) => {
+    icons[group] = L.icon({
+      iconUrl: url,
+      shadowUrl: 'https://unpkg.com/leaflet@1.7.1/dist/images/marker-shadow.png',
+      iconSize:     [25, 41],   // ขนาดไอคอน
+      iconAnchor:   [12, 41],   // จุดที่ตรงกับพิกัด
+      popupAnchor:  [1, -34],   // ตำแหน่ง popup เมื่อคลิก
+      shadowSize:   [41, 41]
+    });
+  });
+
+  // 3) สร้างแผนที่
+  const map = L.map('map').setView([14.971, 103.185], 13);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '&copy; OpenStreetMap contributors'
+  }).addTo(map);
+
+  // 4) วนเพิ่ม Marker แต่ละจุด พร้อมไอคอนสีตามกลุ่ม ADL
+  elderlyLocations.forEach(loc => {
+    const adl = loc.adlGroup in icons ? loc.adlGroup : 'ยังไม่ได้ประเมิน';
+    L.marker([loc.latitude, loc.longitude], { icon: icons[adl] })
+      .addTo(map)
+      .bindPopup(
+        `<b>${loc.name}</b><br>` +
+        `ที่อยู่: ${loc.address}<br>` +
+        `<strong>ADL Group:</strong> ${loc.adlGroup}`
+      );
+  });
+});
+
+
+      
+        // Confirm delete action
         function confirmDelete(id) {
-            Swal.fire({
-                title: 'คุณแน่ใจหรือไม่?',
-                text: "คุณจะไม่สามารถย้อนกลับได้หลังจากลบ!",
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#d33',
-                cancelButtonColor: '#3085d6',
-                confirmButtonText: 'ยืนยัน',
-                cancelButtonText: 'ยกเลิก'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    document.getElementById('delete-form-' + id).submit();
-                }
-            });
+          if (confirm('ลบผู้สูงอายุนี้?')) {
+            document.getElementById('delete-form-' + id).submit();
+          }
         }
-    </script>
+      </script>
+      
 </body>
 
 </html>

@@ -187,11 +187,30 @@
                             <input type="number" id="Waist" name="Waist" class="form-control" step="0.1"
                                 value="{{ $caregiver->Waist }}" required>
                         </div>
+                        @php
+                            $group = $caregiver->Group_ADL;
+                            if ($group === 'B3') {
+                                $displayText = 'ติดบ้าน กลุ่มที่ 1';
+                            } elseif (in_array($group, ['C2', 'C3', 'C4'])) {
+                                $displayText = 'ติดบ้าน กลุ่มที่ 2';
+                            } elseif ($group === 'I3') {
+                                $displayText = 'ติดเตียง กลุ่มที่ 1';
+                            } elseif (in_array($group, ['I1', 'I2'])) {
+                                $displayText = 'ติดเตียง กลุ่มที่ 2';
+                            } else {
+                                $displayText = 'ยังไม่ได้ประเมิน';
+                            }
+                        @endphp
+
                         <div class="form-group">
                             <label for="Group_ADL">กลุ่มประเภทผู้สูงอายุ</label>
-                            <input type="text" id="Group_ADL" name="Group_ADL" class="form-control"
-                                value="{{ $caregiver->Group_ADL }}" readonly required>
+                            {{-- ถ้าต้องการเก็บโค้ดจริงด้วย ให้ใช้ hidden field --}}
+                            <input type="hidden" id="Group_ADL" name="Group_ADL" value="{{ $group }}">
+
+                            {{-- แสดงข้อความที่อ่านเข้าใจง่าย --}}
+                            <input type="text" name="Group_ADL_Display" class="form-control" value="{{ $displayText }}" readonly required>
                         </div>
+
                         <div class="form-group">
                             <label for="Disease">โรคประจำตัว</label>
                             <input type="text" id="Disease" name="Disease" class="form-control"
@@ -251,8 +270,7 @@
                         <!-- End hidden fields -->
                         <div class="form-group">
                             <label for="Date">ว/ด/ป</label>
-                            <input type="date" id="Date" name="Date" class="form-control"
-                                value="{{ $caregiver->Date_CG }}" required>
+                            <input type="date" id="Date_CG" name="Date_CG" … value="{{ old('Date_CG', $caregiver->Date_CG) }}">
                         </div>
                         <div class="form-group">
                             <label for="Consciousness">ความรู้สึกตัว</label>
@@ -300,43 +318,43 @@
                             <select id="Bedsores" name="Bedsores" class="form-control" required>
                                 <option value="ไม่มี" {{ $caregiver->Bedsores == 'ไม่มี' ? 'selected' : '' }}>ไม่มี
                                 </option>
-                                <option value="มี" {{ $caregiver->Bedsores == 'มี' ? 'selected' : '' }}>มี
+                                <option value="มี" {{ $caregiver->Bedsores != 'ไม่มี' && $caregiver->Bedsores != null ? 'selected' : '' }}>มี
                                 </option>
                             </select>
-                            <input type="text" id="Bedsores_details" name="Bedsores_details" class="form-control"
-                                value="{{ $caregiver->Bedsores_details }}" placeholder="รายละเอียดถ้ามี">
+                            <input style="display:none;" type="text" id="Bedsores_details" name="Bedsores_details" class="form-control"
+                                value="{{ $caregiver->Bedsores }}" placeholder="รายละเอียดถ้ามี">
                         </div>
                         <div class="form-group">
                             <label for="Pain">อาการปวด</label>
                             <select id="Pain" name="Pain" class="form-control" required>
                                 <option value="ไม่มี" {{ $caregiver->Pain == 'ไม่มี' ? 'selected' : '' }}>ไม่มี
                                 </option>
-                                <option value="มี" {{ $caregiver->Pain == 'มี' ? 'selected' : '' }}>มี</option>
+                                <option value="มี" {{ $caregiver->Pain != 'ไม่มี' && $caregiver->Pain != null ? 'selected' : '' }}>มี</option>
                             </select>
-                            <input type="text" id="Pain_details" name="Pain_details" class="form-control"
-                                value="{{ $caregiver->Pain_details }}" placeholder="รายละเอียดถ้ามี">
+                            <input style="display:none;" type="text" id="Pain_details" name="Pain_details" class="form-control"
+                                value="{{ $caregiver->Pain }}" placeholder="รายละเอียดถ้ามี">
                         </div>
                         <div class="form-group">
                             <label for="Swelling">อาการบวม</label>
                             <select id="Swelling" name="Swelling" class="form-control" required>
                                 <option value="ไม่มี" {{ $caregiver->Swelling == 'ไม่มี' ? 'selected' : '' }}>ไม่มี
                                 </option>
-                                <option value="มี" {{ $caregiver->Swelling == 'มี' ? 'selected' : '' }}>มี
+                                <option value="มี" {{ $caregiver->Swelling != 'ไม่มี' && $caregiver->Swelling != null ? 'selected' : '' }}>มี
                                 </option>
                             </select>
-                            <input type="text" id="Swelling_details" name="Swelling_details" class="form-control"
-                                value="{{ $caregiver->Swelling_details }}" placeholder="รายละเอียดถ้ามี">
+                            <input style="display:none;" type="text" id="Swelling_details" name="Swelling_details" class="form-control"
+                                value="{{ $caregiver->Swelling }}" placeholder="รายละเอียดถ้ามี">
                         </div>
                         <div class="form-group">
                             <label for="Itchy_rash">ผื่นคัน</label>
                             <select id="Itchy_rash" name="Itchy_rash" class="form-control" required>
                                 <option value="ไม่มี" {{ $caregiver->Itchy_rash == 'ไม่มี' ? 'selected' : '' }}>ไม่มี
                                 </option>
-                                <option value="มี" {{ $caregiver->Itchy_rash == 'มี' ? 'selected' : '' }}>มี
+                                <option value="มี" {{ $caregiver->Itchy_rash != 'ไม่มี' && $caregiver->Itchy_rash != null ? 'selected' : '' }}>มี
                                 </option>
                             </select>
-                            <input type="text" id="Itchy_rash_details" name="Itchy_rash_details"
-                                class="form-control" value="{{ $caregiver->Itchy_rash_details }}"
+                            <input style="display:none;" type="text" id="Itchy_rash_details" name="Itchy_rash_details"
+                                class="form-control" value="{{ $caregiver->Itchy_rash }}"
                                 placeholder="รายละเอียดถ้ามี">
                         </div>
                         <div class="form-group">
@@ -344,11 +362,11 @@
                             <select id="Stiff_joints" name="Stiff_joints" class="form-control" required>
                                 <option value="ไม่มี" {{ $caregiver->Stiff_joints == 'ไม่มี' ? 'selected' : '' }}>
                                     ไม่มี</option>
-                                <option value="มี" {{ $caregiver->Stiff_joints == 'มี' ? 'selected' : '' }}>มี
+                                <option value="มี" {{ $caregiver->Stiff_joints != 'ไม่มี' && $caregiver->Stiff_joints != null ? 'selected' : '' }}>มี
                                 </option>
                             </select>
-                            <input type="text" id="Stiff_joints_details" name="Stiff_joints_details"
-                                class="form-control" value="{{ $caregiver->Stiff_joints_details }}"
+                            <input style="display:none;" type="text" id="Stiff_joints_details" name="Stiff_joints_details"
+                                class="form-control" value="{{ $caregiver->Stiff_joints }}"
                                 placeholder="รายละเอียดถ้ามี">
                         </div>
                         <div class="form-group">
@@ -356,11 +374,11 @@
                             <select id="Malnutrition" name="Malnutrition" class="form-control" required>
                                 <option value="ไม่มี" {{ $caregiver->Malnutrition == 'ไม่มี' ? 'selected' : '' }}>
                                     ไม่มี</option>
-                                <option value="มี" {{ $caregiver->Malnutrition == 'มี' ? 'selected' : '' }}>มี
+                                <option value="มี" {{ $caregiver->Malnutrition != 'ไม่มี' && $caregiver->Malnutrition != null ? 'selected' : '' }}>มี
                                 </option>
                             </select>
-                            <input type="text" id="Malnutrition_details" name="Malnutrition_details"
-                                class="form-control" value="{{ $caregiver->Malnutrition_details }}"
+                            <input style="display:none;" type="text" id="Malnutrition_details" name="Malnutrition_details"
+                                class="form-control" value="{{ $caregiver->Malnutrition }}"
                                 placeholder="รายละเอียดถ้ามี">
                         </div>
                         <div class="form-group">
@@ -427,11 +445,11 @@
                             <select id="Economic_problems" name="Economic_problems" class="form-control" required>
                                 <option value="ไม่มี"
                                     {{ $caregiver->Economic_problems == 'ไม่มี' ? 'selected' : '' }}>ไม่มี</option>
-                                <option value="มี" {{ $caregiver->Economic_problems == 'มี' ? 'selected' : '' }}>
+                                <option value="มี" {{ $caregiver->Economic_problems != 'ไม่มี' && $caregiver->Economic_problems != null ? 'selected' : '' }}>
                                     มี</option>
                             </select>
-                            <input type="text" id="Economic_problems_details" name="Economic_problems_details"
-                                class="form-control" value="{{ $caregiver->Economic_problems_details }}"
+                            <input style="display:none;" type="text" id="Economic_problems_details" name="Economic_problems_details"
+                                class="form-control" value="{{ $caregiver->Economic_problems }}"
                                 placeholder="รายละเอียดถ้ามี">
                         </div>
                         <div class="form-group">
@@ -439,11 +457,11 @@
                             <select id="Social_problems" name="Social_problems" class="form-control" required>
                                 <option value="ไม่มี" {{ $caregiver->Social_problems == 'ไม่มี' ? 'selected' : '' }}>
                                     ไม่มี</option>
-                                <option value="มี" {{ $caregiver->Social_problems == 'มี' ? 'selected' : '' }}>มี
+                                <option value="มี" {{ $caregiver->Social_problems != 'ไม่มี' && $caregiver->Social_problems != null ? 'selected' : '' }}>มี
                                 </option>
                             </select>
-                            <input type="text" id="Social_problems_details" name="Social_problems_details"
-                                class="form-control" value="{{ $caregiver->Social_problems_details }}"
+                            <input style="display:none;" type="text" id="Social_problems_details" name="Social_problems_details"
+                                class="form-control" value="{{ $caregiver->Social_problems }}"
                                 placeholder="รายละเอียดถ้ามี">
                         </div>
                         <div class="form-group">
@@ -451,11 +469,11 @@
                             <select id="Doctor_FU" name="Doctor_FU" class="form-control" required>
                                 <option value="ไม่มี" {{ $caregiver->Doctor_FU == 'ไม่มี' ? 'selected' : '' }}>ไม่มี
                                 </option>
-                                <option value="มี" {{ $caregiver->Doctor_FU == 'มี' ? 'selected' : '' }}>มี
+                                <option value="มี" {{ $caregiver->Doctor_FU != 'ไม่มี' && $caregiver->Doctor_FU != null ? 'selected' : '' }}>มี
                                 </option>
                             </select>
-                            <input type="text" id="Doctor_FU_details" name="Doctor_FU_details"
-                                class="form-control" value="{{ $caregiver->Doctor_FU_details }}"
+                            <input style="display:none;" type="text" id="Doctor_FU_details" name="Doctor_FU_details"
+                                class="form-control" value="{{ $caregiver->Doctor_FU }}"
                                 placeholder="รายละเอียดถ้ามี">
                         </div>
                         <div class="form-group">
@@ -530,6 +548,66 @@
         </div>
     </div>
 </body>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+      // รายชื่อฟิลด์ที่ต้องใช้ pattern เดียวกัน
+      const fields = [
+        'Economic_problems',
+        'Social_problems',
+        'Doctor_FU',
+        'Bedsores',
+        'Pain',
+        'Swelling',
+        'Itchy_rash',
+        'Stiff_joints',
+        'Malnutrition'
+      ];
+  
+      fields.forEach(field => {
+        const sel   = document.getElementById(field);
+        const input = document.getElementById(field + '_details');
+  
+        // ฟังก์ชันแสดง/ซ่อน input
+        function toggleDetail() {
+          if (sel.value === 'มี') {
+            input.style.display = 'block';
+            input.required      = true;
+          } else {
+            input.style.display = 'none';
+            input.required      = false;
+            input.value         = '';
+          }
+        }
+  
+        // ตั้ง listener เมื่อเปลี่ยนค่า
+        sel.addEventListener('change', toggleDetail);
+        // เรียกครั้งแรกตอน load page
+        toggleDetail();
+      });
+  
+      // ก่อน submit ให้เปลี่ยน name ของฟิลด์
+      const form = document.getElementById('assessment-form');
+      form.addEventListener('submit', function() {
+        fields.forEach(field => {
+          const sel   = document.getElementById(field);
+          const input = document.getElementById(field + '_details');
+  
+          if (sel.value === 'มี') {
+            // ให้ input ส่งเป็น field เดียวกับชื่อ select
+            input.name = field;
+            // เอา name ของ select ออก (หรือเปลี่ยนเป็นชื่ออื่น)
+            sel.removeAttribute('name');
+          } else {
+            // กรณีไม่มี ยังคงส่ง select ธรรมดา
+            sel.name = field;
+            // ปรับ input ไปส่งชื่อ dummy ไม่ Validate
+            input.name = field + '_details_dummy';
+          }
+        });
+      });
+    });
+  </script>
+  
 <script>
     // ฟังก์ชันแยกค่าสัญญาณชีพเดิมมาใส่ในช่อง input
     function populateVitalSignsFromText(vitalSignsText) {

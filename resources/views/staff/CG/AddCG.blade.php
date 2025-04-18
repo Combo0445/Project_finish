@@ -303,7 +303,7 @@
                                 <option value="ไม่มี">ไม่มี</option>
                                 <option value="มี">มี</option>
                             </select>
-                            <input type="text" id="Bedsores_details" name="Bedsores_details" class="form-control"
+                            <input style="display:none;" type="text" id="Bedsores_details" name="Bedsores_details" class="form-control"
                                 placeholder="รายละเอียดถ้ามี">
                         </div>
                         <div class="form-group">
@@ -312,7 +312,7 @@
                                 <option value="ไม่มี">ไม่มี</option>
                                 <option value="มี">มี</option>
                             </select>
-                            <input type="text" id="Pain_details" name="Pain_details" class="form-control"
+                            <input style="display:none;" type="text" id="Pain_details" name="Pain_details" class="form-control"
                                 placeholder="รายละเอียดถ้ามี">
                         </div>
                         <div class="form-group">
@@ -321,7 +321,7 @@
                                 <option value="ไม่มี">ไม่มี</option>
                                 <option value="มี">มี</option>
                             </select>
-                            <input type="text" id="Swelling_details" name="Swelling_details" class="form-control"
+                            <input style="display:none;" type="text" id="Swelling_details" name="Swelling_details" class="form-control"
                                 placeholder="รายละเอียดถ้ามี">
                         </div>
                         <div class="form-group">
@@ -330,7 +330,7 @@
                                 <option value="ไม่มี">ไม่มี</option>
                                 <option value="มี">มี</option>
                             </select>
-                            <input type="text" id="Itchy_rash_details" name="Itchy_rash_details"
+                            <input style="display:none;" type="text" id="Itchy_rash_details" name="Itchy_rash_details"
                                 class="form-control" placeholder="รายละเอียดถ้ามี">
                         </div>
                         <div class="form-group">
@@ -339,7 +339,7 @@
                                 <option value="ไม่มี">ไม่มี</option>
                                 <option value="มี">มี</option>
                             </select>
-                            <input type="text" id="Stiff_joints_details" name="Stiff_joints_details"
+                            <input style="display:none;" type="text" id="Stiff_joints_details" name="Stiff_joints_details"
                                 class="form-control" placeholder="รายละเอียดถ้ามี">
                         </div>
                         <div class="form-group">
@@ -348,7 +348,7 @@
                                 <option value="ไม่มี">ไม่มี</option>
                                 <option value="มี">มี</option>
                             </select>
-                            <input type="text" id="Malnutrition_details" name="Malnutrition_details"
+                            <input style="display:none;" type="text" id="Malnutrition_details" name="Malnutrition_details"
                                 class="form-control" placeholder="รายละเอียดถ้ามี">
                         </div>
                         <div class="form-group">
@@ -399,7 +399,7 @@
                                 <option value="ไม่มี">ไม่มี</option>
                                 <option value="มี">มี</option>
                             </select>
-                            <input type="text" id="Economic_problems_details" name="Economic_problems_details"
+                            <input style="display:none;" type="text" id="Economic_problems_details" name="Economic_problems_details"
                                 class="form-control" placeholder="รายละเอียดถ้ามี">
                         </div>
                         <div class="form-group">
@@ -408,7 +408,7 @@
                                 <option value="ไม่มี">ไม่มี</option>
                                 <option value="มี">มี</option>
                             </select>
-                            <input type="text" id="Social_problems_details" name="Social_problems_details"
+                            <input style="display:none;" type="text" id="Social_problems_details" name="Social_problems_details"
                                 class="form-control" placeholder="รายละเอียดถ้ามี">
                         </div>
                         <div class="form-group">
@@ -417,7 +417,7 @@
                                 <option value="ไม่มี">ไม่มี</option>
                                 <option value="มี">มี</option>
                             </select>
-                            <input type="text" id="Doctor_FU_details" name="Doctor_FU_details"
+                            <input style="display:none;" type="text" id="Doctor_FU_details" name="Doctor_FU_details"
                                 class="form-control" placeholder="รายละเอียดถ้ามี">
                         </div>
                         <div class="form-group">
@@ -479,6 +479,49 @@
             </div>
         </div>
     </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+          const fields = [
+            'Bedsores','Pain','Swelling','Itchy_rash',
+            'Stiff_joints','Malnutrition',
+            'Economic_problems','Social_problems','Doctor_FU'
+          ];
+        
+          fields.forEach(field => {
+            const sel   = document.getElementById(field);
+            const input = document.getElementById(field + '_details');
+        
+            // ฟังก์ชัน toggle
+            function toggleDetail() {
+              if (sel.value === 'มี') {
+                input.style.display = 'block';
+                input.required      = true;
+              } else {
+                input.style.display = 'none';
+                input.required      = false;
+                input.value         = '';
+              }
+            }
+        
+            // listener & initial state
+            sel.addEventListener('change', toggleDetail);
+            toggleDetail();
+          });
+        
+          // ก่อน submit: ผนวกรายละเอียดเข้า select
+          const form = document.getElementById('assessment-form');
+          form.addEventListener('submit', function() {
+            fields.forEach(field => {
+              const sel   = document.getElementById(field);
+              const input = document.getElementById(field + '_details');
+              const details = input.value.trim();
+              if (sel.value === 'มี' && details) {
+                sel.value = `มี (${details})`;
+              }
+            });
+          });
+        });
+        </script>        
     <script>
         function concatenateVitalSigns() {
             const bpSys = document.getElementById('BP_systolic').value;

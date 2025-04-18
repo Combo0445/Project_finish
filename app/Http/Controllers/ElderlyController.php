@@ -48,19 +48,18 @@ class ElderlyController extends Controller
 
     public function Showelderly(Request $request)
     {
-        $search = $request->get('search');
+        // 1. โหลด Elderly พร้อมที่อยู่และ ADL group
+        $elderlies = Elderly::with(['addressElderly','barthel_adl','care_giver'])->get();
 
-        $elderlies = Elderly::with('addressElderly')->get();
-
+        // 2. คำนวณช่วงอายุ
         $ageGroups = [
             'ช่วงอายุ 60-69' => 0,
             'ช่วงอายุ 70-79' => 0,
             'ช่วงอายุ 80-89' => 0,
-            'ช่วงอายุ 90+' => 0,
+            'ช่วงอายุ 90+'   => 0,
         ];
-
-        foreach ($elderlies as $elderly) {
-            $age = Carbon::parse($elderly->Birthday)->age;
+        foreach ($elderlies as $e) {
+            $age = Carbon::parse($e->Birthday)->age;
             if ($age >= 60 && $age <= 69) {
                 $ageGroups['ช่วงอายุ 60-69']++;
             } elseif ($age >= 70 && $age <= 79) {
@@ -72,14 +71,35 @@ class ElderlyController extends Controller
             }
         }
 
-        // ดึงข้อมูล ADL group counts
+        // 3. คำนวณสัดส่วน ADL
         $adlGroups = [
-            'กลุ่มติดสังคม' => BarthelAdl::where('Group_ADL', 'กลุ่มติดสังคม')->count(),
-            'กลุ่มติดบ้าน' => BarthelAdl::where('Group_ADL', 'กลุ่มติดบ้าน')->count(),
-            'กลุ่มติดเตียง' => BarthelAdl::where('Group_ADL', 'กลุ่มติดเตียง')->count(),
+            'กลุ่มติดสังคม' => BarthelAdl::where('Group_ADL','กลุ่มติดสังคม')->count(),
+            'กลุ่มติดบ้าน' => BarthelAdl::where('Group_ADL','กลุ่มติดบ้าน')->count(),
+            'กลุ่มติดเตียง'=> BarthelAdl::where('Group_ADL','กลุ่มติดเตียง')->count(),
         ];
 
-        return view('staff.dashboard-staff', compact('elderlies', 'ageGroups', 'adlGroups'));
+        // 4. เตรียม JSON สำหรับ Marker บนแผนที่
+        $elderlyLocations = [];
+        foreach ($elderlies as $e) {
+            if ($e->addressElderly
+                && $e->addressElderly->Latitude_position
+                && $e->addressElderly->Longitude_position
+            ) {
+                $adlGroup = optional($e->barthel_adl)->Group_ADL ?: 'ยังไม่ได้ประเมิน';
+                $elderlyLocations[] = [
+                    'latitude'  => $e->addressElderly->Latitude_position,
+                    'longitude' => $e->addressElderly->Longitude_position,
+                    'name'      => $e->Name_Elderly,
+                    'address'   => $e->Address,
+                    'adlGroup'  => $adlGroup,
+                ];
+            }
+        }
+
+        // 5. ส่งข้อมูลไปยัง View
+        return view('staff.dashboard-staff', compact(
+            'elderlies','ageGroups','adlGroups','elderlyLocations'
+        ));
     }
 
 
