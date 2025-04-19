@@ -90,8 +90,13 @@
                                                     ออกรายงาน
                                                     </a>
 
-                                                    <a href="{{ route('cg.edit', ['id' => $cg->ID_CG]) }}"
-                                                        class="btn btn-warning btn-sm">แก้ไข</a>
+                                                    {{--  <a href="{{ route('cg.edit', ['id' => $cg->ID_CG]) }}"
+                                                        class="btn btn-warning btn-sm">แก้ไข</a>  --}}
+                                                        <a href="{{ route('cg.edit', ['id' => $cg->ID_CG]) }}"
+                                                            class="btn btn-sm {{ is_null($cg->Name_CG) ? 'btn-success' : 'btn-warning' }}">
+                                                            <i class="fas fa-edit"></i>
+                                                            {{ is_null($cg->Name_CG) ? 'เพิ่มแบบประเมิน' : 'แก้ไขแบบประเมิน' }}
+                                                        </a>
                                                     <form id="delete-cg-form-{{ $cg->ID_CG }}"
                                                         action="{{ route('cg.destroy', ['id' => $cg->ID_CG]) }}"
                                                         method="POST" style="display:inline-block;">
@@ -271,7 +276,7 @@
             });
         });
 
-        
+
         function generatePdf(id) {
             // สร้าง URL จาก named route
             const url = '{{ url("cg") }}/' + id + '/export-pdf';

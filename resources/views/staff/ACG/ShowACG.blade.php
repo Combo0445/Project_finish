@@ -66,8 +66,13 @@
                                                 <td class="text-center">{{ $activity->caregiver->Name_CG }}</td>
                                                 <td class="text-center">
                                                     <a href="javascript:void(0);" onclick="generatePdf({{ $activity->ID_ACG }})" class="btn btn-success btn-sm">ออกรายงาน</a>
-                                                    <a href="{{ route('acg.edit', ['id' => $activity->ID_ACG]) }}"
-                                                        class="btn btn-warning btn-sm">แก้ไข</a>
+                                                    {{--  <a href="{{ route('acg.edit', ['id' => $activity->ID_ACG]) }}"
+                                                        class="btn btn-warning btn-sm">แก้ไข</a>  --}}
+                                                        <a href="{{ route('cg.edit', ['id' => $activity->ID_ACG]) }}"
+                                                            class="btn btn-sm {{ is_null($activity->Evaluate) ? 'btn-success' : 'btn-warning' }}">
+                                                            <i class="fas fa-edit"></i>
+                                                            {{ is_null($activity->Evaluate) ? 'เพิ่มแบบประเมิน' : 'แก้ไขแบบประเมิน' }}
+                                                        </a>
                                                         <form id="delete-acg-form-{{ $activity->ID_ACG }}"
                                                             action="{{ route('acg.destroy', ['id' => $activity->ID_ACG]) }}"
                                                             method="POST" style="display:inline-block;">

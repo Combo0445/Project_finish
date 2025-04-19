@@ -327,6 +327,9 @@ class CGController extends Controller
             });
         }
 
+        // // เพิ่มการเรียงลำดับจากใหม่ไปเก่า
+        // $activities = $query->orderBy('ID_CG', 'desc')->get();
+
         $activities = $query->get();
         return view('staff.ACG.ShowACG', compact('activities'));
     }
