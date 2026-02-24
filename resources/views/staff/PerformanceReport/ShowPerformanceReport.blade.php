@@ -73,7 +73,7 @@
                                                           method="POST" style="display:inline-block;">
                                                         @csrf @method('DELETE')
                                                         <button type="button" class="btn btn-danger btn-sm"
-                                                                onclick="confirmDelete({{ $r->id }})">
+                                                                onclick="confirmDelete('{{ $r->id }}')">
                                                             ลบ
                                                         </button>
                                                     </form>
