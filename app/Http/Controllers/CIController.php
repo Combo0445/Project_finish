@@ -11,13 +11,13 @@ class CIController extends Controller
 {
     public function ShowStaffCI()
     {
-        $careInstructions = CareInstruction::where('Name_Staff', Auth::user()->Name_User)->with('elderly')->get();
+        $careInstructions = CareInstruction::where('Name_Staff', Auth::user()->Name_User)->with('elderly')->paginate(20);
         return view('staff.CI.Staff-ShowCI', compact('careInstructions'));
     }
 
     public function ShowUnconfirmCI()
     {
-        $careInstructions = CareInstruction::where('Name_Staff', Auth::user()->Name_User)->with('elderly')->get();
+        $careInstructions = CareInstruction::where('Name_Staff', Auth::user()->Name_User)->with('elderly')->paginate(20);
         return view('staff.CI.unconfirmCI', compact('careInstructions'));
     }
 
@@ -41,7 +41,7 @@ class CIController extends Controller
 
     public function ReportCIConfirm()
     {
-        $careInstructions = CareInstruction::whereNotNull('Confirm')->get();
+        $careInstructions = CareInstruction::whereNotNull('Confirm')->paginate(20);
         return view('staff.Report.report-ci-confirm', compact('careInstructions'));
     }
 

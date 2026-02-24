@@ -46,6 +46,7 @@
                 @endforeach
             </tbody>
         </table>
+        {{ $careInstructions->links() }}
     </div>
 
 </body>

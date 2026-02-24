@@ -105,23 +105,27 @@ class AdminController extends Controller
         $request->validate([
             'title' => 'required|string|max:255',
             'content' => 'required|string',
-            'images.*' => 'nullable|image'
+            'images.*' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048'
         ]);
 
-        $news = new News($request->only(['title', 'content']));
-        $news->save();
+        try {
+            $news = new News($request->only(['title', 'content']));
+            $news->save();
 
-        if ($request->hasFile('images')) {
-            foreach ($request->file('images') as $image) {
-                $path = $image->store('news_images', 'public');
-                NewsImage::create([
-                    'news_id' => $news->id,
-                    'image_path' => $path,
-                ]);
+            if ($request->hasFile('images')) {
+                foreach ($request->file('images') as $image) {
+                    $path = $image->store('news_images', 'public');
+                    NewsImage::create([
+                        'news_id' => $news->id,
+                        'image_path' => $path,
+                    ]);
+                }
             }
-        }
 
-        return redirect()->route('admin.layout-admin')->with('success', 'บัญชีผู้ดูแลระบบไม่สามารถลบได้');
+            return redirect()->route('admin.layout-admin')->with('success', 'เพิ่มข่าวเรียบร้อยแล้ว');
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'เกิดข้อผิดพลาดในการเพิ่มข่าว: ' . $e->getMessage());
+        }
     }
 
     public function updateNews(Request $request, $id)
@@ -129,32 +133,36 @@ class AdminController extends Controller
         $request->validate([
             'title' => 'required|string|max:255',
             'content' => 'required|string',
-            'images.*' => 'nullable|image'
+            'images.*' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048'
         ]);
 
-        $news = News::findOrFail($id);
-        $news->fill($request->only(['title', 'content']));
-        $news->save();
+        try {
+            $news = News::findOrFail($id);
+            $news->fill($request->only(['title', 'content']));
+            $news->save();
 
-        // ถ้ามีการอัปโหลดรูปภาพใหม่ ให้ลบรูปภาพเก่าออก
-        if ($request->hasFile('images')) {
-            // ลบรูปภาพเก่าทั้งหมดที่เกี่ยวข้องกับข่าวนี้
-            foreach ($news->images as $oldImage) {
-                Storage::disk('public')->delete($oldImage->image_path);
-                $oldImage->delete();
+            // ถ้ามีการอัปโหลดรูปภาพใหม่ ให้ลบรูปภาพเก่าออก
+            if ($request->hasFile('images')) {
+                // ลบรูปภาพเก่าทั้งหมดที่เกี่ยวข้องกับข่าวนี้
+                foreach ($news->images as $oldImage) {
+                    Storage::disk('public')->delete($oldImage->image_path);
+                    $oldImage->delete();
+                }
+
+                // เพิ่มรูปภาพใหม่เข้าไปในฐานข้อมูลและที่เก็บไฟล์
+                foreach ($request->file('images') as $image) {
+                    $path = $image->store('news_images', 'public');
+                    NewsImage::create([
+                        'news_id' => $news->id,
+                        'image_path' => $path,
+                    ]);
+                }
             }
 
-            // เพิ่มรูปภาพใหม่เข้าไปในฐานข้อมูลและที่เก็บไฟล์
-            foreach ($request->file('images') as $image) {
-                $path = $image->store('news_images', 'public');
-                NewsImage::create([
-                    'news_id' => $news->id,
-                    'image_path' => $path,
-                ]);
-            }
+            return redirect()->route('admin.layout-admin')->with('success', 'อัปเดตข่าวสารสำเร็จแล้ว');
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'เกิดข้อผิดพลาดในการแก้ไขข่าว: ' . $e->getMessage());
         }
-
-        return redirect()->route('admin.layout-admin')->with('success', 'อัปเดตข่าวสารสำเร็จแล้ว');
     }
 
 

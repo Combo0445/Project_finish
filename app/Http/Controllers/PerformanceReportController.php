@@ -16,7 +16,7 @@ class PerformanceReportController extends Controller
     public function index()
     {
         // โหลดข้อมูลพร้อมความสัมพันธ์ที่ต้องการใช้งาน
-        $performanceReports = PerformanceReport::with('elderly', 'adl', 'tai', 'caregiver', 'user')->get();
+        $performanceReports = PerformanceReport::with('elderly', 'adl', 'tai', 'caregiver', 'user')->paginate(20);
         return view('staff.PerformanceReport.ShowPerformanceReport', compact('performanceReports'));
     }
 

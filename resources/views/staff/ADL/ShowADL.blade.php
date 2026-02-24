@@ -80,6 +80,7 @@
                                         @endforeach
                                     </tbody>
                                 </table>
+                                {{ $adls->links() }}
                             </div>
                         </div>
                     </div>

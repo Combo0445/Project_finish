@@ -42,37 +42,41 @@ class ProfileController extends Controller
             'Image_User' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
         ]);
 
-        $user->Name_User = $request->Name_User;
-        $user->Email = $request->Email;
-        $user->Address = $request->Address ?? '';
-        $user->Phone = $request->Phone ?? '';
+        try {
+            $user->Name_User = $request->Name_User;
+            $user->Email = $request->Email;
+            $user->Address = $request->Address ?? '';
+            $user->Phone = $request->Phone ?? '';
 
-        if ($request->hasFile('Image_User')) {
-            $imageName = time() . '.' . $request->Image_User->extension();
-            $request->Image_User->move(public_path('images'), $imageName);
-            $user->Image_User = 'images/' . $imageName;
-        } else {
-            // Set default profile image if none is provided
-            if (!$user->Image_User) {
-                switch ($user->Type_Personnel) {
-                    case 'Admin':
-                        $user->Image_User = 'images-user/Admin.jpg';
-                        break;
-                    case 'Staff':
-                        $user->Image_User = 'images-user/Staff.png';
-                        break;
-                    case 'Doctor':
-                        $user->Image_User = 'images-user/Doctor.png';
-                        break;
-                    default:
-                        $user->Image_User = '';
-                        break;
+            if ($request->hasFile('Image_User')) {
+                $imageName = time() . '.' . $request->Image_User->extension();
+                $request->Image_User->move(public_path('images'), $imageName);
+                $user->Image_User = 'images/' . $imageName;
+            } else {
+                // Set default profile image if none is provided
+                if (!$user->Image_User) {
+                    switch ($user->Type_Personnel) {
+                        case 'Admin':
+                            $user->Image_User = 'images-user/Admin.jpg';
+                            break;
+                        case 'Staff':
+                            $user->Image_User = 'images-user/Staff.png';
+                            break;
+                        case 'Doctor':
+                            $user->Image_User = 'images-user/Doctor.png';
+                            break;
+                        default:
+                            $user->Image_User = '';
+                            break;
+                    }
                 }
             }
+
+            $user->save();
+
+            return redirect()->route('profile-user')->with('success', 'อัปเดตโปรไฟล์สำเร็จแล้ว');
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'เกิดข้อผิดพลาดในการอัปเดตโปรไฟล์: ' . $e->getMessage());
         }
-
-        $user->save();
-
-        return redirect()->route('profile-user')->with('success', 'อัปเดตโปรไฟล์สำเร็จแล้ว');
     }
 }

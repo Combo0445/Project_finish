@@ -14,7 +14,7 @@ class ADLController extends Controller
     {
         $search = $request->get('search');
 
-        $adls = BarthelAdl::with('elderly')->get();
+        $adls = BarthelAdl::with('elderly')->paginate(20);
 
         return view('staff.ADL.ShowADL', compact('adls'));
     }

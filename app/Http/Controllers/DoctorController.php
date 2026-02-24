@@ -19,7 +19,7 @@ class DoctorController extends Controller
 
 
 
-        $elderlys = $query->get();
+        $elderlys = $query->paginate(20);
         return view('doctor.dashboard-doctor', compact('elderlys'));
     }
 
@@ -43,7 +43,14 @@ class DoctorController extends Controller
             'Care_instructions' => 'required|string',
         ]);
 
-        CareInstruction::create($request->all());
+        CareInstruction::create($request->only([
+            'ID_Elderly',
+            'Date_CI',
+            'Name_Elderly',
+            'Name_Doctor',
+            'Name_Staff',
+            'Care_instructions',
+        ]));
 
         return redirect()->route('doctor.dashboard')->with('success', 'คำแนะนำถูกบันทึกเรียบร้อยแล้ว');
     }
@@ -66,7 +73,7 @@ class DoctorController extends Controller
             });
         }
 
-        $careInstructions = $query->get();
+        $careInstructions = $query->paginate(20);
         return view('doctor.CI.ShowCI', compact('careInstructions'));
     }
 
@@ -95,7 +102,14 @@ class DoctorController extends Controller
         ]);
 
         $careInstruction = CareInstruction::findOrFail($id);
-        $careInstruction->update($request->all());
+        $careInstruction->update($request->only([
+            'ID_Elderly',
+            'Date_CI',
+            'Name_Elderly',
+            'Name_Doctor',
+            'Name_Staff',
+            'Care_instructions',
+        ]));
 
         return redirect()->route('ci.index')->with('success', 'คำแนะนำถูกอัปเดตเรียบร้อยแล้ว');
     }

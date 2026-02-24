@@ -110,6 +110,7 @@
                                         @endforeach
                                     </tbody>
                                 </table>
+                                {{ $scoreTAIs->links() }}
                             </div>
                         </div>
                     </div>

@@ -14,8 +14,7 @@ class TAIController extends Controller
 {
     public function index()
     {
-        $tai = ScoreTAI::with(['elderly', 'user'])->get();
-        // dd($tai); // ตรวจสอบข้อมูลก่อนส่งไป View
+        $tai = ScoreTAI::with(['elderly', 'user'])->paginate(20);
         return view('staff.TAI.ShowTAI', compact('tai'));
     }
 

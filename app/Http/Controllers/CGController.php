@@ -21,7 +21,7 @@ class CGController extends Controller
                 ->orWhere('Name_CG', 'like', '%' . $request->search . '%');
         }
 
-        $careGivers = $query->get();
+        $careGivers = $query->paginate(20);
         return view('staff.CG.ShowCG', compact('careGivers'));
     }
 
@@ -82,91 +82,94 @@ class CGController extends Controller
 
         ]);
 
-        $careGiverData = $request->only([
-            'Name_CG',
-            'Related',
-            'Phone_CG',
-            'Name_Elderly',
-            'Address',
-            'Weight',
-            'Height',
-            'Waist',
-            'Group_ADL',
-            'Disease',
-            'Disability',
-            'Rights',
-            'Date',
-            'Consciousness',
-            'Vital_signs',
-            'Bedsores',
-            'Bedsores_details',
-            'Pain',
-            'Pain_details',
-            'Swelling',
-            'Swelling_details',
-            'Itchy_rash',
-            'Itchy_rash_details',
-            'Stiff_joints',
-            'Stiff_joints_details',
-            'Malnutrition',
-            'Malnutrition_details',
-            'Eating',
-            'Swallowing',
-            'Defecation',
-            'Urinary_excretion',
-            'Taking_medicine',
-            'Emotional_state',
-            'Economic_problems',
-            'Economic_problems_details',
-            'Social_problems',
-            'Social_problems_details',
-            'Doctor_FU',
-            'Doctor_FU_details',
-            'Other_problems',
-            'Assistance',
-            'Reporter',
-        ]);
+        try {
+            $careGiverData = $request->only([
+                'Name_CG',
+                'Related',
+                'Phone_CG',
+                'Name_Elderly',
+                'Address',
+                'Weight',
+                'Height',
+                'Waist',
+                'Group_ADL',
+                'Disease',
+                'Disability',
+                'Rights',
+                'Date',
+                'Consciousness',
+                'Vital_signs',
+                'Bedsores',
+                'Bedsores_details',
+                'Pain',
+                'Pain_details',
+                'Swelling',
+                'Swelling_details',
+                'Itchy_rash',
+                'Itchy_rash_details',
+                'Stiff_joints',
+                'Stiff_joints_details',
+                'Malnutrition',
+                'Malnutrition_details',
+                'Eating',
+                'Swallowing',
+                'Defecation',
+                'Urinary_excretion',
+                'Taking_medicine',
+                'Emotional_state',
+                'Economic_problems',
+                'Economic_problems_details',
+                'Social_problems',
+                'Social_problems_details',
+                'Doctor_FU',
+                'Doctor_FU_details',
+                'Other_problems',
+                'Assistance',
+                'Reporter',
+            ]);
 
-        $id_elderly = BarthelAdl::findOrFail($request->ID_Elderly);
-        $elderly = Elderly::findOrFail($id_elderly->ID_Elderly);
+            $id_elderly = BarthelAdl::findOrFail($request->ID_Elderly);
+            $elderly = Elderly::findOrFail($id_elderly->ID_Elderly);
 
-        $careGiverData['Bedsores'] = $request->Bedsores . ($request->Bedsores_details ? '-' . $request->Bedsores_details : '');
-        $careGiverData['Pain'] = $request->Pain . ($request->Pain_details ? '-' . $request->Pain_details : '');
-        $careGiverData['Swelling'] = $request->Swelling . ($request->Swelling_details ? '-' . $request->Swelling_details : '');
-        $careGiverData['Itchy_rash'] = $request->Itchy_rash . ($request->Itchy_rash_details ? '-' . $request->Itchy_rash_details : '');
-        $careGiverData['Stiff_joints'] = $request->Stiff_joints . ($request->Stiff_joints_details ? '-' . $request->Stiff_joints_details : '');
-        $careGiverData['Malnutrition'] = $request->Malnutrition . ($request->Malnutrition_details ? '-' . $request->Malnutrition_details : '');
-        $careGiverData['Economic_problems'] = $request->Economic_problems . ($request->Economic_problems_details ? '-' . $request->Economic_problems_details : '');
-        $careGiverData['Social_problems'] = $request->Social_problems . ($request->Social_problems_details ? '-' . $request->Social_problems_details : '');
-        $careGiverData['Doctor_FU'] = $request->Doctor_FU . ($request->Doctor_FU_details ? '-' . $request->Doctor_FU_details : '');
-        $careGiverData['Date_CG'] = $request->Date;
-        $careGiverData['Birthday'] = $elderly->Birthday;
-        $careGiverData['ID_Elderly'] = $id_elderly->ID_Elderly;
+            $careGiverData['Bedsores'] = $request->Bedsores . ($request->Bedsores_details ? '-' . $request->Bedsores_details : '');
+            $careGiverData['Pain'] = $request->Pain . ($request->Pain_details ? '-' . $request->Pain_details : '');
+            $careGiverData['Swelling'] = $request->Swelling . ($request->Swelling_details ? '-' . $request->Swelling_details : '');
+            $careGiverData['Itchy_rash'] = $request->Itchy_rash . ($request->Itchy_rash_details ? '-' . $request->Itchy_rash_details : '');
+            $careGiverData['Stiff_joints'] = $request->Stiff_joints . ($request->Stiff_joints_details ? '-' . $request->Stiff_joints_details : '');
+            $careGiverData['Malnutrition'] = $request->Malnutrition . ($request->Malnutrition_details ? '-' . $request->Malnutrition_details : '');
+            $careGiverData['Economic_problems'] = $request->Economic_problems . ($request->Economic_problems_details ? '-' . $request->Economic_problems_details : '');
+            $careGiverData['Social_problems'] = $request->Social_problems . ($request->Social_problems_details ? '-' . $request->Social_problems_details : '');
+            $careGiverData['Doctor_FU'] = $request->Doctor_FU . ($request->Doctor_FU_details ? '-' . $request->Doctor_FU_details : '');
+            $careGiverData['Date_CG'] = $request->Date;
+            $careGiverData['Birthday'] = $elderly->Birthday;
+            $careGiverData['ID_Elderly'] = $id_elderly->ID_Elderly;
 
-        $adl = BarthelAdl::where('ID_Elderly', $id_elderly->ID_Elderly)->first();
-        if ($adl) {
-            $careGiverData['ID_ADL'] = $adl->ID_ADL;
-        } else {
-            return redirect()->back()->withErrors(['ID_ADL' => 'ไม่พบข้อมูล ADL สำหรับผู้สูงอายุที่เลือก']);
-        }
-
-        $picturePaths = [];
-
-        if ($request->hasFile('Picture')) {
-            foreach ($request->file('Picture') as $picture) {
-                $path = $picture->store('pictures', 'public');
-                $picturePaths[] = $path;
+            $adl = BarthelAdl::where('ID_Elderly', $id_elderly->ID_Elderly)->first();
+            if ($adl) {
+                $careGiverData['ID_ADL'] = $adl->ID_ADL;
+            } else {
+                return redirect()->back()->withErrors(['ID_ADL' => 'ไม่พบข้อมูล ADL สำหรับผู้สูงอายุที่เลือก']);
             }
+
+            $picturePaths = [];
+
+            if ($request->hasFile('Picture')) {
+                foreach ($request->file('Picture') as $picture) {
+                    $path = $picture->store('pictures', 'public');
+                    $picturePaths[] = $path;
+                }
+            }
+
+            $careGiverData['Picture'] = json_encode($picturePaths);
+
+            $cg = new CareGiver();
+            $cg->fill($careGiverData);
+            $cg->save();
+
+            return redirect()->route('cg.create')->with('success', 'เพิ่ม Care Giver สำเร็จแล้ว!');
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'เกิดข้อผิดพลาดในการบันทึกข้อมูล: ' . $e->getMessage());
         }
-
-        $careGiverData['Picture'] = json_encode($picturePaths);
-
-
-        $cg = new CareGiver();
-        $cg->fill($careGiverData);
-        $cg->save();
-
-        return redirect()->route('cg.create')->with('success', 'เพิ่ม Care Giver สำเร็จแล้ว!');
     }
 
     public function edit($id)
@@ -221,92 +224,96 @@ class CGController extends Controller
             'Picture.*' => 'image|mimes:jpeg,png,jpg,gif|max:2048', // validate ทีละรูป
         ]);
 
-        $careGiverData = $request->only([
-            'Name_CG',
-            'Related',
-            'Phone_CG',
-            'ID_Elderly',
-            'Name_Elderly',
-            'Address',
-            'Weight',
-            'Height',
-            'Waist',
-            'Group_ADL',
-            'Disease',
-            'Disability',
-            'Rights',
-            'Date_CG',
-            'Consciousness',
-            'Vital_signs',
-            'Bedsores',
-            'Pain',
-            'Swelling',
-            'Itchy_rash',
-            'Stiff_joints',
-            'Malnutrition',
-            'Eating',
-            'Swallowing',
-            'Defecation',
-            'Urinary_excretion',
-            'Taking_medicine',
-            'Emotional_state',
-            'Economic_problems',
-            'Social_problems',
-            'Doctor_FU',
-            'Other_problems',
-            'Assistance',
-            'Reporter',
-        ]);
+        try {
+            $careGiverData = $request->only([
+                'Name_CG',
+                'Related',
+                'Phone_CG',
+                'ID_Elderly',
+                'Name_Elderly',
+                'Address',
+                'Weight',
+                'Height',
+                'Waist',
+                'Group_ADL',
+                'Disease',
+                'Disability',
+                'Rights',
+                'Date_CG',
+                'Consciousness',
+                'Vital_signs',
+                'Bedsores',
+                'Pain',
+                'Swelling',
+                'Itchy_rash',
+                'Stiff_joints',
+                'Malnutrition',
+                'Eating',
+                'Swallowing',
+                'Defecation',
+                'Urinary_excretion',
+                'Taking_medicine',
+                'Emotional_state',
+                'Economic_problems',
+                'Social_problems',
+                'Doctor_FU',
+                'Other_problems',
+                'Assistance',
+                'Reporter',
+            ]);
 
-        $careGiver = CareGiver::findOrFail($id);
+            $careGiver = CareGiver::findOrFail($id);
 
-        // ลบรูปเก่าออกจาก storage
-        if ($careGiver->Picture) {
-            $oldImages = json_decode($careGiver->Picture, true);
-            foreach ($oldImages as $oldPath) {
-                Storage::disk('public')->delete($oldPath);
+            // ลบรูปเก่าออกจาก storage
+            if ($careGiver->Picture) {
+                $oldImages = json_decode($careGiver->Picture, true);
+                foreach ($oldImages as $oldPath) {
+                    Storage::disk('public')->delete($oldPath);
+                }
             }
-        }
 
-        // บันทึกรูปใหม่
-        $picturePaths = [];
-        if ($request->hasFile('Picture')) {
-            foreach ($request->file('Picture') as $picture) {
-                $path = $picture->store('pictures', 'public');
-                $picturePaths[] = $path;
+            // บันทึกรูปใหม่
+            $picturePaths = [];
+            if ($request->hasFile('Picture')) {
+                foreach ($request->file('Picture') as $picture) {
+                    $path = $picture->store('pictures', 'public');
+                    $picturePaths[] = $path;
+                }
+                $careGiverData['Picture'] = json_encode($picturePaths);
+            } else {
+                $careGiverData['Picture'] = null; // หากไม่อัปใหม่ ให้ล้างรูปเก่า
             }
-            $careGiverData['Picture'] = json_encode($picturePaths);
-        } else {
-            $careGiverData['Picture'] = null; // หากไม่อัปใหม่ ให้ล้างรูปเก่า
+
+            $careGiver->update($careGiverData);
+
+            ActivityCaregiver::create([
+                'ID_CG' => $careGiver->ID_CG,
+                'Date_ACG' => Carbon::now()->toDateString(), // วันที่ปัจจุบัน
+                'Evaluate' => null,
+                'Dress_the_wound' => null,
+                'Rehabilitate' => null,
+                'Clean_body' => null,
+                'Take_care_medicine' => null,
+                'Take_care_feeding' => null,
+                'Environmental' => null,
+                'Take_exercise' => null,
+                'Give_advice_consult' => null,
+                'Take_to_see_a_doctor' => null,
+                'Other' => null,
+                'Take_to_make_merit' => null,
+                'Take_to_market' => null,
+                'Take_to_meet_friends' => null,
+                'Take_to_allowance' => null,
+                'Talk_as_friends' => null,
+                'Other_specified' => null,
+                'Problem' => null,
+                'Solution' => null,
+            ]);
+
+            return redirect()->route('cg.index')->with('success', 'อัปเดตข้อมูล Care Giver สำเร็จแล้ว!');
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'เกิดข้อผิดพลาดในการแก้ไขข้อมูล: ' . $e->getMessage());
         }
-
-        $careGiver->update($careGiverData);
-
-        ActivityCaregiver::create([
-            'ID_CG' => $careGiver->ID_CG,
-            'Date_ACG' => Carbon::now()->toDateString(), // วันที่ปัจจุบัน
-            'Evaluate' => null,
-            'Dress_the_wound' => null,
-            'Rehabilitate' => null,
-            'Clean_body' => null,
-            'Take_care_medicine' => null,
-            'Take_care_feeding' => null,
-            'Environmental' => null,
-            'Take_exercise' => null,
-            'Give_advice_consult' => null,
-            'Take_to_see_a_doctor' => null,
-            'Other' => null,
-            'Take_to_make_merit' => null,
-            'Take_to_market' => null,
-            'Take_to_meet_friends' => null,
-            'Take_to_allowance' => null,
-            'Talk_as_friends' => null,
-            'Other_specified' => null,
-            'Problem' => null,
-            'Solution' => null,
-        ]);
-
-        return redirect()->route('cg.index')->with('success', 'อัปเดตข้อมูล Care Giver สำเร็จแล้ว!');
     }
 
     public function destroy($id)

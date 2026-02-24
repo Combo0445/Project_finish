@@ -186,6 +186,7 @@
                                 @endforeach
                             </tbody>
                         </table>
+                        {{ $elderlys->links() }}
                         </div>
                     </div>
                 </div>

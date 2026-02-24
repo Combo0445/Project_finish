@@ -110,6 +110,7 @@
                                         @endforeach
                                     </tbody>
                                 </table>
+                                {{ $careGivers->links() }}
                             </div>
                         </div>
                     </div>
