@@ -10,6 +10,7 @@ class ProfileController extends Controller
 {
     public function showProfile()
     {
+        /** @var User $user */
         $user = Auth::user(); // Retrieve the logged-in user
 
         if (!$user) {
@@ -20,6 +21,7 @@ class ProfileController extends Controller
 
     public function editProfile()
     {
+        /** @var User $user */
         $user = Auth::user();
         if (!$user) {
             return redirect('login')->with('error', 'กรุณาล็อกอินเพื่อเข้าถึงหน้านี้');
@@ -29,6 +31,7 @@ class ProfileController extends Controller
 
     public function updateProfile(Request $request)
     {
+        /** @var User $user */
         $user = Auth::user();
         if (!$user) {
             return redirect()->route('profile-user')->with('error', 'คุณสามารถแก้ไขโปรไฟล์ของคุณเองเท่านั้น');
