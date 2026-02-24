@@ -40,7 +40,19 @@
                     @endif
                     <tr>
                         <td>
-                            <img src="{{ url($user->Image_User) }}" alt="User Image" class="user-image">
+                            @if ($user->Image_User)
+                                <img src="{{ url($user->Image_User) }}" alt="User Image" class="user-image">
+                            @else
+                                @if ($user->Type_Personnel === 'Admin')
+                                    <img src="{{ url('images-user/Admin.jpg') }}" alt="Admin Avatar" class="user-image">
+                                @elseif ($user->Type_Personnel === 'Staff')
+                                    <img src="{{ url('images-user/Staff.png') }}" alt="Staff Avatar" class="user-image">
+                                @elseif ($user->Type_Personnel === 'Doctor')
+                                    <img src="{{ url('images-user/Doctor.png') }}" alt="Doctor Avatar" class="user-image">
+                                @else
+                                    <img src="{{ url('Logo.png') }}" alt="Default Avatar" class="user-image">
+                                @endif
+                            @endif
                         </td>
                         <td>{{ $user->Name_User ?: 'ไม่มีข้อมูล' }}</td>
                         <td style="text-align: center;">{{ $user->Type_Personnel }}</td>

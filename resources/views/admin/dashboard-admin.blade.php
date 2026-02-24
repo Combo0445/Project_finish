@@ -101,7 +101,19 @@
                                         @foreach ($users as $user)
                                             <tr>
                                                 <td class="text-center">
-                                                    <img src="{{ url('/' . $user->Image_User) }}" alt="User Image" class="img-fluid" style="max-width: 50px;">
+                                                    @if ($user->Image_User)
+                                                        <img src="{{ url('/' . $user->Image_User) }}" alt="User Image" class="img-fluid" style="max-width: 50px; border-radius: 50%; object-fit: cover;">
+                                                    @else
+                                                        @if ($user->Type_Personnel === 'Admin')
+                                                            <img src="{{ url('images-user/Admin.jpg') }}" alt="Admin Avatar" class="img-fluid" style="max-width: 50px; border-radius: 50%; object-fit: cover;">
+                                                        @elseif ($user->Type_Personnel === 'Staff')
+                                                            <img src="{{ url('images-user/Staff.png') }}" alt="Staff Avatar" class="img-fluid" style="max-width: 50px; border-radius: 50%; object-fit: cover;">
+                                                        @elseif ($user->Type_Personnel === 'Doctor')
+                                                            <img src="{{ url('images-user/Doctor.png') }}" alt="Doctor Avatar" class="img-fluid" style="max-width: 50px; border-radius: 50%; object-fit: cover;">
+                                                        @else
+                                                            <img src="{{ url('Logo.png') }}" alt="Default Avatar" class="img-fluid" style="max-width: 50px; border-radius: 50%; object-fit: cover;">
+                                                        @endif
+                                                    @endif
                                                 </td>
                                                 <td class="text-center">{{ $user->Name_User ?: 'ไม่มีข้อมูล' }}</td>
                                                 <td class="text-center">{{ $user->Username ?: 'ไม่มีข้อมูล' }}</td>
