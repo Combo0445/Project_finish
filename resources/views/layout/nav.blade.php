@@ -302,9 +302,27 @@
 
         @if (Auth::check())
             <div class="user-info">
+                @php
+                    $user = Auth::user();
+                    $avatarSrc = '';
+                    if ($user && $user->Image_User) {
+                        $avatarSrc = url($user->Image_User);
+                    } else {
+                        $type = $user->Type_Personnel ?? '';
+                        if ($type === 'Admin') {
+                            $avatarSrc = asset('images/1722828897.png');
+                        } elseif ($type === 'Staff') {
+                            $avatarSrc = asset('images/1722828889.png');
+                        } elseif ($type === 'Doctor') {
+                            $avatarSrc = asset('images/1724410409.svg');
+                        } else {
+                            $avatarSrc = asset('images/Logo.png');
+                        }
+                    }
+                @endphp
                 <a href="{{ url('profile-user') }}">
-                    <img src="{{ url(Auth::user()->Image_User) }}" alt="Profile Image">
-                    <span>{{ Auth::user()->Name_User }}</span>
+                    <img src="{{ $avatarSrc }}" alt="Profile Image">
+                    <span>{{ $user->Name_User ?? '' }}</span>
                 </a>
                 <div class="notifications">
                     @php

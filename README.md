@@ -1,53 +1,220 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# ระบบประเมินความสามารถในการดำเนินกิจวัตรประจำวันของผู้สูงอายุ
+## ADL Assessment System
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+![Laravel](https://img.shields.io/badge/Laravel-10-red?logo=laravel)
+![MySQL](https://img.shields.io/badge/MySQL-8.0-blue?logo=mysql)
+![PHP](https://img.shields.io/badge/PHP-8.1+-purple?logo=php)
+![License](https://img.shields.io/badge/License-MIT-green)
 
-## About Laravel
+## 📋 ภาพรวมโปรเจกต์
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+ระบบประเมินความสามารถในการดำเนินชีวิตประจำวันของผู้สูงอายุ (ADL Barthel Index) พร้อมการประเมิน Care Giver และ TAI (Thai Able Index) สำหรับสนับสนุนการดูแลผู้สูงอายุในสถานสงเคราะห์และโรงพยาบาล
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+**เทคโนโลยี:** Laravel 10, MySQL, jQuery, Bootstrap 4, Quill Editor
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+---
 
-## Learning Laravel
+## ✨ ฟีเจอร์หลัก
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+### 👥 ระบบแบ่งบทบาท (Role-Based Access)
+- **Admin** - จัดการระบบ, ผู้ใช้, ข่าวสาร, Sliders
+- **Staff** - บันทึก ADL Assessment, Care Giver, TAI, Activity, Performance Report
+- **Doctor** - จัดการคำสั่งดูแล (Care Instructions)
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+### 📊 ระบบประเมินครอบคลุม
+- **Barthel ADL Index** - ประเมิน 10 ด้าน (Self-care, Mobility, Continence)
+- **Care Giver Assessment** - บันทึก caregiver และสภาพสุขภาพผู้สูงอายุ (37+ ข้อมูลด้าน)
+- **TAI (Thai Able Index)** - ประเมิน Mobility, Confusion, Feeding, Toileting
+- **Performance Report** - รวบรวมและรายงานผลประเมิน
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains over 2000 video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+### 📰 ระบบข่าวสาร
+- สร้าง/แก้ไข/ลบข่าว พร้อม Quill Editor
+- อัพโหลดหลายรูป (ตารางแยก news_images)
+- Avatar ตามบทบาท (Admin/Staff/Doctor)
 
-## Laravel Sponsors
+### 📁 การจัดการไฟล์
+- Upload Profile Picture, Caregiver Photos, Sliders
+- Storage symlink สำหรับเก็บไฟล์สาธารณะ
+- ลบไฟล์อัตโนมัติเมื่อลบบันทึก
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the Laravel [Patreon page](https://patreon.com/taylorotwell).
+### 📑 ระบบรายงาน & Export
+- Export Excel (ADL, Care Giver, TAI)
+- PDF Report สำหรับแต่ละประเมิน
+- ค้นหาและกรองข้อมูล
 
-### Premium Partners
+### 🔔 ระบบแจ้งเตือน
+- Notification สำหรับใบสั่ง Care Instruction ที่รอยืนยัน
+- Bell Icon มี shake animation เมื่อมีการแจ้งเตือน
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Cubet Techno Labs](https://cubettech.com)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[Many](https://www.many.co.uk)**
-- **[Webdock, Fast VPS Hosting](https://www.webdock.io/en)**
-- **[DevSquad](https://devsquad.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[OP.GG](https://op.gg)**
-- **[WebReinvent](https://webreinvent.com/?utm_source=laravel&utm_medium=github&utm_campaign=patreon-sponsors)**
-- **[Lendio](https://lendio.com)**
+---
+
+## 🛠️ การติดตั้ง
+
+### ข้อกำหนด
+- PHP >= 8.1
+- Composer
+- MySQL / MariaDB 8.0
+- Node.js & npm (ตามต้องการ)
+
+### ขั้นตอนการติดตั้ง
+
+**1. Clone Repository**
+```bash
+git clone https://github.com/Combo0445/Project_finish.git
+cd Project_finish
+```
+
+**2. ติดตั้ง PHP Dependencies**
+```bash
+composer install
+```
+
+**3. สร้าง .env File**
+```bash
+cp .env.example .env
+php artisan key:generate
+```
+
+**4. ตั้งค่า Database ใน .env**
+```env
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=project_finish
+DB_USERNAME=root
+DB_PASSWORD=
+```
+
+**5. รัน Migration**
+```bash
+php artisan migrate
+```
+
+**6. สร้าง Storage Symlink**
+```bash
+php artisan storage:link
+```
+
+**7. สตาร์ท Development Server**
+```bash
+php artisan serve
+```
+
+เปิดเบราว์เซอร์ไปที่: `http://localhost:8000`
+
+---
+
+## 📖 การใช้งาน
+
+### สำหรับ Admin
+- ไปที่ `/admin-dashboard`
+- สร้าง/ลบผู้ใช้งาน (Staff/Doctor)
+- จัดการข่าวสาร และ Sliders
+
+### สำหรับ Staff
+- ไปที่ `/staff-dashboard`
+- บันทึก ADL Assessment สำหรับผู้สูงอายุ
+- บันทึก Care Giver และ Activity
+- ประเมิน TAI scores
+- บันทึก Performance Report
+
+### สำหรับ Doctor
+- ไปที่ `/doctor-dashboard`
+- ออกคำสั่งดูแล (Care Instructions)
+- ดูรายงานประเมิน
+
+---
+
+## 📊 โครงสร้าง Database
+
+| ตาราง | รายละเอียด |
+|------|----------|
+| `users` | ผู้ใช้งาน พร้อม Image_User & Type_Personnel |
+| `elderlys` | ข้อมูลผู้สูงอายุ (ชื่อ, วันเกิด, ที่อยู่) |
+| `barthel_adls` | ผลการประเมิน ADL (10 ด้าน) |
+| `care_givers` | ข้อมูล Caregiver และสุขภาพผู้สูงอายุ (37+ ฟิลด์, nullable) |
+| `score_t_a_i_s` | ผลการประเมิน TAI พร้อม timestamps |
+| `care_instructions` | คำสั่งดูแลจากแพทย์ |
+| `activity_caregivers` | กิจกรรมรายวันของ Caregiver |
+| `news` | บทความข่าวสาร (title, content) |
+| `news_images` | รูปภาพข่าวสาร (JSON paths) |
+| `performance_report` | รวมผลการประเมินทั้งหมด |
+| `sliders` | ภาพบนหน้าแรก |
+
+---
+
+## 🔐 ความปลอดภัย
+
+- ✅ Laravel Authentication + Session
+- ✅ Middleware Role-based Access Control
+- ✅ CSRF Token Protection
+- ✅ Password Hashing (Bcrypt)
+- ✅ SQL Injection Prevention (Eloquent ORM)
+- ✅ .env ไม่ Commit ลง Git
+
+---
+
+## 📝 API Routes
+
+ดูรายละเอียด:
+```bash
+php artisan route:list
+```
+
+---
+
+## 🚀 Deployment
+
+### การ Deploy ไปยัง Production
+
+1. ตั้งค่า `.env`:
+   ```env
+   APP_ENV=production
+   APP_DEBUG=false
+   ```
+
+2. ปรับ Composer:
+   ```bash
+   composer install --no-dev
+   ```
+
+3. Cache Configuration:
+   ```bash
+   php artisan config:cache
+   php artisan route:cache
+   ```
+
+4. ตั้งค่า Web Server (Nginx/Apache) ให้ Document Root = `public/`
+
+5. ติดตั้ง SSL Certificate
+
+---
+
+## 🤝 ผู้ร่วมสร้าง
+
+- **พัฒนาโดย:** Combo (Combo0445)
+
+---
+
+## 📧 ติดต่อ
+
+- **GitHub:** [https://github.com/Combo0445](https://github.com/Combo0445)
+
+---
+
+## 📜 เวอร์ชั่นและอัปเดต
+
+**v1.0 (Feb 2026)**
+- ✅ แก้ไข UrlGenerator error ใน Avatar
+- ✅ เพิ่มระบบข่าวสาร & Quill Editor
+- ✅ ทำให้ care_givers columns nullable
+- ✅ สร้างตาราง performance_report  
+- ✅ แก้ไข JavaScript onclick errors
+- ✅ Role-based Avatar Selection
+
+---
+
+**ขอบคุณที่ใช้ระบบนี้ 🙏**
 
 ## Contributing
 

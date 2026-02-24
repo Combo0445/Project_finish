@@ -327,8 +327,16 @@
                                     <h5 class="card-title">{{ $newsItem->title }}</h5>
                                 </div>
                                 <div class="card-footer d-flex justify-content-end">
-                                    <button class="btn btn-warning btn-sm" style="margin-right: 10px;"
-                                        onclick="showEditModal('{{ $newsItem->id }}', '{{ $newsItem->title }}', '{{ $newsItem->content }}', [@foreach ($newsItem->images as $image) '{{ url('storage/' . $image->image_path) }}', @endforeach])">แก้ไข</button>
+                                    @php
+                                        $imageUrls = $newsItem->images->map(function($img) {
+                                            return url('storage/' . $img->image_path);
+                                        })->toArray();
+                                    @endphp
+                                    <button class="btn btn-warning btn-sm edit-news-btn" style="margin-right: 10px;"
+                                        data-id="{{ $newsItem->id }}"
+                                        data-title='@json($newsItem->title)'
+                                        data-content='@json($newsItem->content)'
+                                        data-images='@json($imageUrls)'>แก้ไข</button>
                                     <form action="{{ route('admin.news.destroy', $newsItem->id) }}" method="POST"
                                         id="delete-news-form-{{ $newsItem->id }}" style="display:inline;">
                                         @csrf
@@ -731,8 +739,6 @@
             document.getElementById('edit-content').value = quillEditContent.root.innerHTML;
         };
 
-
-
     function showEditModal(id, title, content, images) {
 
         document.getElementById('editNewsForm').action = '{{ route("admin.news.update", ":id") }}'.replace(':id', id);
@@ -754,6 +760,19 @@
 
         $('#editNewsModal').modal('show');
     }
+
+    // Attach click handlers for edit buttons that pass data via data-* attributes
+    document.addEventListener('DOMContentLoaded', function() {
+        document.querySelectorAll('.edit-news-btn').forEach(function(btn) {
+            btn.addEventListener('click', function() {
+                const id = this.getAttribute('data-id');
+                const title = JSON.parse(this.getAttribute('data-title') || '""');
+                const content = JSON.parse(this.getAttribute('data-content') || '""');
+                const images = JSON.parse(this.getAttribute('data-images') || '[]');
+                showEditModal(id, title, content, images);
+            });
+        });
+    });
 
         function setSliderData(id, image) {
             const form = document.getElementById('editSliderForm');
