@@ -8,7 +8,7 @@ use App\Models\CareGiver;
 use App\Models\Elderly;
 use App\Models\CareInstruction;
 use Carbon\Carbon;
-use Auth;
+use Illuminate\Support\Facades\Auth;
 
 class DoctorController extends Controller
 {
