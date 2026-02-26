@@ -14,8 +14,9 @@
 <body>
 
     <div class="container">
-        <h5>
-            <img src="{{ url('images/Logo.png') }}" alt="Logo">
+        <h5 style="text-align: center;">
+            <img src="{{ $logo }}" alt="Logo"
+                style="height: 40px; margin-bottom: 10px; display: block; margin-left: auto; margin-right: auto;">
             รายงานกิจกรรมผู้ดูแลผู้สูงอายุทั้งหมด
         </h5>
         <table>
@@ -28,18 +29,18 @@
             </thead>
             <tbody>
                 @foreach($activities as $index => $activity)
-                @if ($index % 17 == 0 && $index != 0)
-                <tr class="page-break">
-                    <th>วันที่</th>
-                    <th>ชื่อผู้สูงอายุ</th>
-                    <th>ชื่อผู้ดูแลผู้สูงอายุ</th>
-                </tr>
-                @endif
-                <tr>
-                    <td>{{ $activity->Date_ACG }}</td>
-                    <td>{{ $activity->caregiver->Name_Elderly }}</td>
-                    <td>{{ $activity->caregiver->Name_CG }}</td>
-                </tr>
+                    @if ($index % 17 == 0 && $index != 0)
+                        <tr class="page-break">
+                            <th>วันที่</th>
+                            <th>ชื่อผู้สูงอายุ</th>
+                            <th>ชื่อผู้ดูแลผู้สูงอายุ</th>
+                        </tr>
+                    @endif
+                    <tr>
+                        <td>{{ $activity->Date_ACG }}</td>
+                        <td>{{ $activity->caregiver->Name_Elderly }}</td>
+                        <td>{{ $activity->caregiver->Name_CG }}</td>
+                    </tr>
                 @endforeach
             </tbody>
         </table>

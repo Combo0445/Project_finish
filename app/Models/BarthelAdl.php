@@ -18,7 +18,12 @@ class BarthelAdl extends Model
 
     public function elderly()
     {
-        return $this->belongsTo(Elderly::class, 'ID_Elderly', 'ID_Elderly');
+        return $this->belongsTo(Elderly::class , 'ID_Elderly', 'ID_Elderly');
+    }
+
+    public function care_giver()
+    {
+        return $this->hasOne(CareGiver::class , 'ID_Elderly', 'ID_Elderly');
     }
 
     public static function getAdlDescription($category, $score)

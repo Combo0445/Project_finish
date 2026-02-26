@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Elderly;
 use App\Models\AddressElderly;
 use App\Models\BarthelAdl;
+use App\Http\Requests\ElderlyRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Carbon\Carbon;
@@ -16,18 +17,11 @@ class ElderlyController extends Controller
         return view('staff.elderly.addelderly');
     }
 
-    public function Storeelderly(Request $request)
+    public function Storeelderly(ElderlyRequest $request)
     {
-        $request->validate([
-            'Name_Elderly' => 'required|string|max:255',
-            'Birthday' => 'required|date',
-            'Address' => 'required|string',
-            'Phone_Elderly' => 'required|string',
-            'Image_Elderly' => 'nullable|image'
-        ]);
 
         $elderly = new Elderly();
-        $elderly->fill($request->only(['Name_Elderly', 'Birthday', 'Address', 'Phone_Elderly']));
+        $elderly->fill($request->only(['Name_Elderly', 'Gender', 'Birthday', 'Address', 'Phone_Elderly']));
 
         if ($request->hasFile('Image_Elderly')) {
             $imagePath = $request->file('Image_Elderly')->store('elderly_images', 'public');
@@ -46,61 +40,6 @@ class ElderlyController extends Controller
         return redirect()->back()->with('success', 'เพิ่มข้อมูลผู้สูงอายุเรียบร้อยแล้ว');
     }
 
-    public function Showelderly(Request $request)
-    {
-        // 1. โหลด Elderly พร้อมที่อยู่และ ADL group
-        $elderlies = Elderly::with(['addressElderly','barthel_adl','care_giver'])->get();
-
-        // 2. คำนวณช่วงอายุ
-        $ageGroups = [
-            'ช่วงอายุ 60-69' => 0,
-            'ช่วงอายุ 70-79' => 0,
-            'ช่วงอายุ 80-89' => 0,
-            'ช่วงอายุ 90+'   => 0,
-        ];
-        foreach ($elderlies as $e) {
-            $age = Carbon::parse($e->Birthday)->age;
-            if ($age >= 60 && $age <= 69) {
-                $ageGroups['ช่วงอายุ 60-69']++;
-            } elseif ($age >= 70 && $age <= 79) {
-                $ageGroups['ช่วงอายุ 70-79']++;
-            } elseif ($age >= 80 && $age <= 89) {
-                $ageGroups['ช่วงอายุ 80-89']++;
-            } elseif ($age >= 90) {
-                $ageGroups['ช่วงอายุ 90+']++;
-            }
-        }
-
-        // 3. คำนวณสัดส่วน ADL
-        $adlGroups = [
-            'กลุ่มติดสังคม' => BarthelAdl::where('Group_ADL','กลุ่มติดสังคม')->count(),
-            'กลุ่มติดบ้าน' => BarthelAdl::where('Group_ADL','กลุ่มติดบ้าน')->count(),
-            'กลุ่มติดเตียง'=> BarthelAdl::where('Group_ADL','กลุ่มติดเตียง')->count(),
-        ];
-
-        // 4. เตรียม JSON สำหรับ Marker บนแผนที่
-        $elderlyLocations = [];
-        foreach ($elderlies as $e) {
-            if ($e->addressElderly
-                && $e->addressElderly->Latitude_position
-                && $e->addressElderly->Longitude_position
-            ) {
-                $adlGroup = optional($e->barthel_adl)->Group_ADL ?: 'ยังไม่ได้ประเมิน';
-                $elderlyLocations[] = [
-                    'latitude'  => $e->addressElderly->Latitude_position,
-                    'longitude' => $e->addressElderly->Longitude_position,
-                    'name'      => $e->Name_Elderly,
-                    'address'   => $e->Address,
-                    'adlGroup'  => $adlGroup,
-                ];
-            }
-        }
-
-        // 5. ส่งข้อมูลไปยัง View
-        return view('staff.dashboard-staff', compact(
-            'elderlies','ageGroups','adlGroups','elderlyLocations'
-        ));
-    }
 
 
     public function Editelderly($id)
@@ -110,19 +49,11 @@ class ElderlyController extends Controller
         return view('staff.elderly.editelderly', compact('elderly', 'addressElderly'));
     }
 
-    public function Updateelderly(Request $request, $id)
+    public function Updateelderly(ElderlyRequest $request, $id)
     {
         $elderly = Elderly::findOrFail($id);
 
-        $request->validate([
-            'Name_Elderly' => 'required|string|max:255',
-            'Birthday' => 'required|date',
-            'Address' => 'required|string',
-            'Phone_Elderly' => 'required|string',
-            'Image_Elderly' => 'nullable|image'
-        ]);
-
-        $elderly->fill($request->only(['Name_Elderly', 'Birthday', 'Address', 'Phone_Elderly']));
+        $elderly->fill($request->only(['Name_Elderly', 'Gender', 'Birthday', 'Address', 'Phone_Elderly']));
 
         if ($request->hasFile('Image_Elderly')) {
             // Delete old image
@@ -145,21 +76,17 @@ class ElderlyController extends Controller
         $addressElderly->Longitude_position = $request->input('Longitude_position');
         $addressElderly->save();
 
-        return redirect()->route('staff-dashboard')->with('success', 'อัปเดตข้อมูลผู้สูงอายุเรียบร้อยแล้ว');
+        return redirect()->route('dashboard')->with('success', 'อัปเดตข้อมูลผู้สูงอายุเรียบร้อยแล้ว');
     }
 
     public function Deleteelderly($id)
     {
         $elderly = Elderly::findOrFail($id);
 
-        // Delete image
-        if ($elderly->Image_Elderly) {
-            Storage::disk('public')->delete($elderly->Image_Elderly);
-        }
-
+        // Soft deletes the record without wiping the physical image, so it can be restored.
         $elderly->delete();
 
-        return redirect()->route('staff-dashboard')->with('success', 'ลบข้อมูลผู้สูงอายุเรียบร้อยแล้ว');
+        return redirect()->route('dashboard')->with('success', 'ลบข้อมูลผู้สูงอายุเรียบร้อยแล้ว');
     }
 
     public function searchLocation($id)
@@ -173,27 +100,21 @@ class ElderlyController extends Controller
 
     public function showReport()
     {
-        $elderlies = Elderly::all();
+        $elderlies = Elderly::paginate(20);
+
+        $ageGroupsData = Elderly::selectRaw('
+            SUM(TIMESTAMPDIFF(YEAR, Birthday, CURDATE()) BETWEEN 60 AND 69) as age_60_69,
+            SUM(TIMESTAMPDIFF(YEAR, Birthday, CURDATE()) BETWEEN 70 AND 79) as age_70_79,
+            SUM(TIMESTAMPDIFF(YEAR, Birthday, CURDATE()) BETWEEN 80 AND 89) as age_80_89,
+            SUM(TIMESTAMPDIFF(YEAR, Birthday, CURDATE()) >= 90) as age_90_plus
+        ')->first();
 
         $ageGroups = [
-            'ช่วงอายุ 60-69' => 0,
-            'ช่วงอายุ 70-79' => 0,
-            'ช่วงอายุ 80-89' => 0,
-            'ช่วงอายุ 90+' => 0,
+            'ช่วงอายุ 60-69' => (int) ($ageGroupsData->age_60_69 ?? 0),
+            'ช่วงอายุ 70-79' => (int) ($ageGroupsData->age_70_79 ?? 0),
+            'ช่วงอายุ 80-89' => (int) ($ageGroupsData->age_80_89 ?? 0),
+            'ช่วงอายุ 90+' => (int) ($ageGroupsData->age_90_plus ?? 0),
         ];
-
-        foreach ($elderlies as $elderly) {
-            $age = \Carbon\Carbon::parse($elderly->Birthday)->age;
-            if ($age >= 60 && $age <= 69) {
-                $ageGroups['ช่วงอายุ 60-69']++;
-            } elseif ($age >= 70 && $age <= 79) {
-                $ageGroups['ช่วงอายุ 70-79']++;
-            } elseif ($age >= 80 && $age <= 89) {
-                $ageGroups['ช่วงอายุ 80-89']++;
-            } elseif ($age >= 90) {
-                $ageGroups['ช่วงอายุ 90+']++;
-            }
-        }
         // ดึงข้อมูล ADL group counts
         $adlGroups = [
             'กลุ่มติดสังคม' => BarthelAdl::where('Group_ADL', 'กลุ่มติดสังคม')->count(),
@@ -201,6 +122,47 @@ class ElderlyController extends Controller
             'กลุ่มติดเตียง' => BarthelAdl::where('Group_ADL', 'กลุ่มติดเตียง')->count(),
         ];
 
-        return view('staff.Report.report-elderly', compact('elderlies', 'ageGroups','adlGroups'));
+        return view('staff.Report.report-elderly', compact('elderlies', 'ageGroups', 'adlGroups'));
+    }
+
+    public function showProfile($id)
+    {
+        $elderly = Elderly::with([
+            'addressElderly',
+            'barthel_adl',
+            'care_giver',
+            'score_tai',
+            'adl_history',
+            'cg_history',
+            'tai_history',
+            'care_instructions'
+        ])->findOrFail($id);
+
+        return view('staff.elderly.elderly-profile', compact('elderly'));
+    }
+
+    public function checkAssessmentToday($id, Request $request)
+    {
+        $today = $request->query('date', now()->toDateString());
+
+        $adlDone = \App\Models\BarthelAdl::where('ID_Elderly', $id)
+            ->whereDate('created_at', $today)
+            ->exists();
+
+        $cgDone = \App\Models\CareGiver::where('ID_Elderly', $id)
+            ->where('Date_CG', $today)
+            ->exists();
+
+        $acgDone = \App\Models\ActivityCaregiver::where('Date_ACG', $today)
+            ->whereHas('caregiver', function ($query) use ($id) {
+                $query->where('ID_Elderly', $id);
+            })
+            ->exists();
+
+        return response()->json([
+            'adl_done' => $adlDone,
+            'cg_done' => $cgDone,
+            'acg_done' => $acgDone,
+        ]);
     }
 }

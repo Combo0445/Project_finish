@@ -5,21 +5,34 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ระบบประเมินความสามารถในการดำเนินกิจวัตรประจำวันของผู้สูงอายุ</title>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link href="{{ url('assets/css/argon-dashboard.css') }}" rel="stylesheet" />
     <link href="{{ url('assets/css/nucleo-icons.css') }}" rel="stylesheet" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&family=Open+Sans:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
     <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" rel="stylesheet">
     <style>
+        /* Override Argon Dashboard CSS variable to use Sarabun for Thai */
+        :root {
+            --bs-font-sans-serif: 'Sarabun', 'Open Sans', sans-serif;
+        }
+
         body {
-            font-family: 'Open Sans', sans-serif;
+            font-family: 'Sarabun', 'Open Sans', sans-serif !important;
             background-color: #f8f9fa;
             color: #344767;
             display: flex;
             flex-direction: column;
             min-height: 100vh;
+            padding-top: 80px;
+            /* Space for fixed navbar */
         }
 
         .content {
-            flex: 1; /* ให้เนื้อหายืดเต็มพื้นที่ที่เหลือ */
+            flex: 1;
+            /* ให้เนื้อหายืดเต็มพื้นที่ที่เหลือ */
         }
 
         .news,
@@ -217,8 +230,10 @@
         }
 
         .office-logo {
-            width: 150px; /* ปรับขนาดให้ใหญ่ขึ้น */
-            height: auto; /* รักษาอัตราส่วนภาพ */
+            width: 150px;
+            /* ปรับขนาดให้ใหญ่ขึ้น */
+            height: auto;
+            /* รักษาอัตราส่วนภาพ */
             margin-bottom: 20px;
         }
 
@@ -240,7 +255,6 @@
                 font-size: 1.5rem;
             }
         }
-
     </style>
 </head>
 
@@ -274,10 +288,12 @@
                                     <div class="news-item">
                                         <a href="{{ route('news.show', ['id' => $newsItem->id]) }}">
                                             <img src="{{ $newsItem->images->first() ? url('storage/' . $newsItem->images->first()->image_path) : url('path/to/default/image.jpg') }}"
-                                            alt="ไม่มีรูปภาพ" class="card-img-top" style="height: 180px; object-fit: cover;">
+                                                alt="ไม่มีรูปภาพ" class="card-img-top"
+                                                style="height: 180px; object-fit: cover;">
                                         </a>
                                         <h5 class="mt-2">
-                                            <a href="{{ route('news.show', ['id' => $newsItem->id]) }}">{{ $newsItem->title }}</a>
+                                            <a
+                                                href="{{ route('news.show', ['id' => $newsItem->id]) }}">{{ $newsItem->title }}</a>
                                         </h5>
                                     </div>
                                 </div>
@@ -319,86 +335,86 @@
 
 
 
-    <!-- Footer -->
-    <footer>
-        <p>&copy; 2024 สำนักงานสาธารณสุข อำเภอห้วยราช จังหวัดบุรีรัมย์</p>
-    </footer>
+        <!-- Footer -->
+        <footer>
+            <p>&copy; 2024 สำนักงานสาธารณสุข อำเภอห้วยราช จังหวัดบุรีรัมย์</p>
+        </footer>
 
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
 
-    <script>
-        let slideIndex = 0;
-        const slides = document.querySelector('.slides');
+        <script>
+            let slideIndex = 0;
+            const slides = document.querySelector('.slides');
 
-        function showSlides() {
-            const totalSlides = slides.children.length;
-            slideIndex++;
-            if (slideIndex >= totalSlides) {
-                slideIndex = 0;
+            function showSlides() {
+                const totalSlides = slides.children.length;
+                slideIndex++;
+                if (slideIndex >= totalSlides) {
+                    slideIndex = 0;
+                }
+                slides.style.transform = `translateX(${-slideIndex * 100}%)`;
             }
-            slides.style.transform = `translateX(${-slideIndex * 100}%)`;
-        }
 
-        function plusSlides(n) {
-            slideIndex += n;
-            const totalSlides = slides.children.length;
-            if (slideIndex < 0) {
-                slideIndex = totalSlides - 1;
-            } else if (slideIndex >= totalSlides) {
-                slideIndex = 0;
+            function plusSlides(n) {
+                slideIndex += n;
+                const totalSlides = slides.children.length;
+                if (slideIndex < 0) {
+                    slideIndex = totalSlides - 1;
+                } else if (slideIndex >= totalSlides) {
+                    slideIndex = 0;
+                }
+                slides.style.transform = `translateX(${-slideIndex * 100}%)`;
             }
-            slides.style.transform = `translateX(${-slideIndex * 100}%)`;
-        }
 
-        setInterval(showSlides, 3000);
+            setInterval(showSlides, 3000);
 
-        const adlChartContext = document.getElementById('adlChart').getContext('2d');
-        const adlData = {
-        labels: ['กลุ่มติดสังคม', 'กลุ่มติดบ้าน', 'กลุ่มติดเตียง'],
-        datasets: [{
-        label: 'จำนวนการประเมิน ADL',
-        data: [
+            const adlChartContext = document.getElementById('adlChart').getContext('2d');
+            const adlData = {
+                labels: ['กลุ่มติดสังคม', 'กลุ่มติดบ้าน', 'กลุ่มติดเตียง'],
+                datasets: [{
+                    label: 'จำนวนการประเมิน ADL',
+                    data: [
             {{ $adlGroupCounts['กลุ่มติดสังคม'] }},
             {{ $adlGroupCounts['กลุ่มติดบ้าน'] }},
-            {{ $adlGroupCounts['กลุ่มติดเตียง'] }}
-        ],
-        backgroundColor: ['#3498db', '#2ecc71', '#e74c3c'],
-        borderWidth: 1
-    }]
-};
+                        {{ $adlGroupCounts['กลุ่มติดเตียง'] }}
+                    ],
+                    backgroundColor: ['#3498db', '#2ecc71', '#e74c3c'],
+                    borderWidth: 1
+                }]
+            };
 
-const adlChart = new Chart(adlChartContext, {
-    type: 'doughnut',
-    data: adlData,
-    options: {
-        responsive: true,
-        plugins: {
-            legend: {
-                position: 'top',
-            },
-            tooltip: {
-                enabled: true,
-            },
-            datalabels: {
-                formatter: (value, ctx) => {
-                    let sum = ctx.chart.data.datasets[0].data.reduce((a, b) => a + b, 0);
-                    let percentage = (value * 100 / sum).toFixed(2) + "%";
-                    return percentage;
+            const adlChart = new Chart(adlChartContext, {
+                type: 'doughnut',
+                data: adlData,
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                        },
+                        tooltip: {
+                            enabled: true,
+                        },
+                        datalabels: {
+                            formatter: (value, ctx) => {
+                                let sum = ctx.chart.data.datasets[0].data.reduce((a, b) => a + b, 0);
+                                let percentage = (value * 100 / sum).toFixed(2) + "%";
+                                return percentage;
+                            },
+                            color: '#fff',  // สีข้อความที่แสดง
+                            font: {
+                                weight: 'bold',
+                                size: 14
+                            }
+                        }
+                    },
+                    cutout: '50%',
                 },
-                color: '#fff',  // สีข้อความที่แสดง
-                font: {
-                    weight: 'bold',
-                    size: 14
-                }
-            }
-        },
-        cutout: '50%',
-    },
-    plugins: [ChartDataLabels]  // เพิ่ม plugin datalabels เข้าไปในกราฟ
-});
+                plugins: [ChartDataLabels]  // เพิ่ม plugin datalabels เข้าไปในกราฟ
+            });
 
-    </script>
+        </script>
 </body>
 
 </html>

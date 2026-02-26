@@ -1,145 +1,91 @@
-<!DOCTYPE html>
-<html lang="en">
+@extends('layouts.app')
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CG Information</title>
-    <!-- Argon Dashboard CSS -->
-    <link href="{{ url('assets/css/argon-dashboard.css') }}" rel="stylesheet">
-    <link href="{{ url('assets/css/nucleo-icons.css') }}" rel="stylesheet">
-    <link href="{{ url('assets/css/nucleo-svg.css') }}" rel="stylesheet">
-    <!-- DataTables CSS -->
-    <link rel="stylesheet" href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.min.css">
-    {{--  pdf  --}}
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.2/html2pdf.bundle.min.js"></script>
-    <style>
-        .container {
-            margin-top: 20px;
-        }
+@section('title', 'CG Information')
 
-        .table th,
-        .table td {
-            vertical-align: middle;
-        }
-    </style>
-</head>
+@section('content')
+    <x-card>
+        <x-slot name="header">
+            <h4>รายงานผลการปฏิบัติงานผู้ดูแลผู้สูงอายุ (CG)</h4>
+            <div class="d-flex gap-2">
+                <a href="{{ route('cg.create') }}" class="btn btn-primary">
+                    <i class="fas fa-plus"></i> เพิ่ม CG
+                </a>
+                <button id="generate-pdf" class="btn btn-success">
+                    <i class="fas fa-print"></i>
+                </button>
+                <a href="{{ route('cg.export') }}" class="btn btn-primary btn-sm">Export Excel</a>
+            </div>
+        </x-slot>
 
-<body>
-
-    @include('layout.nav')
-
-    <main class="main-content position-relative h-100 border-radius-lg">
-        <div class="container-fluid py-4">
-
-            <!-- CG Information Card -->
-            <div class="row">
-                <div class="col-12">
-                    <div class="card mb-4">
-                        <div class="card-header pb-0 d-flex justify-content-between align-items-center">
-                            <h4>รายงานผลการปฏิบัติงานผู้ดูแลผู้สูงอายุ (CG)</h4>
-                            <div class="d-flex gap-2">
-                            <a href="{{ route('cg.create') }}" class="btn btn-primary">
-                                <i class="fas fa-plus"></i> เพิ่ม CG
-                            </a>
-                            <button id="generate-pdf" class="btn btn-success">
-                                <i class="fas fa-print"></i>
-                            </button>
-                            <a href="{{ route('cg.export') }}" class="btn btn-primary btn-sm">Export Excel</a>
-                            </div>
-                        </div>
-                        <div class="card-body px-0 pt-0 pb-2">
-                            <div class="table-responsive p-0">
-                                <table id="cgTable" class="table align-items-center mb-0">
-                                    <thead>
-                                        <tr>
-                                            <th class="text-center">วันที่</th>
-                                            <th class="text-center">ชื่อผู้สูงอายุ</th>
-                                            <th class="text-center">ชื่อผู้ดูแลผู้สูงอายุ</th>
-                                            <th class="text-center">ประเภทกลุ่มผู้สูงอายุ</th>
-                                            <th class="text-center">Actions</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        @foreach ($careGivers as $cg)
-                                            <tr>
-                                                <td class="text-center">{{ $cg->Date_CG }}</td>
-                                                <td class="text-center">{{ $cg->Name_Elderly }}</td>
-                                                <td class="text-center">{{ $cg->Name_CG }}</td>
-                                                <td class="text-center">
-                                                    @php
-                                                        $group = $cg->Group_ADL;
-                                                        if (in_array($group, ['B3'])) {
-                                                            $displayText = 'ติดบ้าน กลุ่มที่ 1';
-                                                        } else if (in_array($group, ['C4', 'C3', 'C2'])) {
-                                                            $displayText = 'ติดบ้าน กลุ่มที่ 2';
-                                                        } else if (in_array($group, ['I3'])) {
-                                                            $displayText = 'ติดเตียง กลุ่มที่ 1';
-                                                        } else if (in_array($group, ['I2', 'I1'])){
-                                                            $displayText = 'ติดเตียง กลุ่มที่ 1';
-                                                        } else {
-                                                            $displayText = 'ยังไม่ได้ประเมิน';
-                                                        }
-                                                    @endphp
-                                                    {{ $displayText }}
-                                                </td>
-                                                <td class="text-center">
-                                                    <a href="javascript:void(0);"
-                                                    class="btn btn-success btn-sm"
-                                                    onclick="generatePdf('{{ $cg->ID_CG }}')">
-                                                    ออกรายงาน
-                                                    </a>
-
-                                                    {{--  <a href="{{ route('cg.edit', ['id' => $cg->ID_CG]) }}"
-                                                        class="btn btn-warning btn-sm">แก้ไข</a>  --}}
-                                                        <a href="{{ route('cg.edit', ['id' => $cg->ID_CG]) }}"
-                                                            class="btn btn-sm {{ is_null($cg->Name_CG) ? 'btn-success' : 'btn-warning' }}">
-                                                            <i class="fas fa-edit"></i>
-                                                            {{ is_null($cg->Name_CG) ? 'เพิ่มแบบประเมิน' : 'แก้ไขแบบประเมิน' }}
-                                                        </a>
-                                                    <form id="delete-cg-form-{{ $cg->ID_CG }}"
-                                                        action="{{ route('cg.destroy', ['id' => $cg->ID_CG]) }}"
-                                                        method="POST" style="display:inline-block;">
-                                                        @csrf
-                                                        @method('DELETE')
-                                                        <button type="button" class="btn btn-danger btn-sm"
-                                                            onclick="confirmDelete('{{ $cg->ID_CG }}')">ลบ</button>
-                                                    </form>
-                                                </td>
-                                            </tr>
-                                        @endforeach
-                                    </tbody>
-                                </table>
-                                {{ $careGivers->links() }}
-                            </div>
-                        </div>
-                    </div>
-                </div>
+        <div class="table-responsive p-0">
+            <table id="cgTable" class="table align-items-center mb-0">
+                <thead>
+                    <tr>
+                        <th class="text-center">วันที่</th>
+                        <th class="text-center">ชื่อผู้สูงอายุ</th>
+                        <th class="text-center">ชื่อผู้ดูแลผู้สูงอายุ</th>
+                        <th class="text-center">ประเภทกลุ่มผู้สูงอายุ</th>
+                        <th class="text-center">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach ($careGivers as $cg)
+                        <tr>
+                            <td class="text-center">{{ $cg->Date_CG }}</td>
+                            <td class="text-center">{{ $cg->Name_Elderly }}</td>
+                            <td class="text-center">{{ $cg->Name_CG }}</td>
+                            <td class="text-center">
+                                @php
+                                    $group = $cg->Group_ADL;
+                                    if (in_array($group, ['B3'])) {
+                                        $displayText = 'ติดบ้าน กลุ่มที่ 1';
+                                    } else if (in_array($group, ['C4', 'C3', 'C2'])) {
+                                        $displayText = 'ติดบ้าน กลุ่มที่ 2';
+                                    } else if (in_array($group, ['I3', 'I2', 'I1'])) {
+                                        $displayText = 'ติดเตียง กลุ่มที่ 1';
+                                    } else {
+                                        $displayText = 'ยังไม่ได้ประเมิน';
+                                    }
+                                @endphp
+                                {{ $displayText }}
+                            </td>
+                            <td class="text-center">
+                                <a href="javascript:void(0);" class="btn btn-success btn-sm"
+                                    onclick="generatePdf('{{ $cg->ID_CG }}')">
+                                    ออกรายงาน
+                                </a>
+                                <a href="{{ route('cg.edit', ['id' => $cg->ID_CG]) }}"
+                                    class="btn btn-sm {{ is_null($cg->Name_CG) ? 'btn-success' : 'btn-warning' }}">
+                                    <i class="fas fa-edit"></i>
+                                    {{ is_null($cg->Name_CG) ? 'เพิ่มแบบประเมิน' : 'แก้ไขแบบประเมิน' }}
+                                </a>
+                                <form id="delete-cg-form-{{ $cg->ID_CG }}"
+                                    action="{{ route('cg.destroy', ['id' => $cg->ID_CG]) }}" method="POST"
+                                    style="display:inline-block;">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="button" class="btn btn-danger btn-sm"
+                                        onclick="confirmDelete('{{ $cg->ID_CG }}')">ลบ</button>
+                                </form>
+                            </td>
+                        </tr>
+                    @endforeach
+                </tbody>
+            </table>
+            <div class="mt-3">
+                {{ $careGivers->links() }}
             </div>
         </div>
-    </main>
+    </x-card>
+@endsection
 
-    <!-- Argon Dashboard JS -->
-    <script src="{{ url('assets/js/argon-dashboard.js') }}"></script>
-    <script src="{{ url('assets/js/bootstrap.bundle.min.js') }}"></script>
-    <script src="{{ url('assets/js/popper.min.js') }}"></script>
-    <script src="{{ url('assets/js/bootstrap-notify.js') }}"></script>
-    <script src="{{ url('assets/js/chartjs.min.js') }}"></script>
-    <script src="{{ url('assets/js/Chart.extension.js') }}"></script>
-    <script src="{{ url('assets/js/perfect-scrollbar.min.js') }}"></script>
-    <script src="{{ url('assets/js/smooth-scrollbar.min.js') }}"></script>
-    <!-- jQuery -->
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <!-- DataTables JS -->
-    <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+@push('scripts')
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.2/html2pdf.bundle.min.js"></script>
     <script>
-        $(document).ready(function() {
+        $(document).ready(function () {
             $('#cgTable').DataTable({
                 "language": {
-                    "paginate": {
-                        "previous": "ก่อนหน้า",
-                        "next": "ถัดไป"
-                    },
+                    "paginate": { "previous": "ก่อนหน้า", "next": "ถัดไป" },
                     "search": "ค้นหา : ",
                     "lengthMenu": "แสดง _MENU_ รายการ",
                     "zeroRecords": "ไม่พบข้อมูล",
@@ -147,10 +93,9 @@
                     "infoEmpty": "ไม่พบข้อมูล",
                     "infoFiltered": "(filtered from _MAX_ total records)"
                 },
-                "dom": '<"row"<"col-sm-12 col-md-12"l><"col-sm-12 col-md-12"f>>t<"row"<"col-sm-12 col-md-5"i><"col-sm-12 col-md-2 d-flex justify-content-center"p>>'
+                "dom": '<"row"<"col-sm-12 col-md-12"l><"col-sm-12 col-md-12"f>>t<"row"<"col-sm-12 col-md-5"i><"col-sm-12 col-md-7 d-flex justify-content-end"p>>'
             });
         });
-
 
         function confirmDelete(id) {
             Swal.fire({
@@ -169,122 +114,85 @@
             });
         }
 
+        function generatePdf(id) {
+            const url = `/cg/report/${id}`;
+            fetch(url)
+                .then(response => response.text())
+                .then(data => {
+                    const parser = new DOMParser();
+                    const doc = parser.parseFromString(data, 'text/html');
+                    const element = doc.querySelector('.container');
+                    const style = document.createElement('style');
+                    style.innerHTML = `
+                        * { font-family: 'Arial', sans-serif !important; color: black !important; background-color: white !important; }
+                        h5 { text-align: center; margin-bottom: 20px; font-size: 24px; }
+                        table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
+                        table, th, td { border: 1px solid black; }
+                        th, td { padding: 8px; text-align: left; }
+                    `;
+                    element.appendChild(style);
+                    const opt = {
+                        margin: 0.5,
+                        filename: 'รายงาน_CG.pdf',
+                        jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' }
+                    };
+                    html2pdf().set(opt).from(element).output('blob').then(function (pdfBlob) {
+                        const pdfUrl = URL.createObjectURL(pdfBlob);
+                        const pdfWindow = window.open();
+                        pdfWindow.location.href = pdfUrl;
+                    });
+                });
+        }
 
-        document.getElementById('generate-pdf').addEventListener('click', function() {
-            // Fetch the filtered data from the DataTable (if any filters are applied)
+        document.getElementById('generate-pdf').addEventListener('click', function () {
             var filteredData = $('#cgTable').DataTable().rows({ filter: 'applied' }).data().toArray();
-
             if (filteredData.length === 0) {
                 Swal.fire('ไม่พบข้อมูลที่ตรงกับการค้นหา', '', 'error');
                 return;
             }
 
-            // Create a hidden div to hold the content
             var reportContent = document.createElement('div');
             reportContent.innerHTML = `
                 <style>
-                    * {
-                        font-family: 'Open Sans', Arial, sans-serif !important;
-                        color: black !important;
-                        background-color: white !important;
-                    }
-
-                    h5 {
-                        font-size: 20px;
-                        margin: 0;
-                    }
-
-                    img {
-                        height: 80px;
-                        margin-right: 10px;
-                    }
-
-                    /* กำหนดความกว้างของตาราง */
-                    table {
-                        width: 100%;
-                        border-collapse: collapse;
-                        margin-bottom: 20px;
-                        font-size: 14px; /* เพิ่มขนาดฟอนต์ในตาราง */
-                    }
-
-                    /* กำหนดสไตล์สำหรับ th และ td */
-                    th, td {
-                        padding: 8px; /* เพิ่ม padding ให้ดูใหญ่ขึ้น */
-                        text-align: center;
-                        border: 1px solid black;
-                    }
-
-                    /* ขนาดฟอนต์ใน td */
-                    td {
-                        font-size: 12.5px;
-                        text-align: center;
-                    }
-
-                    .page-break {
-                        page-break-before: always; /* บังคับขึ้นหน้าใหม่ */
-                    }
+                    * { font-family: 'Open Sans', Arial, sans-serif !important; color: black !important; background-color: white !important; }
+                    h5 { font-size: 20px; margin: 0; text-align: center; }
+                    table { width: 100%; border-collapse: collapse; margin-bottom: 20px; font-size: 14px; }
+                    th, td { padding: 8px; text-align: center; border: 1px solid black; }
                 </style>
-
-                <h5>
-                    <img src="{{ url('images/Logo.png') }}" alt="Logo">
-                    รายงานการปฏิบัติงานผู้ดูแลผู้สูงอายุ (CG)
-                </h5>
-                <br>
+                <h5>รายงานการปฏิบัติงานผู้ดูแลผู้สูงอายุ (CG)</h5>
                 <table>
                     <thead>
                         <tr>
-                            <th style="width: 20%;">วันที่</th>
-                            <th style="width: 20%;">ชื่อผู้สูงอายุ</th>
-                            <th style="width: 20%;">ชื่อผู้ดูแลผู้สูงอายุ</th>
-                            <th style="width: 20%;">ประเภทกลุ่มผู้สูงอายุ</th>
+                            <th>วันที่</th>
+                            <th>ชื่อผู้สูงอายุ</th>
+                            <th>ชื่อผู้ดูแล</th>
+                            <th>ประเภทผู้สูงอายุ</th>
                         </tr>
                     </thead>
                     <tbody>
-                        ${filteredData.map((cg, index) => `
-                            ${(index % 12 === 0 && index !== 0) ? `
-                                <tr class="page-break">
-                                    <th style="width: 20%;">วันที่</th>
-                                    <th style="width: 20%;">ชื่อผู้สูงอายุ</th>
-                                    <th style="width: 20%;">ชื่อผู้ดูแลผู้สูงอายุ</th>
-                                    <th style="width: 20%;">ประเภทกลุ่มผู้สูงอายุ</th>
-                                </tr>` : ''}
+                        ${filteredData.map(row => `
                             <tr>
-                                <td>${cg[0]}</td>
-                                <td>${cg[1]}</td>
-                                <td>${cg[2]}</td>
-                                <td>${cg[3]}</td>
-                            </tr>`).join('')}
+                                <td>${row[0]}</td>
+                                <td>${row[1]}</td>
+                                <td>${row[2]}</td>
+                                <td>${row[3]}</td>
+                            </tr>
+                        `).join('')}
                     </tbody>
                 </table>
             `;
 
-            setTimeout(function () {
-                // Configure options for generating the PDF
-                var opt = {
-                    margin: 0.5,
-                    filename: 'รายงาน_CG.pdf',
-                    image: { type: 'jpeg', quality: 0.98 },
-                    html2canvas: { scale: 2 },
-                    jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
-                };
+            const opt = {
+                margin: 0.5,
+                filename: 'รายงาน_CG_ทั้งหมด.pdf',
+                jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' }
+            };
 
-                // Generate the PDF and open it in a new window
-                html2pdf().set(opt).from(reportContent).output('blob').then(function(pdfBlob) {
-                    var pdfUrl = URL.createObjectURL(pdfBlob);
-                    var pdfWindow = window.open();
-                    pdfWindow.location.href = pdfUrl;
-                });
+            html2pdf().set(opt).from(reportContent).output('blob').then(function (pdfBlob) {
+                var pdfUrl = URL.createObjectURL(pdfBlob);
+                var pdfWindow = window.open();
+                pdfWindow.location.href = pdfUrl;
             });
         });
-
-
-        function generatePdf(id) {
-            // สร้าง URL จาก named route
-            const url = '{{ url("cg") }}/' + id + '/export-pdf';
-            window.open(url, '_blank');
-        }
-
     </script>
-</body>
-
-</html>
+@endpush

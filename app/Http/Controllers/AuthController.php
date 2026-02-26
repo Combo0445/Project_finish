@@ -38,15 +38,7 @@ class AuthController extends Controller
         if (Hash::check($request->password, $user->Password)) {
             Auth::login($user);
 
-            // Redirect the user based on their role
-            switch ($user->Type_Personnel) {
-                case 'Admin':
-                    return redirect()->intended('admin-dashboard');
-                case 'Doctor':
-                    return redirect()->intended('doctor-dashboard');
-                default:
-                    return redirect()->intended('staff-dashboard');
-            }
+            return redirect()->intended('dashboard');
         }
 
         // If password is incorrect, return with error

@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\Elderly;
+use App\Http\Requests\CareGiverRequest;
+use App\Http\Requests\ActivityCaregiverRequest;
 use Illuminate\Http\Request;
 use App\Models\BarthelAdl;
 use App\Models\ActivityCaregiver;
@@ -14,7 +16,7 @@ class CGController extends Controller
 {
     public function index(Request $request)
     {
-        $query = CareGiver::query();
+        $query = CareGiver::with(['elderly']);
 
         if ($request->has('search')) {
             $query->where('Name_Elderly', 'like', '%' . $request->search . '%')
@@ -31,57 +33,8 @@ class CGController extends Controller
         return view('staff.CG.AddCG', compact('elderlys'));
     }
 
-    public function store(Request $request)
+    public function store(CareGiverRequest $request)
     {
-        $request->validate([
-            'Name_CG' => 'required|string',
-            'Related' => 'required|string',
-            'Phone_CG' => 'required|string',
-            'ID_Elderly' => 'required|exists:barthel_adls,ID_ADL',
-            'Name_Elderly' => 'required|string',
-            'Address' => 'required|string',
-            'Weight' => 'required|numeric',
-            'Height' => 'required|numeric',
-            'Waist' => 'required|numeric',
-            'Group_ADL' => 'required|string',
-            'Disease' => 'nullable|string',
-            'Disability' => 'nullable|string',
-            'Rights' => 'nullable|string',
-            'Date' => 'required|date',
-            'Consciousness' => 'required|string',
-            'Vital_signs' => 'required|string',
-            'Bedsores' => 'required|string',
-            'Bedsores_details' => 'nullable|string',
-            'Pain' => 'required|string',
-            'Pain_details' => 'nullable|string',
-            'Swelling' => 'required|string',
-            'Swelling_details' => 'nullable|string',
-            'Itchy_rash' => 'required|string',
-            'Itchy_rash_details' => 'nullable|string',
-            'Stiff_joints' => 'required|string',
-            'Stiff_joints_details' => 'nullable|string',
-            'Malnutrition' => 'required|string',
-            'Malnutrition_details' => 'nullable|string',
-            'Eating' => 'required|string',
-            'Swallowing' => 'required|string',
-            'Defecation' => 'required|string',
-            'Urinary_excretion' => 'required|string',
-            'Taking_medicine' => 'required|string',
-            'Emotional_state' => 'required|string',
-            'Economic_problems' => 'required|string',
-            'Economic_problems_details' => 'nullable|string',
-            'Social_problems' => 'required|string',
-            'Social_problems_details' => 'nullable|string',
-            'Doctor_FU' => 'required|string',
-            'Doctor_FU_details' => 'nullable|string',
-            'Other_problems' => 'nullable|string',
-            'Assistance' => 'nullable|string',
-            'Reporter' => 'required|string',
-            'Picture' => 'nullable|array|max:4', // ต้องเป็น array และไม่เกิน 4 รูป
-            'Picture.*' => 'image|mimes:jpeg,png,jpg,gif', // validate ทีละรูป
-
-        ]);
-
         try {
             $careGiverData = $request->only([
                 'Name_CG',
@@ -130,6 +83,15 @@ class CGController extends Controller
 
             $id_elderly = BarthelAdl::findOrFail($request->ID_Elderly);
             $elderly = Elderly::findOrFail($id_elderly->ID_Elderly);
+
+            // ป้องกันการประเมินซ้ำในวันเดียวกัน
+            $alreadyToday = CareGiver::where('ID_Elderly', $elderly->ID_Elderly)
+                ->where('Date_CG', now()->toDateString())
+                ->exists();
+
+            if ($alreadyToday) {
+                return redirect()->back()->with('error', 'ผู้สูงอายุคนนี้ได้รับการประเมิน CG ในวันนี้แล้ว ไม่สามารถประเมินซ้ำได้');
+            }
 
             $careGiverData['Bedsores'] = $request->Bedsores . ($request->Bedsores_details ? '-' . $request->Bedsores_details : '');
             $careGiverData['Pain'] = $request->Pain . ($request->Pain_details ? '-' . $request->Pain_details : '');
@@ -183,47 +145,8 @@ class CGController extends Controller
         return view('staff.CG.EditCG', compact('caregiver', 'elderly', 'age'));
     }
 
-    public function update(Request $request, $id)
+    public function update(CareGiverRequest $request, $id)
     {
-        $request->validate([
-            'Name_CG' => 'required|string',
-            'Related' => 'required|string',
-            'Phone_CG' => 'required|string',
-            'ID_Elderly' => 'required|string',
-            'Name_Elderly' => 'required|string',
-            'Address' => 'required|string',
-            'Weight' => 'required|numeric',
-            'Height' => 'required|numeric',
-            'Waist' => 'required|numeric',
-            'Group_ADL' => 'required|string',
-            'Disease' => 'nullable|string',
-            'Disability' => 'nullable|string',
-            'Rights' => 'nullable|string',
-            'Date_CG' => 'required|date',
-            'Consciousness' => 'required|string',
-            'Vital_signs' => 'required|string',
-            'Bedsores' => 'required|string',
-            'Pain' => 'required|string',
-            'Swelling' => 'required|string',
-            'Itchy_rash' => 'required|string',
-            'Stiff_joints' => 'required|string',
-            'Malnutrition' => 'required|string',
-            'Eating' => 'required|string',
-            'Swallowing' => 'required|string',
-            'Defecation' => 'required|string',
-            'Urinary_excretion' => 'required|string',
-            'Taking_medicine' => 'required|string',
-            'Emotional_state' => 'required|string',
-            'Economic_problems' => 'required|string',
-            'Social_problems' => 'required|string',
-            'Doctor_FU' => 'required|string',
-            'Other_problems' => 'nullable|string',
-            'Assistance' => 'nullable|string',
-            'Reporter' => 'required|string',
-            'Picture' => 'nullable|array|max:4', // ต้องเป็น array และไม่เกิน 4 รูป
-            'Picture.*' => 'image|mimes:jpeg,png,jpg,gif|max:2048', // validate ทีละรูป
-        ]);
-
         try {
             $careGiverData = $request->only([
                 'Name_CG',
@@ -319,6 +242,16 @@ class CGController extends Controller
     public function destroy($id)
     {
         $careGiver = CareGiver::findOrFail($id);
+
+        if ($careGiver->Picture) {
+            $images = json_decode($careGiver->Picture, true);
+            if (is_array($images)) {
+                foreach ($images as $oldPath) {
+                    Storage::disk('public')->delete($oldPath);
+                }
+            }
+        }
+
         $careGiver->delete();
 
         return redirect()->route('cg.index')->with('success', 'ลบ Care Giver เรียบร้อยแล้ว!');
@@ -347,30 +280,8 @@ class CGController extends Controller
         return view('staff.ACG.EditACG', compact('activity'));
     }
 
-    public function updateActivity(Request $request, $id)
+    public function updateActivity(ActivityCaregiverRequest $request, $id)
     {
-        $request->validate([
-            'activity_date' => 'required|date',
-            'evaluate' => 'nullable|string',
-            'dress_the_wound' => 'nullable|string',
-            'rehabilitate' => 'nullable|string',
-            'clean_body' => 'nullable|string',
-            'take_care_medicine' => 'nullable|string',
-            'take_care_feeding' => 'nullable|string',
-            'environmental' => 'nullable|string',
-            'take_exercise' => 'nullable|string',
-            'give_advice_consult' => 'nullable|string',
-            'take_to_see_a_doctor' => 'nullable|string',
-            'other_specified' => 'nullable|string',
-            'take_to_make_merit' => 'nullable|string',
-            'take_to_market' => 'nullable|string',
-            'take_to_meet_friends' => 'nullable|string',
-            'take_to_allowance' => 'nullable|string',
-            'talk_as_friends' => 'nullable|string',
-            'other_social_specified' => 'nullable|string',
-            'problem' => 'nullable|string',
-            'solution' => 'nullable|string',
-        ]);
 
         $activityData = [
             'Date_ACG' => $request->activity_date,
@@ -415,36 +326,22 @@ class CGController extends Controller
         return view('staff.ACG.AddACG', compact('elderlys'));
     }
 
-    public function storeActivity(Request $request)
+    public function storeActivity(ActivityCaregiverRequest $request)
     {
-        $request->validate([
-            'ID_Elderly' => 'required|exists:elderlys,ID_Elderly',
-            'activity_date' => 'required|date',
-            'evaluate' => 'nullable|string',
-            'dress_the_wound' => 'nullable|string',
-            'rehabilitate' => 'nullable|string',
-            'clean_body' => 'nullable|string',
-            'take_care_medicine' => 'nullable|string',
-            'take_care_feeding' => 'nullable|string',
-            'environmental' => 'nullable|string',
-            'take_exercise' => 'nullable|string',
-            'give_advice_consult' => 'nullable|string',
-            'take_to_see_a_doctor' => 'nullable|string',
-            'other_specified' => 'nullable|string',
-            'take_to_make_merit' => 'nullable|string',
-            'take_to_market' => 'nullable|string',
-            'take_to_meet_friends' => 'nullable|string',
-            'take_to_allowance' => 'nullable|string',
-            'talk_as_friends' => 'nullable|string',
-            'other_social_specified' => 'nullable|string',
-            'problem' => 'nullable|string',
-            'solution' => 'nullable|string',
-        ]);
 
         $careGiverId = $this->getLatestCareGiverId($request->ID_Elderly, $request->activity_date);
 
         if (!$careGiverId) {
             return redirect()->back()->withErrors(['ID_CG' => 'ไม่พบข้อมูล Care Giver สำหรับผู้สูงอายุที่เลือก']);
+        }
+
+        // ป้องกันการประเมินซ้ำในวันเดียวกัน
+        $alreadyExists = ActivityCaregiver::where('ID_CG', $careGiverId)
+            ->where('Date_ACG', $request->activity_date)
+            ->exists();
+
+        if ($alreadyExists) {
+            return redirect()->back()->with('error', 'กิจกรรม ACG สำหรับวันนี้ได้รับบันทึกแล้ว ไม่สามารถบันทึกซ้ำได้');
         }
 
         $activityData = [
@@ -499,6 +396,7 @@ class CGController extends Controller
                     'Age' => $age,
                     'Address' => $elderly->Address,
                     'Group_ADL' => $adl->Group_ADL,
+                    'ID_Elderly' => $elderly->ID_Elderly,
                 ]);
             }
         }
@@ -509,29 +407,5 @@ class CGController extends Controller
         ]);
     }
 
-    public function ReportCGAll()
-    {
-        $cgs = CareGiver::all();
 
-        return view('staff.Report.report-cg-all', compact('cgs'));
-    }
-
-    public function ReportCG($id)
-    {
-        $cg = CareGiver::with('elderly')->findOrFail($id);
-
-        return view('staff.Report.report-cg', compact('cg'));
-    }
-
-    public function ReportACGAll()
-    {
-        $activities = ActivityCaregiver::with('caregiver')->get();
-        return view('staff.Report.report-acg-all', compact('activities'));
-    }
-
-    public function ReportACG($id)
-    {
-        $activity = ActivityCaregiver::with('caregiver')->findOrFail($id);
-        return view('staff.Report.report-acg', compact('activity'));
-    }
 }

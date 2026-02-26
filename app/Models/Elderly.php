@@ -4,16 +4,18 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Elderly extends Model
 {
-    use HasFactory;
+    use HasFactory, SoftDeletes;
 
     protected $table = 'elderlys';
     protected $primaryKey = 'ID_Elderly';
 
     protected $fillable = [
         'Name_Elderly',
+        'Gender',
         'Birthday',
         'Address',
         'Phone_Elderly',
@@ -21,6 +23,25 @@ class Elderly extends Model
     ];
 
     public $timestamps = false;
+
+    // Return a full URL for the image or a gender-based avatar when missing
+    public function getImageUrlAttribute()
+    {
+        if ($this->Image_Elderly) {
+            return url('storage/' . $this->Image_Elderly);
+        }
+
+        // Choose avatar based on Gender
+        $gender = $this->Gender ?? '';
+        if (strtolower($gender) === 'ชาย') {
+            return asset('images/avatar_male.svg');
+        }
+        if (strtolower($gender) === 'หญิง') {
+            return asset('images/avatar_female.svg');
+        }
+
+        return asset('images/avatar_other.svg');
+    }
 
     public function barthel_adl()
     {
@@ -35,5 +56,31 @@ class Elderly extends Model
     public function addressElderly()
     {
         return $this->hasOne(AddressElderly::class, 'ID_Elderly', 'ID_Elderly');
+    }
+
+    public function score_tai()
+    {
+        return $this->hasOne(ScoreTAI::class, 'ID_Elderly', 'ID_Elderly');
+    }
+
+    // History Relations
+    public function adl_history()
+    {
+        return $this->hasMany(BarthelAdl::class, 'ID_Elderly', 'ID_Elderly')->orderBy('created_at', 'desc');
+    }
+
+    public function cg_history()
+    {
+        return $this->hasMany(CareGiver::class, 'ID_Elderly', 'ID_Elderly')->orderBy('Date_CG', 'desc');
+    }
+
+    public function tai_history()
+    {
+        return $this->hasMany(ScoreTAI::class, 'ID_Elderly', 'ID_Elderly')->orderBy('created_at', 'desc');
+    }
+
+    public function care_instructions()
+    {
+        return $this->hasMany(CareInstruction::class, 'ID_Elderly', 'ID_Elderly');
     }
 }

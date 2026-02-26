@@ -204,6 +204,12 @@ php artisan route:list
 
 ## 📜 เวอร์ชั่นและอัปเดต
 
+**v1.1 (Feb 2026 - Security & Refactoring Audit)**
+- ✅ **Security Hardening**: เพิ่ม Soft Deletes ป้องกันข้อมูลลบถาวร
+- ✅ **Role-Based Access Control (RBAC)**: ควบรวม `Care Instruction` (หมอและสตาฟฟ์) ใช้ Controller ส่วนกลาง
+- ✅ **Performance**: แก้ไข Memory Leaks จากการเรียก `Model::all()` ใน Dashboard และ การปริ้น PDF
+- ✅ **File Upload Security**: เพิ่มระบบคัดกรองขนาดและประเภทไฟล์ (MIME types) แบบเข้มงวดให้ Slider และระบบอื่นๆ
+
 **v1.0 (Feb 2026)**
 - ✅ แก้ไข UrlGenerator error ใน Avatar
 - ✅ เพิ่มระบบข่าวสาร & Quill Editor
@@ -216,18 +222,3 @@ php artisan route:list
 
 **ขอบคุณที่ใช้ระบบนี้ 🙏**
 
-## Contributing
-
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
-
-## Code of Conduct
-
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
-
-## Security Vulnerabilities
-
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
-
-## License
-
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).

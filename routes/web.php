@@ -7,10 +7,7 @@ use App\Http\Controllers\ElderlyController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\PersonnelController;
 use App\Http\Controllers\ProfileController;
-use App\Http\Controllers\UserController;
 use App\Http\Controllers\CGController;
-use App\Http\Controllers\CIController;
-use App\Http\Controllers\DoctorController;
 use App\Models\BarthelAdl;
 use App\Models\CareGiver;
 use App\Http\Controllers\ADLExportController;
@@ -18,17 +15,9 @@ use App\Http\Controllers\CGExportController;
 use App\Http\Controllers\TAIController;
 use App\Http\Controllers\PerformanceReportController;
 use App\Http\Controllers\ReportController;
+use App\Http\Controllers\DashboardController;
 
-/*
-|--------------------------------------------------------------------------
-| Web Routes
-|--------------------------------------------------------------------------
-|
-| Here is where you can register web routes for your application. These
-| routes are loaded by the RouteServiceProvider and all of them will
-| be assigned to the "web" middleware group. Make something great!
-|
-*/
+/* |-------------------------------------------------------------------------- | Web Routes |-------------------------------------------------------------------------- | | Here is where you can register web routes for your application. These | routes are loaded by the RouteServiceProvider and all of them will | be assigned to the "web" middleware group. Make something great! | */
 
 Route::get('/', function () {
     $sliders = App\Models\Slider::all();
@@ -52,8 +41,7 @@ Route::get('/news/{id}', function ($id) {
 })->name('news.show');
 
 
-Route::get('add-personnel-types', [PersonnelController::class, 'addPersonnelTypes']);
-Route::get('add-user', [UserController::class, 'addUser']);
+
 
 
 Route::controller(AuthController::class)->group(function () {
@@ -103,25 +91,29 @@ Route::get('error', function () {
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////Middleware
 Route::middleware(['auth'])->group(function () {
+    Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
     Route::get('profile-user', [ProfileController::class, 'showProfile'])->name('profile-user');
     Route::get('edit-profile', [ProfileController::class, 'editProfile'])->name('edit-profile');
     Route::post('/update-profile', [ProfileController::class, 'updateProfile'])->name('update-profile');
 });
 
-
-
 Route::middleware(['CheckLogin', 'IsAdmin'])->group(function () {
-    // Dashboard & User Management
-    Route::get('admin-dashboard', [AdminController::class, 'showAdmin'])->name('admin.dashboard');
+    // User Management
     Route::get('register-user', [AdminController::class, 'registerUser'])->name('user.register');
     Route::post('register-submit', [AdminController::class, 'submitUser'])->name('register.submit');
     Route::delete('user-delete/{id}', [AdminController::class, 'deleteUser'])->name('user.delete');
-    
+    Route::get('user-edit/{id}', [AdminController::class, 'editUser'])->name('user.edit');
+    Route::put('user-update/{id}', [AdminController::class, 'updateUser'])->name('user.update');
+
+
     // Reports
     Route::get('/admin/report-user-pdf', [AdminController::class, 'ReportUser'])->name('admin.report-user');
-    Route::get('/admin/report-user-pdf-content', function () {
-        return view('admin.report-admin');
-    });
+    Route::get(
+        '/admin/report-user-pdf-content',
+        function () {
+            return view('admin.report-admin');
+        }
+    );
 
     // Layout & Settings
     Route::get('layout-admin', [AdminController::class, 'ShowlayoutAdmin'])->name('admin.layout-admin');
@@ -138,16 +130,15 @@ Route::middleware(['CheckLogin', 'IsAdmin'])->group(function () {
 });
 
 Route::middleware(['CheckLogin', 'IsStaff'])->group(function () {
-    // Dashboard
-    Route::get('staff-dashboard', [ElderlyController::class, 'Showelderly'])->name('staff-dashboard');
-
     // Elderly Management
-    Route::get('add-elderly', [ElderlyController::class, 'Addelderly']);
+    Route::get('add-elderly', [ElderlyController::class, 'Addelderly'])->name('add-elderly');
     Route::post('/store-elderly', [ElderlyController::class, 'Storeelderly'])->name('store-elderly');
     Route::get('edit-elderly/{id}', [ElderlyController::class, 'Editelderly'])->name('edit-elderly');
     Route::put('/update-elderly/{id}', [ElderlyController::class, 'Updateelderly'])->name('update-elderly');
     Route::delete('/delete-elderly/{id}', [ElderlyController::class, 'Deleteelderly'])->name('delete-elderly');
     Route::get('search-location/{id}', [ElderlyController::class, 'searchLocation'])->name('search-location');
+    Route::get('elderly-profile/{id}', [ElderlyController::class, 'showProfile'])->name('elderly.profile');
+    Route::get('check-assessment-today/{id}', [ElderlyController::class, 'checkAssessmentToday'])->name('check.assessment.today');
 
     // ADL Assessment
     Route::get('adl-show', [ADLController::class, 'index'])->name('adl.index');
@@ -174,17 +165,12 @@ Route::middleware(['CheckLogin', 'IsStaff'])->group(function () {
     Route::patch('/acg-update/{id}', [CGController::class, 'updateActivity'])->name('acg.update');
     Route::delete('/acg-destroy/{id}', [CGController::class, 'destroyActivity'])->name('acg.destroy');
 
-    // TAI Assessment
     Route::get('tai-show', [TAIController::class, 'index'])->name('tai.index');
     Route::get('tai-edit/{id}', [TAIController::class, 'edit'])->name('tai.edit');
     Route::patch('tai-update/{id}', [TAIController::class, 'update'])->name('tai.update');
     Route::delete('tai-destroy/{id}', [TAIController::class, 'destroy'])->name('tai.destroy');
 
-    // Care Instructions Management
-    Route::get('staff-ci', [CIController::class, 'ShowStaffCI'])->name('staff.ci.index');
-    Route::get('staff-unconfirm', [CIController::class, 'ShowUnconfirmCI'])->name('staff.ci.unconfirm');
-    Route::put('staff-ci/{id}/confirm', [CIController::class, 'confirmCI'])->name('ci.confirm');
-    Route::put('ci/{id}/unconfirm', [CIController::class, 'unconfirmCI'])->name('ci.unconfirm');
+    // Note: Care Instructions routing was migrated out of IsStaff mapping to Centralized RBAC Map.
 
     // Performance Report
     Route::get('performance-report', [PerformanceReportController::class, 'index'])->name('performanceReport.index');
@@ -196,37 +182,47 @@ Route::middleware(['CheckLogin', 'IsStaff'])->group(function () {
     Route::delete('performance-report/{id}', [PerformanceReportController::class, 'destroy'])->name('performanceReport.destroy');
     Route::get('performance-report/data/{elderly}', [PerformanceReportController::class, 'getPerformanceData'])->name('performanceReport.data');
 
+    // Monthly Reports
+    Route::get('/report/monthly-summary', [ReportController::class, 'MonthlySummary'])->name('report.monthly.summary');
+
     // Reports
     Route::get('/report-all-adl', [ADLController::class, 'ReportADLAll'])->name('report.all.adl');
     Route::get('/report-adl/{id}', [ADLController::class, 'ReportADL'])->name('report.adl');
-    Route::get('/report-all-cg', [CGController::class, 'ReportCGAll'])->name('report.all.cg');
-    Route::get('report-cg/{id}', [CGController::class, 'ReportCG'])->name('report.cg');
-    Route::get('report-all-acg', [CGController::class, 'ReportACGAll'])->name('report.all.acg');
-    Route::get('report-acg/{id}', [CGController::class, 'ReportACG'])->name('report.acg');
-    Route::get('report-ci-confirm', [CIController::class, 'ReportCIConfirm'])->name('report.ci.confirm');
-    Route::get('/report-ci-single/{id}', [CIController::class, 'generateSingleReport'])->name('report.ci.single');
+    Route::get('/report-all-cg', [ReportController::class, 'ReportCGAll'])->name('report.all.cg');
+    Route::get('report-cg/{id}', [ReportController::class, 'ReportCG'])->name('report.cg');
+    Route::get('report-all-acg', [ReportController::class, 'ReportACGAll'])->name('report.all.acg');
+    Route::get('report-acg/{id}', [ReportController::class, 'ReportACG'])->name('report.acg');
+    Route::get('report-ci-confirm', [ReportController::class, 'ReportCIConfirm'])->name('report.ci.confirm');
+    Route::get('/report-ci-single/{id}', [ReportController::class, 'ReportCI_Single'])->name('report.ci.single');
     Route::get('elderly-report', [ElderlyController::class, 'showReport'])->name('elderly-report');
+
+    // PDF Reports (Direct PDF links)
+    Route::get('report-tai-pdf/{id}', [ReportController::class, 'ReportTAI'])->name('report.tai.pdf');
+    Route::get('report-adl-pdf/{id}', [ReportController::class, 'ReportADL'])->name('report.adl.pdf');
+    Route::get('report-acg-pdf/{id}', [ReportController::class, 'ReportACG'])->name('report.acg.pdf');
+    Route::get('report-ci-pdf/{id}', [ReportController::class, 'ReportCI_Single'])->name('report.ci.pdf');
+
     Route::get('performance-report/{id}/export-pdf', [ReportController::class, 'ReportPerformanceReport'])->name('performanceReport.exportPDF');
 
     // Export Functions
     Route::get('/export-adl', [ADLExportController::class, 'export'])->name('adl.export');
     Route::get('/export-cg', [CGExportController::class, 'export'])->name('cg.export');
     Route::get('/export-tai', [TAIController::class, 'ExportTAI'])->name('tai.export');
-    Route::get('cg/{id}/export-pdf', [ReportController::class, 'ReportCG'])->name('cg.exportPdf');
+
 });
 
 
-Route::middleware(['CheckLogin', 'IsDoctor'])->group(function () {
-
-
-    Route::controller(DoctorController::class)->group(function () {
-        Route::get('doctor-dashboard', 'ShowDataElderly')->name('doctor.dashboard');
-        Route::get('ci-show', 'ShowCI')->name('ci.index');
-        Route::get('ci-create', 'CreateCI')->name('ci.create');
-        Route::post('/ci-store', 'storeCI')->name('ci.store');
-        Route::delete('/ci/{id}', 'DestroyCI')->name('ci.destroy');
-        Route::get('ci/{id}/edit', 'editCI')->name('ci.edit');
-        Route::put('/ci/{id}', 'updateCI')->name('ci.update');
-        Route::get('/care-instructions/report', 'ReportCI')->name('report.ci');
-    });
+Route::middleware(['auth'])->group(function () {
+    // Care Instructions (RBAC Centralized)
+    Route::get('/care-instructions', [\App\Http\Controllers\CareInstructionController::class, 'index'])->name('care_instructions.index');
+    Route::get('/care-instructions/create', [\App\Http\Controllers\CareInstructionController::class, 'create'])->name('care_instructions.create');
+    Route::post('/care-instructions', [\App\Http\Controllers\CareInstructionController::class, 'store'])->name('care_instructions.store');
+    Route::get('/care-instructions/{id}/edit', [\App\Http\Controllers\CareInstructionController::class, 'edit'])->name('care_instructions.edit');
+    Route::put('/care-instructions/{id}', [\App\Http\Controllers\CareInstructionController::class, 'update'])->name('care_instructions.update');
+    Route::delete('/care-instructions/{id}', [\App\Http\Controllers\CareInstructionController::class, 'destroy'])->name('care_instructions.destroy');
+    Route::put('/care-instructions/{id}/confirm', [\App\Http\Controllers\CareInstructionController::class, 'confirm'])->name('care_instructions.confirm');
+    Route::put('/care-instructions/{id}/unconfirm', [\App\Http\Controllers\CareInstructionController::class, 'unconfirm'])->name('care_instructions.unconfirm');
 });
+
+// Doctor-only roles no longer need a dedicated routing block as 
+// their functionality spans via RBAC into CareInstructionController and Dashboard.

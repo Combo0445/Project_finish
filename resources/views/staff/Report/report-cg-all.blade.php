@@ -12,7 +12,7 @@
 
     <div class="container">
         <h5>
-            <img src="{{ url('images/Logo.png') }}" alt="Logo" style="width: 100px; height: auto; padding-bottom: 15px;">
+            <img src="{{ $logo }}" alt="Logo" style="height: 40px; width: auto; padding-bottom: 15px;">
             รายงานการปฏิบัติงานของผู้ดูแลผู้สูงอายุทั้งหมด
         </h5>
         <table>
@@ -26,14 +26,14 @@
             </thead>
             <tbody>
                 @foreach ($cgs as $index => $cg)
-                @if ($index % 17 == 0 && $index != 0)
-                <tr class="page-break">
-                    <th>วันที่</th>
-                    <th>ชื่อผู้สูงอายุ</th>
-                    <th>ชื่อผู้ดูแลผู้สูงอายุ</th>
-                    <th>กลุ่ม ADL</th>
-                </tr>
-                @endif
+                    @if ($index % 17 == 0 && $index != 0)
+                        <tr class="page-break">
+                            <th>วันที่</th>
+                            <th>ชื่อผู้สูงอายุ</th>
+                            <th>ชื่อผู้ดูแลผู้สูงอายุ</th>
+                            <th>กลุ่ม ADL</th>
+                        </tr>
+                    @endif
                     <tr>
                         <td>{{ $cg->Date_CG ?: 'ไม่มีข้อมูล' }}</td>
                         <td>{{ $cg->Name_Elderly ?: 'ไม่มีข้อมูล' }}</td>

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\ProfileRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\User;
@@ -29,21 +30,13 @@ class ProfileController extends Controller
         return view('layout.edit-profile', compact('user'));
     }
 
-    public function updateProfile(Request $request)
+    public function updateProfile(ProfileRequest $request)
     {
         /** @var User $user */
         $user = Auth::user();
         if (!$user) {
             return redirect()->route('profile-user')->with('error', 'คุณสามารถแก้ไขโปรไฟล์ของคุณเองเท่านั้น');
         }
-
-        $request->validate([
-            'Name_User' => 'required|string',
-            'Email' => 'required|string|email',
-            'Address' => 'nullable|string',
-            'Phone' => 'nullable|string',
-            'Image_User' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
-        ]);
 
         try {
             $user->Name_User = $request->Name_User;

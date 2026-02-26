@@ -7,37 +7,34 @@ use App\Models\News;
 use App\Models\NewsImage;
 use App\Models\Slider;
 use App\Models\Personnel;
+use App\Http\Requests\UserRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 
 class AdminController extends Controller
 {
-    public function showAdmin()
-    {
-        $users = User::all();
-        return view('admin.dashboard-admin', compact('users'));
-    }
-
     public function registerUser()
     {
-        $personnelTypes = Personnel::where('Type_Personnel', '!=', 'Admin')->get();
+        $personnelTypes = [
+            ['id' => 1, 'Type_Personnel' => 'Admin'],
+            ['id' => 2, 'Type_Personnel' => 'Staff'],
+            ['id' => 3, 'Type_Personnel' => 'Doctor'],
+        ];
         return view('admin.register-user', compact('personnelTypes'));
     }
 
-    public function submitUser(Request $request)
+    public function submitUser(UserRequest $request)
     {
-        $request->validate([
-            'Username' => 'required|unique:users,Username|max:255',
-            'Email' => 'required|email|max:255|unique:users,Email',
-            'Password' => 'required',
-            'Type_Personnel' => 'required',
-            'Type_Elderly' => 'nullable|string'
-        ]);
 
-        $personnel = Personnel::find($request->Type_Personnel);
+        $personnelMap = [
+            1 => 'Admin',
+            2 => 'Staff',
+            3 => 'Doctor',
+        ];
 
-        if (!$personnel) {
+        $personnelId = (int) $request->Type_Personnel;
+        if (!isset($personnelMap[$personnelId])) {
             return redirect()->route('user.register')->with('error', 'ประเภทบุคลากรที่เลือกไม่ถูกต้อง');
         }
 
@@ -45,17 +42,12 @@ class AdminController extends Controller
         $user->Username = $request->Username;
         $user->Email = $request->Email;
         $user->Password = Hash::make($request->Password);
-        $user->ID_Personnel = $personnel->ID_Personnel;
-        $user->Type_Personnel = $personnel->Type_Personnel;
-        $user->Name_User = '';
+        $user->ID_Personnel = $personnelId;
+        $user->Type_Personnel = $personnelMap[$personnelId];
+        $user->Name_User = $request->Name_User;
         $user->Address = '';
         $user->Phone = '';
-
-        if ($user->Type_Personnel == 'Doctor') {
-            $user->Type_Doctor = $request->Type_Elderly;
-        } else {
-            $user->Type_Doctor = '';
-        }
+        $user->line_token = $request->line_token;
 
         // Set default profile image based on user type
         switch ($user->Type_Personnel) {
@@ -67,6 +59,7 @@ class AdminController extends Controller
                 break;
             case 'Doctor':
                 $user->Image_User = 'images-user/Doctor.png';
+                $user->Type_Doctor = $request->Type_Elderly ?? '';
                 break;
             default:
                 $user->Image_User = '';
@@ -75,19 +68,93 @@ class AdminController extends Controller
 
         $user->save();
 
-        return redirect()->route('user.register')->with('success', 'ลงทะเบียนผู้ใช้เรียบร้อยแล้ว!');
+        return redirect()->route('dashboard')->with('success', 'ลงทะเบียนผู้ใช้เรียบร้อยแล้ว!');
     }
 
     public function deleteUser($id)
     {
-        $user = User::find($id);
-        if ($user->Type_Personnel !== 'Admin') {
-            $user->delete();
-            return redirect()->route('admin.dashboard')->with('success', 'ลบผู้ใช้เรียบร้อยแล้ว!');
-        } else {
-            return redirect()->route('admin.dashboard')->with('error', 'บัญชีผู้ดูแลระบบไม่สามารถลบได้');
+        if (auth()->id() == $id) {
+            return redirect()->route('dashboard')->with('error', 'ไม่สามารถลบบัญชีของตนเองได้');
         }
+
+        $user = User::findOrFail($id);
+
+        if (auth()->user()->Type_Personnel === $user->Type_Personnel) {
+            return redirect()->route('dashboard')->with('error', 'ไม่สามารถลบผู้ใช้งานระดับเดียวกันได้');
+        }
+
+        $user->delete();
+        return redirect()->route('dashboard')->with('success', 'ลบผู้ใช้เรียบร้อยแล้ว!');
     }
+
+    public function editUser($id)
+    {
+        $user = User::findOrFail($id);
+        return view('admin.edit-user', compact('user'));
+    }
+
+    public function updateUser(UserRequest $request, $id)
+    {
+        $user = User::findOrFail($id);
+
+        // Keep track of old type for safety check
+        $oldType = $user->Type_Personnel;
+        $newType = $request->Type_Personnel;
+
+        // Safety check: Don't allow changing the last admin's role
+        if ($oldType === 'Admin' && $newType !== 'Admin') {
+            $adminCount = User::where('Type_Personnel', 'Admin')->count();
+            if ($adminCount <= 1) {
+                return redirect()->back()->with('error', 'ไม่สามารถเปลี่ยนประเภทของผู้ดูแลระบบคนสุดท้ายได้');
+            }
+        }
+
+        $user->Username = $request->Username;
+        $user->Email = $request->Email;
+        $user->Name_User = $request->filled('Name_User') ? $request->Name_User : $user->Name_User;
+        $user->Phone = $request->filled('Phone') ? $request->Phone : $user->Phone;
+        $user->Address = $request->filled('Address') ? $request->Address : $user->Address;
+        $user->line_token = $request->line_token;
+
+        if ($request->filled('Password')) {
+            $user->Password = Hash::make($request->Password);
+        }
+
+        $personnelMap = [
+            'Admin' => 1,
+            'Staff' => 2,
+            'Doctor' => 3,
+        ];
+
+        if (isset($personnelMap[$newType])) {
+            $user->Type_Personnel = $newType;
+            $user->ID_Personnel = $personnelMap[$newType];
+
+            if ($newType === 'Doctor') {
+                $user->Type_Doctor = $request->Type_Doctor ?? '';
+            } else {
+                $user->Type_Doctor = '';
+            }
+
+            // Update default image if needed
+            $defaultImages = [
+                'Admin' => 'images-user/Admin.jpg',
+                'Staff' => 'images-user/Staff.png',
+                'Doctor' => 'images-user/Doctor.png',
+            ];
+
+            // If the user currently has a default image from a previous role, update it to the new role's default
+            if (in_array($user->Image_User, array_values($defaultImages))) {
+                $user->Image_User = $defaultImages[$newType];
+            }
+        }
+
+        $user->save();
+
+        return redirect()->route('dashboard')->with('success', 'แก้ไขข้อมูลผู้ใช้เรียบร้อยแล้ว!');
+    }
+
+
 
     public function ShowlayoutAdmin()
     {
@@ -187,7 +254,7 @@ class AdminController extends Controller
     public function storeSlider(Request $request)
     {
         $request->validate([
-            'image' => 'required|image'
+            'image' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048'
         ]);
 
         $slider = new Slider();
@@ -205,7 +272,7 @@ class AdminController extends Controller
     public function updateSlider(Request $request, $id)
     {
         $request->validate([
-            'image' => 'nullable|image'
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048'
         ]);
 
         $slider = Slider::findOrFail($id);

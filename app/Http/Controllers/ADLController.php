@@ -10,6 +10,13 @@ use Illuminate\Support\Facades\Auth;
 
 class ADLController extends Controller
 {
+    protected $notificationService;
+
+    public function __construct(\App\Services\NotificationService $notificationService)
+    {
+        $this->notificationService = $notificationService;
+    }
+
     public function index(Request $request)
     {
         $search = $request->get('search');
@@ -41,10 +48,19 @@ class ADLController extends Controller
             'bowels' => 'required|integer',
             'bladder' => 'required|integer',
         ]);
-    
+
+        // ป้องกันการประเมินซ้ำในวันเดียวกัน
+        $alreadyToday = BarthelAdl::where('ID_Elderly', $request->elderly_id)
+            ->whereDate('created_at', now()->toDateString())
+            ->exists();
+
+        if ($alreadyToday) {
+            return redirect()->back()->with('error', 'ผู้สูงอายุคนนี้ได้รับการประเมิน ADL ในวันนี้แล้ว ไม่สามารถประเมินซ้ำได้');
+        }
+
         // Calculate the total score
         $totalScore = $request->feeding + $request->grooming + $request->transfer + $request->toilet_use + $request->mobility + $request->dressing + $request->stairs + $request->bathing + $request->bowels + $request->bladder;
-    
+
         // Determine the group based on the total score
         if ($totalScore >= 0 && $totalScore <= 4) {
             $group = 'กลุ่มติดเตียง';
@@ -53,12 +69,18 @@ class ADLController extends Controller
         } else {
             $group = 'กลุ่มติดสังคม';
         }
-    
+
         // Get elderly and user information
         $elderly = Elderly::find($request->elderly_id);
         $user = Auth::user();
-    
-        // Create a new ADL record andเก็บไว้ในตัวแปร
+
+        // Get previous ADL for comparison
+        $previousAdl = BarthelAdl::where('ID_Elderly', $elderly->ID_Elderly)
+            ->where('ID_ADL', '<', 999999999) // Placeholder for latest
+            ->orderBy('ID_ADL', 'desc')
+            ->first();
+
+        // Create a new ADL record
         $adl = BarthelAdl::create([
             'ID_Elderly' => $elderly->ID_Elderly,
             'Name_Elderly' => $elderly->Name_Elderly,
@@ -77,23 +99,31 @@ class ADLController extends Controller
             'Bowels' => $request->bowels,
             'Bladder' => $request->bladder,
         ]);
-    
-        // บันทึก ScoreTAI เมื่อคะแนนอยู่ในช่วง 0-11
-        if ($totalScore >= 0 && $totalScore <= 11) {
-            ScoreTAI::create([
-                'ID_Elderly' => $elderly->ID_Elderly,
-                'ID_ADL' => $adl->ID_ADL, // ใช้ ID จาก ADL ที่เพิ่งสร้าง
-                'ID_User' => $user->ID_User,
-                'mobility' => null,
-                'confuse' => null,
-                'feed' => null,
-                'toilet' => null,
-                'group' => null,
-            ]);
+
+        // Check for health deterioration
+        if ($previousAdl && $previousAdl->Group_ADL !== $group) {
+            $levels = ['กลุ่มติดสังคม' => 3, 'กลุ่มติดบ้าน' => 2, 'กลุ่มติดเตียง' => 1];
+            $prevLevel = $levels[$previousAdl->Group_ADL] ?? 0;
+            $currLevel = $levels[$group] ?? 0;
+
+            if ($currLevel < $prevLevel) {
+                // Status deteriorated - Notify using centralized Service
+                $this->notificationService->notifyAdlDrop(
+                    $elderly->Name_Elderly,
+                    $previousAdl->Group_ADL,
+                    $group,
+                    $user->Name_User
+                );
+            }
         }
-    
+
+        $tai = ScoreTAI::where('ID_ADL', $adl->ID_ADL)->first();
+        if ($tai) {
+            return redirect()->route('tai.edit', $tai->id)->with('success', 'ส่งการประเมิน ADL สำเร็จแล้ว! กรุณาประเมิน TAI ต่อ');
+        }
+
         return redirect()->back()->with('success', 'ส่งการประเมิน ADL สำเร็จแล้ว!');
-    }    
+    }
 
     public function edit($id)
     {
@@ -149,6 +179,11 @@ class ADLController extends Controller
             'created_at' => $adl->created_at,
         ]);
 
+        $tai = ScoreTAI::where('ID_ADL', $adl->ID_ADL)->first();
+        if ($tai) {
+            return redirect()->route('tai.edit', $tai->id)->with('success', 'อัปเดตการประเมิน ADL สำเร็จแล้ว! กรุณาตรวจสอบการประเมิน TAI');
+        }
+
         return redirect()->route('adl.index')->with('success', 'อัปเดตการประเมิน ADL สำเร็จแล้ว!');
     }
 
@@ -162,7 +197,12 @@ class ADLController extends Controller
 
     public function ReportADLAll()
     {
-        $adls = BarthelAdl::all();
+        $adls = BarthelAdl::with('elderly')
+            ->orderBy('created_at', 'desc')
+            ->get()
+            ->groupBy(function ($item) {
+                return $item->created_at ? $item->created_at->format('Y-m-d') : 'Non-Dated';
+            });
 
         return view('staff.Report.report-adl-all', compact('adls'));
     }
