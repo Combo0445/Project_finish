@@ -1,54 +1,29 @@
-<!DOCTYPE html>
-<html lang="en">
+@extends('layouts.reports')
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>รายงานข้อมูล ADL</title>
-</head>
+@section('title', 'รายงานข้อมูล ADL ทั้งหมด')
+@section('report_title', 'รายงานความสามารถในการดำเนินชีวิตประจำวัน (ADL) ทั้งหมด')
 
-<body>
-
-    <div class="container">
-        <h5>
-            <img src="{{ url('images/Logo.png') }}" alt="Logo">
-            รายงานข้อมูล ADL
-        </h5>
-        <table>
-            <thead>
+@section('content')
+    <table>
+        <thead>
+            <tr>
+                <th style="text-align: center;">วันที่</th>
+                <th style="text-align: center;">ชื่อผู้สูงอายุ</th>
+                <th style="text-align: center;">ชื่อผู้รับผิดชอบ</th>
+                <th style="text-align: center;">คะแนน</th>
+                <th style="text-align: center;">กลุ่ม</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach ($adls as $adl)
                 <tr>
-                    <th>วันที่</th>
-                    <th>ชื่อผู้สูงอายุ</th>
-                    <th>ชื่อเจ้าหน้าที่ผู้รับผิดชอบ</th>
-                    <th>กลุ่ม ADL</th>
+                    <td style="text-align: center;">{{ $adl->created_at ? $adl->created_at->format('Y-m-d') : '-' }}</td>
+                    <td style="text-align: center;">{{ $adl->Name_Elderly }}</td>
+                    <td style="text-align: center;">{{ $adl->Name_User }}</td>
+                    <td style="text-align: center;">{{ $adl->Score_ADL }}</td>
+                    <td style="text-align: center;">{{ $adl->Group_ADL }}</td>
                 </tr>
-            </thead>
-            <tbody>
-                @foreach ($adls as $adl)
-                    <tr>
-                        <td>{{ $adl->created_at->date_format('Y-m-d') }}</td>
-                        <td>{{ $adl->elderly ? $adl->elderly->Name_Elderly : 'ไม่มีข้อมูล' }}</td>
-                        <td>{{ $adl->Name_User ?: 'ไม่มีข้อมูล' }}</td>
-                        <td>{{ $adl->Group_ADL ?: 'ไม่มีข้อมูล' }}</td>
-                    </tr>
-                    @if($loop->iteration % 19 == 0 && !$loop->last)
-                        </tbody>
-                    </table>
-                    <div class="page-break"></div>
-                    <table>
-                    <thead>
-                        <tr>
-                            <th>ชื่อผู้สูงอายุ</th>
-                            <th>ชื่อเจ้าหน้าที่ผู้รับผิดชอบ</th>
-                            <th>กลุ่ม ADL</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                    @endif
-                @endforeach
-            </tbody>
-        </table>
-    </div>
-</body>
-
-</html>
+            @endforeach
+        </tbody>
+    </table>
+@endsection

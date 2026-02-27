@@ -7,6 +7,8 @@ use App\Models\CareInstruction;
 use App\Models\Elderly;
 use App\Models\CareGiver;
 use App\Models\User;
+use App\Models\Medicine;
+use App\Models\Prescription;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 
@@ -25,7 +27,7 @@ class CareInstructionController extends Controller
     public function index(Request $request)
     {
         $user = Auth::user();
-        $query = CareInstruction::with('elderly');
+        $query = CareInstruction::with(['elderly', 'prescriptions.medicine']);
 
         // Role-Based Filtering
         if ($user->Type_Personnel == 'Doctor') {
@@ -40,13 +42,27 @@ class CareInstructionController extends Controller
                     $q->where('Group_ADL', 'ติดเตียง');
             });
         } elseif ($user->Type_Personnel == 'Staff') {
-            // Staff see only instructions assigned to them
-            $query->where('Name_Staff', $user->Name_User);
+            // Staff can see all instructions, so no additional filter is applied.
+        } elseif ($user->Type_Personnel == 'Pharmacist') {
+            // Pharmacists see all instructions to prepare medicine, but usually only look at unconfirmed
         }
 
         // Feature Toggle: Filter Unconfirmed Only via Query Parameter
         if ($request->has('unconfirmed') && $request->unconfirmed == 'true') {
             $query->whereNull('Confirm');
+        }
+
+        // Search Filter
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function ($q) use ($search) {
+                $q->where('Name_Elderly', 'LIKE', "%$search%")
+                    ->orWhere('Care_instructions', 'LIKE', "%$search%");
+            });
+        }
+
+        if ($request->filled('elderly_id')) {
+            $query->where('ID_Elderly', $request->elderly_id);
         }
 
         $careInstructions = $query->orderBy('Date_CI', 'desc')->paginate(20);
@@ -56,7 +72,8 @@ class CareInstructionController extends Controller
 
     public function create(Request $request)
     {
-        if (Auth::user()->Type_Personnel !== 'Doctor') {
+        $role = session('impersonate_role', Auth::user()->Type_Personnel);
+        if ($role !== 'Doctor') {
             abort(403, 'Unauthorized action.');
         }
 
@@ -64,12 +81,24 @@ class CareInstructionController extends Controller
         $careGiver = CareGiver::where('ID_Elderly', $elderly->ID_Elderly)->first();
         $reporter = $careGiver ? $careGiver->Reporter : 'Unknown';
 
-        return view('care_instructions.create', compact('elderly', 'reporter'));
+        // Fetch all staff members for the dropdown
+        $staffMembers = User::where('Type_Personnel', 'Staff')->get();
+
+        // Fetch historical care instructions for this patient
+        $history = CareInstruction::where('ID_Elderly', $elderly->ID_Elderly)
+            ->orderBy('Date_CI', 'desc')
+            ->take(5)
+            ->get();
+
+        $medicines = Medicine::select('id', 'name', 'stock', 'type')->get();
+
+        return view('care_instructions.create', compact('elderly', 'reporter', 'staffMembers', 'history', 'medicines'));
     }
 
     public function store(Request $request)
     {
-        if (Auth::user()->Type_Personnel !== 'Doctor') {
+        $role = session('impersonate_role', Auth::user()->Type_Personnel);
+        if ($role !== 'Doctor') {
             abort(403, 'Unauthorized action.');
         }
 
@@ -91,6 +120,19 @@ class CareInstructionController extends Controller
             'Care_instructions',
         ]));
 
+        if ($request->has('prescriptions')) {
+            foreach ($request->prescriptions as $prescriptionData) {
+                if (!empty($prescriptionData['medicine_id']) && !empty($prescriptionData['amount'])) {
+                    Prescription::create([
+                        'care_instruction_id' => $ci->ID_CI,
+                        'medicine_id' => $prescriptionData['medicine_id'],
+                        'amount' => $prescriptionData['amount'],
+                        'dosage' => $prescriptionData['dosage'] ?? null,
+                    ]);
+                }
+            }
+        }
+
         $staff = User::where('Name_User', $request->Name_Staff)->first();
         if ($staff && $this->notificationService) {
             $this->notificationService->notifyCareInstruction(
@@ -101,12 +143,13 @@ class CareInstructionController extends Controller
             );
         }
 
-        return redirect()->route('care_instructions.index')->with('success', 'คำแนะนำถูกบันทึกเรียบร้อยแล้ว');
+        return redirect()->route('dashboard')->with('success', 'คำแนะนำถูกบันทึกเรียบร้อยแล้ว');
     }
 
     public function edit($id)
     {
-        if (Auth::user()->Type_Personnel !== 'Doctor') {
+        $role = session('impersonate_role', Auth::user()->Type_Personnel);
+        if ($role !== 'Doctor') {
             abort(403, 'Unauthorized action.');
         }
 
@@ -116,12 +159,25 @@ class CareInstructionController extends Controller
         $careGiver = CareGiver::where('ID_Elderly', $elderly->ID_Elderly)->first();
         $reporter = $careGiver ? $careGiver->Reporter : 'Unknown';
 
-        return view('care_instructions.edit', compact('careInstruction', 'elderly', 'reporter'));
+        // Fetch all staff members for the dropdown
+        $staffMembers = User::where('Type_Personnel', 'Staff')->get();
+
+        // Fetch historical care instructions for this patient (excluding current one)
+        $history = CareInstruction::where('ID_Elderly', $elderly->ID_Elderly)
+            ->where('ID_CI', '!=', $id)
+            ->orderBy('Date_CI', 'desc')
+            ->take(5)
+            ->get();
+
+        $medicines = Medicine::select('id', 'name', 'stock', 'type')->get();
+
+        return view('care_instructions.edit', compact('careInstruction', 'elderly', 'reporter', 'staffMembers', 'history', 'medicines'));
     }
 
     public function update(Request $request, $id)
     {
-        if (Auth::user()->Type_Personnel !== 'Doctor') {
+        $role = session('impersonate_role', Auth::user()->Type_Personnel);
+        if ($role !== 'Doctor') {
             abort(403, 'Unauthorized action.');
         }
 
@@ -144,6 +200,21 @@ class CareInstructionController extends Controller
             'Care_instructions',
         ]));
 
+        // Delete all old prescriptions and recreate them
+        $careInstruction->prescriptions()->delete();
+        if ($request->has('prescriptions')) {
+            foreach ($request->prescriptions as $prescriptionData) {
+                if (!empty($prescriptionData['medicine_id']) && !empty($prescriptionData['amount'])) {
+                    Prescription::create([
+                        'care_instruction_id' => $careInstruction->ID_CI,
+                        'medicine_id' => $prescriptionData['medicine_id'],
+                        'amount' => $prescriptionData['amount'],
+                        'dosage' => $prescriptionData['dosage'] ?? null,
+                    ]);
+                }
+            }
+        }
+
         $staff = User::where('Name_User', $request->Name_Staff)->first();
         if ($staff && $this->notificationService) {
             $this->notificationService->notifyCareInstruction(
@@ -155,12 +226,13 @@ class CareInstructionController extends Controller
             );
         }
 
-        return redirect()->route('care_instructions.index')->with('success', 'คำแนะนำถูกอัปเดตเรียบร้อยแล้ว');
+        return redirect()->route('dashboard')->with('success', 'คำแนะนำถูกอัปเดตเรียบร้อยแล้ว');
     }
 
     public function destroy($id)
     {
-        if (Auth::user()->Type_Personnel !== 'Doctor') {
+        $role = session('impersonate_role', Auth::user()->Type_Personnel);
+        if ($role !== 'Doctor') {
             abort(403, 'Unauthorized action.');
         }
 
@@ -173,25 +245,122 @@ class CareInstructionController extends Controller
     // Role Methods for Staff Only
     public function confirm($id)
     {
-        if (Auth::user()->Type_Personnel !== 'Staff') {
+        $role = session('impersonate_role', Auth::user()->Type_Personnel);
+        if ($role !== 'Staff') {
             abort(403, 'Unauthorized action.');
         }
 
-        $careInstruction = CareInstruction::findOrFail($id);
-        $careInstruction->update(['Confirm' => 'ยืนยัน']);
+        $careInstruction = CareInstruction::with('prescriptions.medicine')->findOrFail($id);
 
-        return redirect()->back()->with('success', 'คำแนะนำการดูแลยืนยันเรียบร้อยแล้ว');
+        try {
+            \Illuminate\Support\Facades\DB::transaction(function () use ($careInstruction) {
+                // Validation for stock with locks
+                foreach ($careInstruction->prescriptions as $prescription) {
+                    if ($prescription->medicine_id) {
+                        // Lock the medicine row
+                        $medicine = \App\Models\Medicine::where('id', $prescription->medicine_id)->lockForUpdate()->first();
+
+                        if ($medicine && $prescription->amount > $medicine->stock) {
+                            throw new \Exception('สต็อกยา ' . $medicine->name . ' ไม่เพียงพอ (ต้องการ: ' . $prescription->amount . ', มีอยู่: ' . $medicine->stock . ')');
+                        }
+                    }
+                }
+
+                // Dispense logic (FIFO)
+                foreach ($careInstruction->prescriptions as $prescription) {
+                    if (!$prescription->medicine_id)
+                        continue;
+
+                    $medicine = \App\Models\Medicine::where('id', $prescription->medicine_id)->lockForUpdate()->first();
+                    if (!$medicine)
+                        continue;
+
+                    $amountToDispense = $prescription->amount;
+
+                    // Get lots that have stock, ordered by expiry date (FIFO) and lock them
+                    $lots = \App\Models\MedicineLot::where('medicine_id', $prescription->medicine_id)
+                        ->where('stock', '>', 0)
+                        ->orderByRaw('exp_date IS NULL, exp_date ASC') // nulls last
+                        ->orderBy('mfd_date', 'asc')
+                        ->lockForUpdate()
+                        ->get();
+
+                    foreach ($lots as $lot) {
+                        if ($amountToDispense <= 0)
+                            break;
+
+                        if ($lot->stock >= $amountToDispense) {
+                            $lot->decrement('stock', $amountToDispense);
+                            $amountToDispense = 0;
+                        } else {
+                            $amountToDispense -= $lot->stock;
+                            $lot->update(['stock' => 0]);
+                        }
+                    }
+
+                    // Deduct total stock from medicine
+                    $medicine->decrement('stock', $prescription->amount);
+
+                    // Mark prescription as dispensed
+                    $prescription->update(['dispensed' => true]);
+                }
+
+                $careInstruction->update(['Confirm' => 'ยืนยัน']);
+            });
+
+            return redirect()->back()->with('success', 'คำแนะนำการดูแลยืนยันและตัดสต็อกยาเรียบร้อยแล้ว');
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', $e->getMessage());
+        }
     }
 
     public function unconfirm($id)
     {
-        if (Auth::user()->Type_Personnel !== 'Staff') {
+        $role = session('impersonate_role', Auth::user()->Type_Personnel);
+        if ($role !== 'Staff') {
             abort(403, 'Unauthorized action.');
         }
 
-        $careInstruction = CareInstruction::findOrFail($id);
-        $careInstruction->update(['Confirm' => null]);
+        $careInstruction = CareInstruction::with('prescriptions.medicine')->findOrFail($id);
 
-        return redirect()->back()->with('success', 'ยกเลิกการยืนยันคำแนะนำการดูแลแล้ว');
+        try {
+            \Illuminate\Support\Facades\DB::transaction(function () use ($careInstruction) {
+                // Restore stock
+                foreach ($careInstruction->prescriptions as $prescription) {
+                    if ($prescription->dispensed && $prescription->medicine_id) {
+
+                        $medicine = \App\Models\Medicine::where('id', $prescription->medicine_id)->lockForUpdate()->first();
+
+                        if ($medicine) {
+                            $medicine->increment('stock', $prescription->amount);
+
+                            // Try to find the latest lot to return the stock to, locking it
+                            $latestLot = \App\Models\MedicineLot::where('medicine_id', $prescription->medicine_id)
+                                ->orderBy('created_at', 'desc')
+                                ->lockForUpdate()
+                                ->first();
+
+                            if ($latestLot) {
+                                $latestLot->increment('stock', $prescription->amount);
+                            } else {
+                                // Fallback if no lot exists
+                                \App\Models\MedicineLot::create([
+                                    'medicine_id' => $prescription->medicine_id,
+                                    'lot_number' => 'RETURN-' . date('Ymd_His'),
+                                    'stock' => $prescription->amount
+                                ]);
+                            }
+                            $prescription->update(['dispensed' => false]);
+                        }
+                    }
+                }
+
+                $careInstruction->update(['Confirm' => null]);
+            });
+
+            return redirect()->back()->with('success', 'ยกเลิกการยืนยันและคืนสต็อกยาแล้ว');
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'เกิดข้อผิดพลาดในการคืนสต็อก: ' . $e->getMessage());
+        }
     }
 }

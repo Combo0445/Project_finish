@@ -42,24 +42,30 @@
                     }
                 }
             @endphp
+            @if($user->is_admin_permanent && $user->Type_Personnel !== 'Admin')
+                <span class="badge bg-warning text-dark me-3"
+                    style="padding: 8px 12px; border-radius: 20px; display: flex; align-items: center; box-shadow: 0 2px 4px rgba(0,0,0,0.2);">
+                    <i class="fas fa-eye me-2"></i> โหมดมุมมอง: {{ $user->Type_Personnel == 'Staff' ? 'เจ้าหน้าที่' : 'แพทย์' }}
+                </span>
+            @endif
             <a href="{{ url('profile-user') }}">
                 <img src="{{ $avatarSrc }}" alt="Profile Image">
                 <span>{{ $user->Name_User ?? '' }}</span>
             </a>
             <div class="notifications dropdown">
                 @php
-                    $notifications = \App\Models\CareInstruction::where('Name_Staff', Auth::user()->Name_User)
+                    $notifications = \App\Models\CareInstruction::where('Name_Staff', $user->Name_User)
                         ->whereNull('Confirm')
                         ->get();
                 @endphp
-                <i class="fas fa-bell {{ $notifications->isNotEmpty() && !Request::is('staff-ci') ? 'shake' : '' }}"
+                <i class="fas fa-bell {{ $notifications->isNotEmpty() && !Request::is('care-instructions') ? 'shake' : '' }}"
                     onclick="toggleNotificationDropdown()"></i>
                 <div class="dropdown-content" id="notificationDropdown">
                     @if ($notifications->isEmpty())
                         <a href="#">ไม่มีการแจ้งเตือน</a>
                     @else
                         @foreach ($notifications as $notification)
-                            <a href="{{ url('staff-ci') }}">{{ $notification->Name_Elderly }} -
+                            <a href="{{ route('care_instructions.index') }}">{{ $notification->Name_Elderly }} -
                                 {{ $notification->Care_instructions }}</a>
                         @endforeach
                     @endif
@@ -68,9 +74,28 @@
 
             <div class="dropdown">
                 <i class="fas fa-cog" onclick="toggleDropdown()"></i>
-                <div class="dropdown-content" id="userDropdown" style="width: 200px; padding: 10px;">
+                <div class="dropdown-content" id="userDropdown" style="width: 220px; padding: 10px;">
                     <a href="{{ url('profile-user') }}"
                         style="padding: 12px 20px; font-size: 16px; display: block;">โปรไฟล์</a>
+
+                    @if($user->is_admin_permanent)
+                        @if($user->Type_Personnel !== 'Admin')
+                            <a href="{{ route('admin.revert-role') }}"
+                                style="padding: 12px 20px; font-size: 16px; display: block; color: #ffeb3b !important;">
+                                <i class="fas fa-undo me-2"></i> กลับสู่แอดมิน
+                            </a>
+                        @else
+                            <a href="{{ route('admin.switch-role', 'Staff') }}"
+                                style="padding: 12px 20px; font-size: 16px; display: block;">
+                                <i class="fas fa-user-tie me-2"></i> สลับเป็นเจ้าหน้าที่
+                            </a>
+                            <a href="{{ route('admin.switch-role', 'Doctor') }}"
+                                style="padding: 12px 20px; font-size: 16px; display: block;">
+                                <i class="fas fa-user-md me-2"></i> สลับเป็นแพทย์
+                            </a>
+                        @endif
+                        <div style="border-bottom: 1px solid rgba(255, 255, 255, 0.1); margin: 5px 0;"></div>
+                    @endif
                     <form action="{{ route('logout') }}" method="POST">
                         @csrf
                         <button type="submit"

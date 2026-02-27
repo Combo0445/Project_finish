@@ -6,9 +6,9 @@ use App\Models\User;
 use App\Models\News;
 use App\Models\NewsImage;
 use App\Models\Slider;
-use App\Models\Personnel;
 use App\Http\Requests\UserRequest;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 
@@ -16,11 +16,14 @@ class AdminController extends Controller
 {
     public function registerUser()
     {
-        $personnelTypes = [
-            ['id' => 1, 'Type_Personnel' => 'Admin'],
-            ['id' => 2, 'Type_Personnel' => 'Staff'],
-            ['id' => 3, 'Type_Personnel' => 'Doctor'],
-        ];
+        // Use a static collection of objects for the dropdown since there is no Personnel model
+        $personnelTypes = collect([
+            (object) ['ID_Personnel' => 1, 'Type_Personnel' => 'Admin'],
+            (object) ['ID_Personnel' => 2, 'Type_Personnel' => 'Staff'],
+            (object) ['ID_Personnel' => 3, 'Type_Personnel' => 'Doctor'],
+            (object) ['ID_Personnel' => 4, 'Type_Personnel' => 'Pharmacist'],
+        ]);
+
         return view('admin.register-user', compact('personnelTypes'));
     }
 
@@ -31,6 +34,7 @@ class AdminController extends Controller
             1 => 'Admin',
             2 => 'Staff',
             3 => 'Doctor',
+            4 => 'Pharmacist',
         ];
 
         $personnelId = (int) $request->Type_Personnel;
@@ -45,8 +49,8 @@ class AdminController extends Controller
         $user->ID_Personnel = $personnelId;
         $user->Type_Personnel = $personnelMap[$personnelId];
         $user->Name_User = $request->Name_User;
-        $user->Address = '';
-        $user->Phone = '';
+        $user->Address = $request->Address ?? '';
+        $user->Phone = $request->Phone ?? '';
         $user->line_token = $request->line_token;
 
         // Set default profile image based on user type
@@ -60,6 +64,9 @@ class AdminController extends Controller
             case 'Doctor':
                 $user->Image_User = 'images-user/Doctor.png';
                 $user->Type_Doctor = $request->Type_Elderly ?? '';
+                break;
+            case 'Pharmacist':
+                $user->Image_User = 'images-user/Pharmacist.png'; // Need to provide a default image or use staff
                 break;
             default:
                 $user->Image_User = '';
@@ -124,6 +131,7 @@ class AdminController extends Controller
             'Admin' => 1,
             'Staff' => 2,
             'Doctor' => 3,
+            'Pharmacist' => 4,
         ];
 
         if (isset($personnelMap[$newType])) {
@@ -141,6 +149,7 @@ class AdminController extends Controller
                 'Admin' => 'images-user/Admin.jpg',
                 'Staff' => 'images-user/Staff.png',
                 'Doctor' => 'images-user/Doctor.png',
+                'Pharmacist' => 'images-user/Pharmacist.png',
             ];
 
             // If the user currently has a default image from a previous role, update it to the new role's default
@@ -158,12 +167,9 @@ class AdminController extends Controller
 
     public function ShowlayoutAdmin()
     {
-        $sliders = Slider::all();
-        $news = News::all();
-        $visitorCount = 12344865; // ตัวอย่างข้อมูล
-        $adlAssessmentCount = 6789; // ตัวอย่างข้อมูล
-        $cgAssessmentCount = 6548;
-        return view('admin.layout-admin', compact('sliders', 'news', 'visitorCount', 'adlAssessmentCount', 'cgAssessmentCount'));
+        $sliders = Slider::orderBy('id', 'desc')->get();
+        $news = News::orderBy('id', 'desc')->get();
+        return view('admin.layout-admin', compact('sliders', 'news'));
     }
 
     // News Management
@@ -307,8 +313,52 @@ class AdminController extends Controller
 
     public function ReportUser()
     {
-        $users = User::all();
+        $users = User::orderBy('ID_User', 'desc')->get();
 
-        return view('admin.report-admin', compact('users'));
+        // Use ReportController logic style for consistency
+        $mpdf = new \Mpdf\Mpdf([
+            'default_font_size' => 18,
+            'default_font' => 'sarabun',
+            'margin_left' => 10,
+            'margin_right' => 10,
+            'margin_top' => 10,
+            'margin_bottom' => 10,
+            'shrink_tables_to_fit' => 1,
+        ]);
+
+        $html = view('admin.report-admin', [
+            'users' => $users,
+            'logo' => 'data:image/png;base64,' . base64_encode(file_get_contents(public_path('images/Logo.png')))
+        ])->render();
+
+        $mpdf->WriteHTML($html);
+        return response($mpdf->Output('', 'S'), 200, [
+            'Content-Type' => 'application/pdf',
+            'Content-Disposition' => 'inline; filename="User_Report.pdf"',
+        ]);
+    }
+
+    public function switchRole($role)
+    {
+        $allowedRoles = ['Staff', 'Doctor'];
+        if (in_array($role, $allowedRoles)) {
+            $user = Auth::user();
+            // Store that we are switching so we can still show the "revert" button
+            // but the actual Type_Personnel in the DB will change.
+            $user->update(['Type_Personnel' => $role]);
+
+            return redirect()->route('dashboard')->with('success', 'เปลี่ยนบทบาทเป็น ' . $role . ' เรียบร้อยแล้ว');
+        }
+        return redirect()->back()->with('error', 'บทบาทไม่ถูกต้อง');
+    }
+
+    public function revertRole()
+    {
+        $user = Auth::user();
+        if ($user->is_admin_permanent) {
+            $user->update(['Type_Personnel' => 'Admin']);
+            return redirect()->route('dashboard')->with('success', 'กลับสู่บทบาทแอดมินปกติเรียบร้อยแล้ว');
+        }
+        return redirect()->back()->with('error', 'คุณไม่ได้รับอนุญาตให้ทำรายการนี้');
     }
 }

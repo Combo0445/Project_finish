@@ -4,6 +4,60 @@
 @section('report_title', 'รายงาน Care Giver รายบุคคล')
 @section('reporter_name', $cg->Reporter ?? 'เจ้าหน้าที่ผู้รับผิดชอบ')
 
+@push('styles')
+    <style>
+        /* Extremely compact styles to fit 18px base font on a single page */
+        body {
+            padding: 0px 5px;
+            color: #000 !important;
+            line-height: 1.1 !important;
+            /* Squish text vertically */
+        }
+
+        .header {
+            margin-bottom: 2px;
+            padding-bottom: 2px;
+            border-bottom: 2px solid #000;
+        }
+
+        .report-title {
+            color: #000 !important;
+            margin: 0;
+            padding: 0;
+        }
+
+        .section-title {
+            margin: 6px 0 2px 0;
+            padding: 2px 5px;
+            background-color: #f0f0f0 !important;
+            color: #000 !important;
+            border-left: 4px solid #000 !important;
+        }
+
+        table {
+            margin-bottom: 4px;
+        }
+
+        th,
+        td {
+            padding: 2px 4px;
+            /* Minimal cell padding */
+            border: 1px solid #000 !important;
+            color: #000 !important;
+        }
+
+        th {
+            background-color: #e0e0e0 !important;
+            font-weight: bold !important;
+        }
+
+        .footer {
+            margin-top: 10px;
+            color: #000 !important;
+        }
+    </style>
+@endpush
+
 @section('content')
     <div class="section-title">ข้อมูลทั่วไป</div>
     <table>
@@ -91,7 +145,7 @@
 
     @if($cg->Other_problems)
         <div class="section-title">ปัญหาอื่นๆ และข้อเสนอแนะ</div>
-        <div style="padding: 10px; border: 1px solid #e9ecef;">
+        <div style="padding: 6px; border: 1px solid #e9ecef; margin-bottom: 5px;">
             {{ $cg->Other_problems }}
         </div>
     @endif

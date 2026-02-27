@@ -13,9 +13,9 @@
         <x-slot name="header">
             <h4>รายงานผลการประเมินผู้สูงอายุ (TAI)</h4>
             <div class="d-flex gap-2">
-                <button id="generate-pdf" class="btn btn-success">
+                <a href="{{ route('report.all.tai') }}" target="_blank" class="btn btn-success">
                     <i class="fas fa-print"></i>
-                </button>
+                </a>
                 <a href="{{ route('tai.export') }}" class="btn btn-primary btn-sm">Export Excel</a>
             </div>
         </x-slot>
@@ -36,7 +36,8 @@
                     @foreach ($tai as $item)
                         <tr>
                             <td class="text-center">
-                                {{ \Carbon\Carbon::parse($item->updated_at)->locale('th')->translatedFormat('d F Y') }}</td>
+                                {{ \Carbon\Carbon::parse($item->updated_at)->locale('th')->translatedFormat('d F Y') }}
+                            </td>
                             <td class="text-center">{{ $item->elderly->Name_Elderly ?? 'ยังไม่ได้ประเมิน' }}</td>
                             <td class="text-center">{{ $item->user->Name_User ?? 'ยังไม่ได้ประเมิน' }}</td>
                             <td class="text-center">{{ $item->group ?? 'ยังไม่ได้ประเมิน' }}</td>
@@ -56,6 +57,10 @@
                                 {{ $displayText }}
                             </td>
                             <td class="text-center">
+                                <a href="{{ route('report.tai.pdf', ['id' => $item->id]) }}" target="_blank"
+                                    class="btn btn-sm btn-info">
+                                    ออกรายงาน
+                                </a>
                                 <a href="{{ route('tai.edit', ['id' => $item->id]) }}"
                                     class="btn btn-sm {{ is_null($item->group) ? 'btn-success' : 'btn-warning' }}">
                                     <i class="fas fa-edit"></i>
@@ -116,57 +121,6 @@
             });
         }
 
-        document.getElementById('generate-pdf').addEventListener('click', function () {
-            var filteredData = $('#taiTable').DataTable().rows({ filter: 'applied' }).data().toArray();
-            if (filteredData.length === 0) {
-                Swal.fire('ไม่พบข้อมูลที่ตรงกับการค้นหา', '', 'error');
-                return;
-            }
-
-            var reportContent = document.createElement('div');
-            reportContent.innerHTML = `
-                <style>
-                    * { font-family: 'Open Sans', Arial, sans-serif !important; color: black !important; background-color: white !important; }
-                    h5 { font-size: 20px; margin: 0; text-align: center; }
-                    table { width: 100%; border-collapse: collapse; margin-bottom: 20px; font-size: 14px; }
-                    th, td { padding: 8px; text-align: center; border: 1px solid black; }
-                </style>
-                <h5>รายงานผลการประเมินผู้สูงอายุ (TAI)</h5>
-                <table>
-                    <thead>
-                        <tr>
-                            <th>วันที่</th>
-                            <th>ชื่อผู้สูงอายุ</th>
-                            <th>ชื่อผู้ดูแล</th>
-                            <th>กลุ่ม</th>
-                            <th>ประเภท</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        ${filteredData.map(row => `
-                            <tr>
-                                <td>${row[0]}</td>
-                                <td>${row[1]}</td>
-                                <td>${row[2]}</td>
-                                <td>${row[3]}</td>
-                                <td>${row[4]}</td>
-                            </tr>
-                        `).join('')}
-                    </tbody>
-                </table>
-            `;
-
-            const opt = {
-                margin: 0.5,
-                filename: 'รายงาน_TAI_ทั้งหมด.pdf',
-                jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' }
-            };
-
-            html2pdf().set(opt).from(reportContent).output('blob').then(function (pdfBlob) {
-                var pdfUrl = URL.createObjectURL(pdfBlob);
-                var pdfWindow = window.open();
-                pdfWindow.location.href = pdfUrl;
-            });
-        });
+        // Script removed to use server-side PDF instead for better formatting consistency (18px font)
     </script>
 @endpush

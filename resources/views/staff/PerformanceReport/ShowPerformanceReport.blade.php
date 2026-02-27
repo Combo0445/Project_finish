@@ -37,7 +37,7 @@
                             <td class="text-center">{{ Str::limit($r->Activity, 30) }}</td>
                             <td class="text-center">
                                 <a href="{{ route('performanceReport.exportPDF', $r->id) }}" class="btn btn-success btn-sm">
-                                    <i class="fas fa-print"></i> สร้าง PDF
+                                    <i class="fas fa-print"></i> ออกรายงาน
                                 </a>
                                 <a href="{{ route('performanceReport.edit', $r->id) }}" class="btn btn-warning btn-sm">แก้ไข</a>
                                 <form id="delete-form-{{ $r->id }}" action="{{ route('performanceReport.destroy', $r->id) }}"

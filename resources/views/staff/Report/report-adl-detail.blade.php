@@ -36,7 +36,7 @@
             </tr>
             <tr>
                 <td>การขับถ่ายอุจจาระ</td>
-                <td>{{ \App\Models\BarthelAdl::getAdlDescription('bowel', $adl->Bowel) }}</td>
+                <td>{{ \App\Models\BarthelAdl::getAdlDescription('bowels', $adl->Bowels) }}</td>
             </tr>
             <tr>
                 <td>การขับถ่ายปัสสาวะ</td>
@@ -44,7 +44,7 @@
             </tr>
             <tr>
                 <td>การใช้ห้องน้ำ</td>
-                <td>{{ \App\Models\BarthelAdl::getAdlDescription('toilet', $adl->Toilet) }}</td>
+                <td>{{ \App\Models\BarthelAdl::getAdlDescription('toilet_use', $adl->Toilet_use) }}</td>
             </tr>
             <tr>
                 <td>การเคลื่อนย้ายจากเตียงไปยังเก้าอี้</td>

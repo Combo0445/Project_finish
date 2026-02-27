@@ -4,7 +4,7 @@
 @section('report_title', 'รายงานสรุปสถิติประจำเดือน')
 
 @section('content')
-    <div style="text-align: center; font-weight: bold; margin-bottom: 30px; color: #5e72e4;">
+    <div style="text-align: center; font-weight: bold; margin-bottom: 30px; color: #000;">
         ประจำเดือน {{ $now->translatedFormat('F Y') }}
     </div>
 
@@ -12,27 +12,27 @@
     <table>
         <tr>
             <th>จำนวนผู้สูงอายุในระบบทั้งหมด</th>
-            <td style="text-align: center; font-size: 18px; font-weight: bold;">{{ number_format($stats['total_elderly']) }}
+            <td style="text-align: center; font-weight: bold;">{{ number_format($stats['total_elderly']) }}
                 คน</td>
         </tr>
         <tr>
             <th>การประเมิน ADL ใหม่ (เดือนนี้)</th>
-            <td style="text-align: center; font-size: 18px; font-weight: bold; color: #2dce89;">{{ $stats['new_adl'] }}
+            <td style="text-align: center; font-weight: bold;">{{ $stats['new_adl'] }}
                 ครั้ง</td>
         </tr>
         <tr>
             <th>การบันทึกรายงาน CG ใหม่ (เดือนนี้)</th>
-            <td style="text-align: center; font-size: 18px; font-weight: bold; color: #fb6340;">{{ $stats['new_cg'] }} ครั้ง
+            <td style="text-align: center; font-weight: bold;">{{ $stats['new_cg'] }} ครั้ง
             </td>
         </tr>
         <tr>
             <th>การประเมิน TAI ใหม่ (เดือนนี้)</th>
-            <td style="text-align: center; font-size: 18px; font-weight: bold; color: #11cdef;">{{ $stats['new_tai'] }}
+            <td style="text-align: center; font-weight: bold;">{{ $stats['new_tai'] }}
                 ครั้ง</td>
         </tr>
         <tr>
             <th>การออกคำแนะนำแพทย์ CI ใหม่ (เดือนนี้)</th>
-            <td style="text-align: center; font-size: 18px; font-weight: bold; color: #5e72e4;">{{ $stats['new_ci'] }} ครั้ง
+            <td style="text-align: center; font-weight: bold;">{{ $stats['new_ci'] }} ครั้ง
             </td>
         </tr>
     </table>
@@ -61,7 +61,7 @@
         </tbody>
     </table>
 
-    <div style="margin-top: 40px; padding: 15px; background: #f8f9fe; border-radius: 4px; font-size: 13px;">
+    <div style="margin-top: 20px; padding: 10px; background: #f0f0f0; border-radius: 4px; font-size: 14px;">
         <strong>หมายเหตุ:</strong> ข้อมูลนี้สรุปจากฐานข้อมูลระบบ Long Term Care อัตโนมัติ
         เพื่อใช้ในการติดตามและประเมินผลการดำเนินโครงการในภาพรวม
     </div>

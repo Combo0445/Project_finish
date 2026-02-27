@@ -137,25 +137,30 @@
                 <div class="tab-content" id="activityTabContent">
                     <!-- Date Tab -->
                     <div class="tab-pane fade show active" id="date" role="tabpanel" aria-labelledby="date-tab">
-                        <form id="activity-form" action="{{ route('acg.update', ['id' => $activity->ID_ACG]) }}" method="POST">
+                        <form id="activity-form" action="{{ route('acg.update', ['id' => $activity->ID_ACG]) }}"
+                            method="POST">
                             @csrf
                             @method('PATCH')
 
                             <div class="form-group">
                                 <label for="ID_Elderly">ชื่อ-สกุลผู้สูงอายุ</label>
-                                <input type="text" id="Name_Elderly" name="Name_Elderly" class="form-control" style="height: 45px;" value="{{ $activity->caregiver->Name_Elderly }}" readonly>
+                                <input type="text" id="Name_Elderly" name="Name_Elderly" class="form-control"
+                                    style="height: 45px;" value="{{ $activity->caregiver->Name_Elderly }}" readonly>
                             </div>
 
                             <div class="form-group">
                                 <label for="activity_date">ลงเวลากิจกรรมการดูแลผู้สูงอายุ</label>
-                                <input type="date" id="activity_date" name="activity_date" class="form-control" value="{{ $activity->Date_ACG }}" required>
+                                <input type="date" id="activity_date" name="activity_date" class="form-control"
+                                    value="{{ $activity->Date_ACG }}" required>
                             </div>
 
                             <div class="form-group">
                                 <label for="evaluate">ประเมิน/ติดตามอาการ</label>
-                                <select id="evaluate" name="evaluate" class="form-control" style="height: 45px;" required>
+                                <select id="evaluate" name="evaluate" class="form-control" style="height: 45px;"
+                                    required>
                                     <option value="">-- กรุณาเลือก --</option>
-                                    <option value="ประเมิน" {{ $activity->Evaluate == 'ประเมิน' ? 'selected' : '' }}>ประเมิน</option>
+                                    <option value="ประเมิน" {{ $activity->Evaluate == 'ประเมิน' ? 'selected' : '' }}>
+                                        ประเมิน</option>
                                     <option value="ติดตามอาการ" {{ $activity->Evaluate == 'ติดตามอาการ' ? 'selected' : '' }}>ติดตามอาการ</option>
                                 </select>
                             </div>
@@ -164,72 +169,88 @@
                     <!-- Health Activities Tab -->
                     <div class="tab-pane fade" id="health" role="tabpanel" aria-labelledby="health-tab">
                         <div class="form-check">
-                            <input class="form-check-input" type="checkbox" value="ทำแผล" id="dress_the_wound" name="dress_the_wound" {{ $activity->Dress_the_wound == 'ทำแผล' ? 'checked' : '' }}>
+                            <input class="form-check-input" type="checkbox" value="ทำแผล" id="dress_the_wound"
+                                name="dress_the_wound" {{ $activity->Dress_the_wound == 'ทำแผล' ? 'checked' : '' }}>
                             <label class="form-check-label" for="dress_the_wound">ทำแผล</label>
                         </div>
                         <div class="form-check">
-                            <input class="form-check-input" type="checkbox" value="ฟื้นฟูสภาพฯ" id="rehabilitate" name="rehabilitate" {{ $activity->Rehabilitate == 'ฟื้นฟูสภาพฯ' ? 'checked' : '' }}>
+                            <input class="form-check-input" type="checkbox" value="ฟื้นฟูสภาพฯ" id="rehabilitate"
+                                name="rehabilitate" {{ $activity->Rehabilitate == 'ฟื้นฟูสภาพฯ' ? 'checked' : '' }}>
                             <label class="form-check-label" for="rehabilitate">ฟื้นฟูสภาพฯ</label>
                         </div>
                         <div class="form-check">
-                            <input class="form-check-input" type="checkbox" value="ทำความสะอาดร่างกาย" id="clean_body" name="clean_body" {{ $activity->Clean_body == 'ทำความสะอาดร่างกาย' ? 'checked' : '' }}>
+                            <input class="form-check-input" type="checkbox" value="ทำความสะอาดร่างกาย" id="clean_body"
+                                name="clean_body" {{ $activity->Clean_body == 'ทำความสะอาดร่างกาย' ? 'checked' : '' }}>
                             <label class="form-check-label" for="clean_body">ทำความสะอาดร่างกาย</label>
                         </div>
                         <div class="form-check">
-                            <input class="form-check-input" type="checkbox" value="ดูแลเรื่องยา" id="take_care_medicine" name="take_care_medicine" {{ $activity->Take_care_medicine == 'ดูแลเรื่องยา' ? 'checked' : '' }}>
+                            <input class="form-check-input" type="checkbox" value="ดูแลเรื่องยา" id="take_care_medicine"
+                                name="take_care_medicine" {{ $activity->Take_care_medicine == 'ดูแลเรื่องยา' ? 'checked' : '' }}>
                             <label class="form-check-label" for="take_care_medicine">ดูแลเรื่องยา</label>
                         </div>
                         <div class="form-check">
-                            <input class="form-check-input" type="checkbox" value="ดูแลให้อาหาร" id="take_care_feeding" name="take_care_feeding" {{ $activity->Take_care_feeding == 'ดูแลให้อาหาร' ? 'checked' : '' }}>
+                            <input class="form-check-input" type="checkbox" value="ดูแลให้อาหาร" id="take_care_feeding"
+                                name="take_care_feeding" {{ $activity->Take_care_feeding == 'ดูแลให้อาหาร' ? 'checked' : '' }}>
                             <label class="form-check-label" for="take_care_feeding">ดูแลให้อาหาร</label>
                         </div>
                         <div class="form-check">
-                            <input class="form-check-input" type="checkbox" value="การจัดสิ่งแวดล้อม" id="environmental" name="environmental" {{ $activity->Environmental == 'การจัดสิ่งแวดล้อม' ? 'checked' : '' }}>
+                            <input class="form-check-input" type="checkbox" value="การจัดสิ่งแวดล้อม" id="environmental"
+                                name="environmental" {{ $activity->Environmental == 'การจัดสิ่งแวดล้อม' ? 'checked' : '' }}>
                             <label class="form-check-label" for="environmental">การจัดสิ่งแวดล้อม</label>
                         </div>
                         <div class="form-check">
-                            <input class="form-check-input" type="checkbox" value="พาออกกำลังกาย" id="take_exercise" name="take_exercise" {{ $activity->Take_exercise == 'พาออกกำลังกาย' ? 'checked' : '' }}>
+                            <input class="form-check-input" type="checkbox" value="พาออกกำลังกาย" id="take_exercise"
+                                name="take_exercise" {{ $activity->Take_exercise == 'พาออกกำลังกาย' ? 'checked' : '' }}>
                             <label class="form-check-label" for="take_exercise">พาออกกำลังกาย</label>
                         </div>
                         <div class="form-check">
-                            <input class="form-check-input" type="checkbox" value="ให้คำแนะนำ/ปรึกษา" id="give_advice_consult" name="give_advice_consult" {{ $activity->Give_advice_consult == 'ให้คำแนะนำ/ปรึกษา' ? 'checked' : '' }}>
+                            <input class="form-check-input" type="checkbox" value="ให้คำแนะนำ/ปรึกษา"
+                                id="give_advice_consult" name="give_advice_consult" {{ $activity->Give_advice_consult == 'ให้คำแนะนำ/ปรึกษา' ? 'checked' : '' }}>
                             <label class="form-check-label" for="give_advice_consult">ให้คำแนะนำ/ปรึกษา</label>
                         </div>
                         <div class="form-check">
-                            <input class="form-check-input" type="checkbox" value="พาพบแพทย์" id="take_to_see_a_doctor" name="take_to_see_a_doctor" {{ $activity->Take_to_see_a_doctor == 'พาพบแพทย์' ? 'checked' : '' }}>
+                            <input class="form-check-input" type="checkbox" value="พาพบแพทย์" id="take_to_see_a_doctor"
+                                name="take_to_see_a_doctor" {{ $activity->Take_to_see_a_doctor == 'พาพบแพทย์' ? 'checked' : '' }}>
                             <label class="form-check-label" for="take_to_see_a_doctor">พาพบแพทย์</label>
                         </div>
                         <div class="form-group">
                             <label for="other_specified">อื่น ๆ ระบุ</label>
-                            <input type="text" id="other_specified" name="other_specified" class="form-control" value="{{ $activity->Other }}">
+                            <input type="text" id="other_specified" name="other_specified" class="form-control"
+                                value="{{ $activity->Other }}">
                         </div>
                     </div>
 
                     <!-- Social Activities Tab -->
                     <div class="tab-pane fade" id="social" role="tabpanel" aria-labelledby="social-tab">
                         <div class="form-check">
-                            <input class="form-check-input" type="checkbox" value="พาไปทำบุญ" id="take_to_make_merit" name="take_to_make_merit" {{ $activity->Take_to_make_merit == 'พาไปทำบุญ' ? 'checked' : '' }}>
+                            <input class="form-check-input" type="checkbox" value="พาไปทำบุญ" id="take_to_make_merit"
+                                name="take_to_make_merit" {{ $activity->Take_to_make_merit == 'พาไปทำบุญ' ? 'checked' : '' }}>
                             <label class="form-check-label" for="take_to_make_merit">พาไปทำบุญ</label>
                         </div>
                         <div class="form-check">
-                            <input class="form-check-input" type="checkbox" value="พาไปจ่ายตลาด" id="take_to_market" name="take_to_market" {{ $activity->Take_to_market == 'พาไปจ่ายตลาด' ? 'checked' : '' }}>
+                            <input class="form-check-input" type="checkbox" value="พาไปจ่ายตลาด" id="take_to_market"
+                                name="take_to_market" {{ $activity->Take_to_market == 'พาไปจ่ายตลาด' ? 'checked' : '' }}>
                             <label class="form-check-label" for="take_to_market">พาไปจ่ายตลาด</label>
                         </div>
                         <div class="form-check">
-                            <input class="form-check-input" type="checkbox" value="พาไปพบเพื่อน" id="take_to_meet_friends" name="take_to_meet_friends" {{ $activity->Take_to_meet_friends == 'พาไปพบเพื่อน' ? 'checked' : '' }}>
+                            <input class="form-check-input" type="checkbox" value="พาไปพบเพื่อน"
+                                id="take_to_meet_friends" name="take_to_meet_friends" {{ $activity->Take_to_meet_friends == 'พาไปพบเพื่อน' ? 'checked' : '' }}>
                             <label class="form-check-label" for="take_to_meet_friends">พาไปพบเพื่อน</label>
                         </div>
                         <div class="form-check">
-                            <input class="form-check-input" type="checkbox" value="พาไปรับเบี้ย" id="take_to_allowance" name="take_to_allowance" {{ $activity->Take_to_allowance == 'พาไปรับเบี้ย' ? 'checked' : '' }}>
+                            <input class="form-check-input" type="checkbox" value="พาไปรับเบี้ย" id="take_to_allowance"
+                                name="take_to_allowance" {{ $activity->Take_to_allowance == 'พาไปรับเบี้ย' ? 'checked' : '' }}>
                             <label class="form-check-label" for="take_to_allowance">พาไปรับเบี้ย</label>
                         </div>
                         <div class="form-check">
-                            <input class="form-check-input" type="checkbox" value="พูดคุยเป็นเพื่อน" id="talk_as_friends" name="talk_as_friends" {{ $activity->Talk_as_friends == 'พูดคุยเป็นเพื่อน' ? 'checked' : '' }}>
+                            <input class="form-check-input" type="checkbox" value="พูดคุยเป็นเพื่อน"
+                                id="talk_as_friends" name="talk_as_friends" {{ $activity->Talk_as_friends == 'พูดคุยเป็นเพื่อน' ? 'checked' : '' }}>
                             <label class="form-check-label" for="talk_as_friends">พูดคุยเป็นเพื่อน</label>
                         </div>
                         <div class="form-group">
                             <label for="other_social_specified">อื่น ๆ ระบุ</label>
-                            <input type="text" id="other_social_specified" name="other_social_specified" class="form-control" value="{{ $activity->Other_specified }}">
+                            <input type="text" id="other_social_specified" name="other_social_specified"
+                                class="form-control" value="{{ $activity->Other_specified }}">
                         </div>
                     </div>
 
@@ -237,20 +258,22 @@
                     <div class="tab-pane fade" id="problem" role="tabpanel" aria-labelledby="problem-tab">
                         <div class="form-group mt-3">
                             <label for="problem">ปัญหาที่พบ</label>
-                            <textarea id="problem" name="problem" class="form-control" rows="3">{{ $activity->Problem }}</textarea>
+                            <textarea id="problem" name="problem" class="form-control"
+                                rows="3">{{ $activity->Problem }}</textarea>
                         </div>
                         <div class="form-group">
                             <label for="solution">แนวทางการแก้ไข</label>
-                            <textarea id="solution" name="solution" class="form-control" rows="3">{{ $activity->Solution }}</textarea>
+                            <textarea id="solution" name="solution" class="form-control"
+                                rows="3">{{ $activity->Solution }}</textarea>
                         </div>
                     </div>
                 </div>
 
-                <div class="button-container">
+                <div class="button-container hidden" id="action-buttons">
                     <button class="btn btn-success mt-3" type="submit">บันทึก</button>
                     <a href="{{ route('acg.index') }}" class="btn btn-danger mt-3">ยกเลิก</a>
                 </div>
-            </form>
+                </form>
             </div>
         </div>
     </div>
@@ -281,11 +304,12 @@
             document.getElementById('activity-form').addEventListener('submit', handleCheckboxValues);
         });
 
+        // Dynamically display the submit button only on the last tab
         $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
-            if (e.target.id === "social-tab") {
-                $('button[type="submit"]').removeClass('hidden');
+            if (e.target.id === "problem-tab") {
+                $('#action-buttons').removeClass('hidden');
             } else {
-                $('button[type="submit"]').addClass('hidden');
+                $('#action-buttons').addClass('hidden');
             }
         });
     </script>

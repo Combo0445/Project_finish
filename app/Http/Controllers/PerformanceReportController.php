@@ -24,7 +24,7 @@ class PerformanceReportController extends Controller
     public function create()
     {
         // แค่โหลด list ผู้สูงอายุ
-        $elderlys = Elderly::all();
+        $elderlys = Elderly::select('ID_Elderly', 'Name_Elderly')->get();
         return view('staff.PerformanceReport.AddPerformanceReport', compact('elderlys'));
     }
 
@@ -32,29 +32,29 @@ class PerformanceReportController extends Controller
     {
         $validatedData = $request->validate([
             'ID_Elderly' => 'required|exists:elderlys,ID_Elderly',
-            'ID_Adl'     => 'required|exists:barthel_adls,ID_ADL',
-            'ID_Tai'     => 'required|exists:score_t_a_i_s,id',
-            'ID_CG'      => 'required|exists:care_givers,ID_CG',    // ← เพิ่มตรงนี้
-            'Date'       => 'required|date_format:Y-m-d\TH:i',
-            'State'      => 'required|string|max:255',
-            'Activity'   => 'required|string|max:255',
-            'Problems'   => 'nullable|string|max:255',
-            'Relative'   => 'nullable|string|max:255',
-            'Note'       => 'nullable|string|max:255',
+            'ID_Adl' => 'required|exists:barthel_adls,ID_ADL',
+            'ID_Tai' => 'required|exists:score_t_a_i_s,id',
+            'ID_CG' => 'required|exists:care_givers,ID_CG',    // ← เพิ่มตรงนี้
+            'Date' => 'required|date_format:Y-m-d\TH:i',
+            'State' => 'required|string|max:255',
+            'Activity' => 'required|string|max:255',
+            'Problems' => 'nullable|string|max:255',
+            'Relative' => 'nullable|string|max:255',
+            'Note' => 'nullable|string|max:255',
         ]);
 
         PerformanceReport::create([
             'ID_Elderly' => $validatedData['ID_Elderly'],
-            'ID_ADL'     => $validatedData['ID_Adl'],
-            'ID_TAI'     => $validatedData['ID_Tai'],
-            'ID_CG'      => $validatedData['ID_CG'], // ← เพิ่มตรงนี้
-            'ID_User'    => auth()->user()->ID_User,
-            'Date'       => Carbon::createFromFormat('Y-m-d\TH:i', $validatedData['Date']),
-            'State'      => $validatedData['State'],
-            'Activity'   => $validatedData['Activity'],
-            'Problems'   => $validatedData['Problems'],
-            'Relative'   => $validatedData['Relative'],
-            'Note'       => $validatedData['Note'],
+            'ID_ADL' => $validatedData['ID_Adl'],
+            'ID_TAI' => $validatedData['ID_Tai'],
+            'ID_CG' => $validatedData['ID_CG'], // ← เพิ่มตรงนี้
+            'ID_User' => auth()->user()->ID_User,
+            'Date' => Carbon::createFromFormat('Y-m-d\TH:i', $validatedData['Date']),
+            'State' => $validatedData['State'],
+            'Activity' => $validatedData['Activity'],
+            'Problems' => $validatedData['Problems'],
+            'Relative' => $validatedData['Relative'],
+            'Note' => $validatedData['Note'],
         ])->save();
 
         return redirect()
@@ -69,7 +69,7 @@ class PerformanceReportController extends Controller
     public function edit($id)
     {
         // โหลด list ผู้สูงอายุ สำหรับ dropdown
-        $elderlys = Elderly::all();
+        $elderlys = Elderly::select('ID_Elderly', 'Name_Elderly')->get();
         $performanceReport = PerformanceReport::with('adl', 'tai', 'caregiver')->findOrFail($id);
         return view('staff.PerformanceReport.EditPerformanceReport', compact('elderlys', 'performanceReport'));
     }
@@ -78,29 +78,29 @@ class PerformanceReportController extends Controller
     {
         $validatedData = $request->validate([
             'ID_Elderly' => 'required|exists:elderlys,ID_Elderly',
-            'ID_Adl'     => 'required|exists:barthel_adls,ID_ADL',
-            'ID_Tai'     => 'required|exists:score_t_a_i_s,id',
-            'ID_CG'      => 'required|exists:care_givers,ID_CG',
-            'Date'       => 'required|date',
-            'State'      => 'required|string|max:255',
-            'Activity'   => 'required|string|max:255',
-            'Problems'   => 'nullable|string|max:255',
-            'Relative'   => 'nullable|string|max:255',
-            'Note'       => 'nullable|string|max:255',
+            'ID_Adl' => 'required|exists:barthel_adls,ID_ADL',
+            'ID_Tai' => 'required|exists:score_t_a_i_s,id',
+            'ID_CG' => 'required|exists:care_givers,ID_CG',
+            'Date' => 'required|date',
+            'State' => 'required|string|max:255',
+            'Activity' => 'required|string|max:255',
+            'Problems' => 'nullable|string|max:255',
+            'Relative' => 'nullable|string|max:255',
+            'Note' => 'nullable|string|max:255',
         ]);
 
         $report = PerformanceReport::findOrFail($id);
         $report->update([
             'ID_Elderly' => $validatedData['ID_Elderly'],
-            'ID_ADL'     => $validatedData['ID_Adl'],
-            'ID_TAI'     => $validatedData['ID_Tai'],
-            'ID_CG'      => $validatedData['ID_CG'],
-            'Date'       => $validatedData['Date'],
-            'State'      => $validatedData['State'],
-            'Activity'   => $validatedData['Activity'],
-            'Problems'   => $validatedData['Problems'],
-            'Relative'   => $validatedData['Relative'],
-            'Note'       => $validatedData['Note'],
+            'ID_ADL' => $validatedData['ID_Adl'],
+            'ID_TAI' => $validatedData['ID_Tai'],
+            'ID_CG' => $validatedData['ID_CG'],
+            'Date' => $validatedData['Date'],
+            'State' => $validatedData['State'],
+            'Activity' => $validatedData['Activity'],
+            'Problems' => $validatedData['Problems'],
+            'Relative' => $validatedData['Relative'],
+            'Note' => $validatedData['Note'],
         ]);
 
         return redirect()->route('performanceReport.index')
@@ -126,20 +126,20 @@ class PerformanceReportController extends Controller
             ->orderBy('created_at', 'desc')->first();
         $latestTai = ScoreTAI::where('ID_Elderly', $elderlyId)
             ->orderBy('created_at', 'desc')->first();
-        $latestCg  = CareGiver::where('ID_Elderly', $elderlyId)
+        $latestCg = CareGiver::where('ID_Elderly', $elderlyId)
             ->orderBy('Date_CG', 'desc')->first();
 
         return response()->json([
             'adl' => $latestAdl ? [
-                'id'    => $latestAdl->ID_ADL,
+                'id' => $latestAdl->ID_ADL,
                 'label' => "ADL #{$latestAdl->ID_ADL} (Score: {$latestAdl->Score_ADL})"
             ] : null,
             'tai' => $latestTai ? [
-                'id'    => $latestTai->id,
+                'id' => $latestTai->id,
                 'label' => "TAI #{$latestTai->id}"
             ] : null,
-            'cg'  => $latestCg  ? [
-                'id'    => $latestCg->ID_CG,
+            'cg' => $latestCg ? [
+                'id' => $latestCg->ID_CG,
                 'label' => $latestCg->Name_CG
             ] : null,
         ]);

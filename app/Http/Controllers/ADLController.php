@@ -28,7 +28,7 @@ class ADLController extends Controller
 
     public function create()
     {
-        $elderlies = Elderly::all();
+        $elderlies = Elderly::select('ID_Elderly', 'Name_Elderly')->get();
         return view('staff.ADL.ADL', compact('elderlies'));
     }
 
@@ -128,7 +128,7 @@ class ADLController extends Controller
     public function edit($id)
     {
         $adl = BarthelAdl::findOrFail($id);
-        $elderlies = Elderly::all();
+        $elderlies = Elderly::select('ID_Elderly', 'Name_Elderly')->get();
         return view('staff.ADL.EditADL', compact('adl', 'elderlies'));
     }
 
@@ -199,12 +199,31 @@ class ADLController extends Controller
     {
         $adls = BarthelAdl::with('elderly')
             ->orderBy('created_at', 'desc')
-            ->get()
-            ->groupBy(function ($item) {
-                return $item->created_at ? $item->created_at->format('Y-m-d') : 'Non-Dated';
-            });
+            ->limit(200)
+            ->get();
 
-        return view('staff.Report.report-adl-all', compact('adls'));
+        // Use ReportController logic style for consistency
+        $reportController = app(\App\Http\Controllers\ReportController::class);
+        $mpdf = new \Mpdf\Mpdf([
+            'default_font_size' => 18,
+            'default_font' => 'sarabun',
+            'margin_left' => 10,
+            'margin_right' => 10,
+            'margin_top' => 10,
+            'margin_bottom' => 10,
+            'shrink_tables_to_fit' => 1,
+        ]);
+
+        $html = view('staff.Report.report-adl-all', [
+            'adls' => $adls,
+            'logo' => 'data:image/png;base64,' . base64_encode(file_get_contents(public_path('images/Logo.png')))
+        ])->render();
+
+        $mpdf->WriteHTML($html);
+        return response($mpdf->Output('', 'S'), 200, [
+            'Content-Type' => 'application/pdf',
+            'Content-Disposition' => 'inline; filename="ADL_Report_All.pdf"',
+        ]);
     }
 
     public function ReportADL($id)

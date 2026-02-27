@@ -18,9 +18,9 @@
                 <a href="{{ route('adl.create') }}" class="btn btn-primary">
                     <i class="fas fa-plus"></i> เพิ่ม ADL
                 </a>
-                <button id="generate-pdf" class="btn btn-success">
+                <a href="{{ route('report.all.adl') }}" target="_blank" class="btn btn-success">
                     <i class="fas fa-print"></i>
-                </button>
+                </a>
                 <a href="{{ route('adl.export') }}" class="btn btn-primary btn-sm">Export Excel</a>
             </div>
         </x-slot>
@@ -46,12 +46,12 @@
                             <td class="text-center">{{ $adl->Score_ADL }}</td>
                             <td class="text-center">{{ $adl->Group_ADL }}</td>
                             <td class="text-center">
-                                <a href="{{ route('report.adl', ['id' => $adl->ID_ADL]) }}"
-                                    class="btn btn-success btn-sm generate-pdf2">
+                                <a href="{{ route('report.adl.pdf', ['id' => $adl->ID_ADL]) }}" class="btn btn-success btn-sm"
+                                    target="_blank">
                                     ออกรายงาน
                                 </a>
-                                <button class="btn btn-info btn-sm" data-bs-toggle="modal"
-                                    data-bs-target="#adlModal-{{ $adl->ID_ADL }}">ดูข้อมูล</button>
+                                <button class="btn btn-info btn-sm" data-toggle="modal"
+                                    data-target="#adlModal-{{ $adl->ID_ADL }}">ดูข้อมูล</button>
                                 <a href="{{ route('adl.edit', ['id' => $adl->ID_ADL]) }}"
                                     class="btn btn-warning btn-sm">แก้ไข</a>
                                 <button type="button" class="btn btn-danger btn-sm"
@@ -82,7 +82,9 @@
                     <div class="modal-header">
                         <h5 class="modal-title" id="adlModalLabel-{{ $adl->ID_ADL }}">
                             ข้อมูลประเมินความสามารถในการดำเนินชีวิตประจำวัน (ADL) ของ {{ $adl->Name_Elderly }}</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
                     </div>
                     <div class="modal-body">
                         <table class="table">
@@ -145,7 +147,7 @@
                         </table>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ปิด</button>
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">ปิด</button>
                     </div>
                 </div>
             </div>
@@ -154,7 +156,7 @@
 @endsection
 
 @push('scripts')
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.2/html2pdf.bundle.min.js"></script>
+    {{-- html2pdf script removed --}}
     <script>
         $(document).ready(function () {
             $('#adlTable').DataTable({
@@ -201,37 +203,37 @@
 
             var reportContent = document.createElement('div');
             reportContent.innerHTML = `
-                <style>
-                    * { font-family: 'Open Sans', Arial, sans-serif !important; color: black !important; background-color: white !important; }
-                    h5 { font-size: 20px; margin: 0; text-align: center; }
-                    table { width: 100%; border-collapse: collapse; margin-bottom: 20px; font-size: 14px; }
-                    th, td { padding: 8px; text-align: center; border: 1px solid black; }
-                    td { font-size: 12px; }
-                </style>
-                <h5>รายงานความสามารถในการดำเนินชีวิตประจำวัน (ADL)</h5>
-                <table>
-                    <thead>
-                        <tr>
-                            <th>วันที่</th>
-                            <th>ชื่อผู้สูงอายุ</th>
-                            <th>ชื่อเจ้าหน้าที่</th>
-                            <th>คะแนน ADL</th>
-                            <th>กลุ่ม ADL</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        ${filteredData.map(row => `
-                            <tr>
-                                <td>${row[0]}</td>
-                                <td>${row[1]}</td>
-                                <td>${row[2]}</td>
-                                <td>${row[3]}</td>
-                                <td>${row[4]}</td>
-                            </tr>
-                        `).join('')}
-                    </tbody>
-                </table>
-            `;
+                            <style>
+                                * { font-family: 'Open Sans', Arial, sans-serif !important; color: black !important; background-color: white !important; }
+                                h5 { font-size: 20px; margin: 0; text-align: center; }
+                                table { width: 100%; border-collapse: collapse; margin-bottom: 20px; font-size: 14px; }
+                                th, td { padding: 8px; text-align: center; border: 1px solid black; }
+                                td { font-size: 12px; }
+                            </style>
+                            <h5>รายงานความสามารถในการดำเนินชีวิตประจำวัน (ADL)</h5>
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>วันที่</th>
+                                        <th>ชื่อผู้สูงอายุ</th>
+                                        <th>ชื่อเจ้าหน้าที่</th>
+                                        <th>คะแนน ADL</th>
+                                        <th>กลุ่ม ADL</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    ${filteredData.map(row => `
+                                        <tr>
+                                            <td>${row[0]}</td>
+                                            <td>${row[1]}</td>
+                                            <td>${row[2]}</td>
+                                            <td>${row[3]}</td>
+                                            <td>${row[4]}</td>
+                                        </tr>
+                                    `).join('')}
+                                </tbody>
+                            </table>
+                        `;
 
             const opt = {
                 margin: 0.5,
@@ -248,38 +250,6 @@
             });
         });
 
-        document.querySelectorAll('.generate-pdf2').forEach(button => {
-            button.addEventListener('click', function (event) {
-                event.preventDefault();
-                const url = this.href;
-                fetch(url)
-                    .then(response => response.text())
-                    .then(data => {
-                        const parser = new DOMParser();
-                        const doc = parser.parseFromString(data, 'text/html');
-                        const element = doc.querySelector('.container');
-                        const style = document.createElement('style');
-                        style.innerHTML = `
-                            * { font-family: 'Arial', sans-serif !important; color: black !important; background-color: white !important; }
-                            h5 { text-align: center; margin-bottom: 20px; font-size: 24px; }
-                            table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
-                            table, th, td { border: 1px solid black; }
-                            th, td { padding: 8px; text-align: left; }
-                            td { font-size: 12px; }
-                        `;
-                        element.appendChild(style);
-                        const opt = {
-                            margin: 0.5,
-                            filename: 'รายงาน_ADL.pdf',
-                            jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' }
-                        };
-                        html2pdf().set(opt).from(element).output('blob').then(function (pdfBlob) {
-                            const pdfUrl = URL.createObjectURL(pdfBlob);
-                            const pdfWindow = window.open();
-                            pdfWindow.location.href = pdfUrl;
-                        });
-                    });
-            });
-        });
+        // Script removed to use server-side PDF instead for better formatting consistency (18px font)
     </script>
 @endpush

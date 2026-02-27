@@ -63,6 +63,7 @@
                             <option value="Admin" {{ old('Type_Personnel', $user->Type_Personnel) == 'Admin' ? 'selected' : '' }}>เจ้าหน้าที่ (ผู้ดูแลระบบ)</option>
                             <option value="Staff" {{ old('Type_Personnel', $user->Type_Personnel) == 'Staff' ? 'selected' : '' }}>เจ้าหน้าที่ (Staff)</option>
                             <option value="Doctor" {{ old('Type_Personnel', $user->Type_Personnel) == 'Doctor' ? 'selected' : '' }}>แพทย์ (Doctor)</option>
+                            <option value="Pharmacist" {{ old('Type_Personnel', $user->Type_Personnel) == 'Pharmacist' ? 'selected' : '' }}>เภสัชกร (Pharmacist)</option>
                         </select>
                     </div>
 

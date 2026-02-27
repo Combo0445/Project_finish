@@ -10,9 +10,9 @@
                 <a href="{{ route('activities.create') }}" class="btn btn-primary">
                     <i class="fas fa-plus"></i> เพิ่ม ACG
                 </a>
-                <button id="generate-pdf" class="btn btn-success">
+                <a href="{{ route('report.all.acg') }}" target="_blank" class="btn btn-success">
                     <i class="fas fa-print"></i>
-                </button>
+                </a>
             </div>
         </x-slot>
 
@@ -33,9 +33,9 @@
                             <td class="text-center">{{ $activity->caregiver->Name_Elderly }}</td>
                             <td class="text-center">{{ $activity->caregiver->Name_CG }}</td>
                             <td class="text-center">
-                                <a href="javascript:void(0);" onclick="generatePdf({{ $activity->ID_ACG }})"
+                                <a href="{{ route('report.acg', ['id' => $activity->ID_ACG]) }}" target="_blank"
                                     class="btn btn-success btn-sm">ออกรายงาน</a>
-                                <a href="{{ route('cg.edit', ['id' => $activity->ID_ACG]) }}"
+                                <a href="{{ route('acg.edit', ['id' => $activity->ID_ACG]) }}"
                                     class="btn btn-sm {{ is_null($activity->Evaluate) ? 'btn-success' : 'btn-warning' }}">
                                     <i class="fas fa-edit"></i>
                                     {{ is_null($activity->Evaluate) ? 'เพิ่มแบบประเมิน' : 'แก้ไขแบบประเมิน' }}
@@ -92,76 +92,6 @@
             });
         }
 
-        function generatePdf(id) {
-            fetch(`{{ route('report.acg', ':id') }}`.replace(':id', id))
-                .then(response => response.text())
-                .then(data => {
-                    const parser = new DOMParser();
-                    const doc = parser.parseFromString(data, 'text/html');
-                    const element = doc.querySelector('.container');
-                    const style = document.createElement('style');
-                    style.innerHTML = `
-                        * { font-family: 'Open Sans', Arial, sans-serif !important; color: black !important; background-color: white !important; }
-                        h5 { text-align: center; margin-bottom: 20px; font-size: 24px; }
-                        table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
-                        table, th, td { border: 1px solid black; }
-                        th, td { padding: 8px; text-align: left; }
-                    `;
-                    element.appendChild(style);
-                    const opt = {
-                        margin: 0.5,
-                        filename: `รายงาน_ACG_บุคคล_${id}.pdf`,
-                        jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
-                    };
-                    html2pdf().set(opt).from(element).output('blob').then(function (pdfBlob) {
-                        const pdfUrl = URL.createObjectURL(pdfBlob);
-                        const pdfWindow = window.open();
-                        pdfWindow.location.href = pdfUrl;
-                    });
-                });
-        }
-
-        document.getElementById('generate-pdf').addEventListener('click', function () {
-            var filteredData = $('#acgTable').DataTable().rows({ filter: 'applied' }).data().toArray();
-            if (filteredData.length === 0) {
-                Swal.fire('ไม่พบข้อมูลที่ตรงกับการค้นหา', '', 'error');
-                return;
-            }
-
-            var reportContent = document.createElement('div');
-            reportContent.innerHTML = `
-                <style>
-                    * { font-family: 'Open Sans', Arial, sans-serif !important; color: black !important; background-color: white !important; }
-                    h5 { font-size: 20px; margin: 0; text-align: center; }
-                    table { width: 100%; border-collapse: collapse; margin-bottom: 20px; font-size: 14px; }
-                    th, td { padding: 8px; text-align: center; border: 1px solid black; }
-                </style>
-                <h5>รายงานการประเมินกิจกรรมการดูแลผู้สูงอายุ (ACG)</h5>
-                <table>
-                    <thead>
-                        <tr>
-                            <th>วันที่</th>
-                            <th>ชื่อผู้สูงอายุ</th>
-                            <th>ชื่อผู้ดูแลผู้สูงอายุ</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        ${filteredData.map(row => `<tr><td>${row[0]}</td><td>${row[1]}</td><td>${row[2]}</td></tr>`).join('')}
-                    </tbody>
-                </table>
-            `;
-
-            const opt = {
-                margin: 0.5,
-                filename: 'รายงานกิจกรรมผู้สูงอายุ_ทั้งหมด.pdf',
-                jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
-            };
-
-            html2pdf().set(opt).from(reportContent).output('blob').then(function (pdfBlob) {
-                var pdfUrl = URL.createObjectURL(pdfBlob);
-                var pdfWindow = window.open();
-                pdfWindow.location.href = pdfUrl;
-            });
-        });
+        // Script removed to use server-side PDF instead for better formatting consistency (18px font)
     </script>
 @endpush

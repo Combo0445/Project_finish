@@ -43,7 +43,8 @@ class ReportController extends Controller
     return new Mpdf([
       'mode' => 'utf-8',
       'format' => $orientation,
-      'default_font_size' => 14,
+      'default_font_size' => 18,
+      'tempDir' => storage_path('app/mpdf'),
       'fontDir' => array_merge($fontDirs, [
         public_path('fonts'),
         public_path('fonts/thsarabun'),
@@ -57,10 +58,12 @@ class ReportController extends Controller
         ],
       ],
       'default_font' => 'sarabun',
-      'margin_left' => 15,
-      'margin_right' => 15,
-      'margin_top' => 15,
-      'margin_bottom' => 15,
+      'margin_left' => 10,
+      'margin_right' => 10,
+      'margin_top' => 10,
+      'margin_bottom' => 10,
+      'packTableData' => true,
+      'shrink_tables_to_fit' => 1,
     ]);
   }
 
@@ -82,7 +85,7 @@ class ReportController extends Controller
     $reports = PerformanceReport::where('ID_Elderly', $report->ID_Elderly)
       ->orderBy('Date', 'desc')
       ->get();
-    $age = $report->elderly->Birthday ? Carbon::parse($report->elderly->Birthday)->age : null;
+    $age = ($report->elderly && $report->elderly->Birthday) ? Carbon::parse($report->elderly->Birthday)->age : null;
 
     return $this->generatePdfResponse('staff.Report.report-performance-report', [
       'report' => $report,
@@ -114,6 +117,12 @@ class ReportController extends Controller
     return $this->generatePdfResponse('staff.Report.report-tai', ['tai' => $tai], ($tai->elderly->Name_Elderly ?? "Report") . "_TAI.pdf");
   }
 
+  public function ReportTAIAll()
+  {
+    $tais = ScoreTAI::with(['elderly', 'user'])->orderBy('updated_at', 'desc')->limit(200)->get();
+    return $this->generatePdfResponse('staff.Report.report-tai-all', ['tais' => $tais], "TAI_Report_All.pdf");
+  }
+
   public function ReportADL($id)
   {
     $adl = BarthelAdl::with('elderly')->findOrFail($id);
@@ -135,7 +144,7 @@ class ReportController extends Controller
 
   public function ReportCI_Single($id)
   {
-    $ci = CareInstruction::with('elderly')->findOrFail($id);
+    $ci = CareInstruction::with(['elderly', 'prescriptions.medicine'])->findOrFail($id);
     return $this->generatePdfResponse('staff.Report.report-ci-pdf', ['ci' => $ci], ($ci->Name_Elderly ?? "Report") . "_CI.pdf");
   }
 
@@ -168,7 +177,45 @@ class ReportController extends Controller
 
   public function ReportCIConfirm()
   {
-    $careInstructions = \App\Models\CareInstruction::whereNotNull('Confirm')->paginate(20);
+    $careInstructions = CareInstruction::whereNotNull('Confirm')->paginate(20);
     return view('staff.Report.report-ci-confirm', compact('careInstructions'));
+  }
+
+  public function ReportCI_All(Request $request)
+  {
+    $user = auth()->user();
+    $query = CareInstruction::with(['elderly', 'prescriptions.medicine'])->orderBy('Date_CI', 'desc');
+
+    // Apply the same filtering as the index page
+    if ($user->Type_Personnel == 'Doctor') {
+      $typeDoctor = $user->Type_Doctor;
+      $query->whereHas('elderly.barthel_adl', function ($q) use ($typeDoctor) {
+        if ($typeDoctor)
+          $q->where('Group_ADL', $typeDoctor);
+      });
+    } elseif ($user->Type_Personnel == 'Staff') {
+      $query->where('Name_Staff', $user->Name_User);
+    }
+
+    if ($request->has('unconfirmed') && $request->unconfirmed == 'true') {
+      $query->whereNull('Confirm');
+    }
+
+    if ($request->filled('elderly_id')) {
+      $query->where('ID_Elderly', $request->elderly_id);
+    }
+
+    // Limit to 200 to prevent PDF memory exhaustion on large datasets
+    $careInstructions = $query->limit(200)->get();
+
+    return $this->generatePdfResponse(
+      'staff.Report.report-ci-confirm',
+      [
+        'careInstructions' => $careInstructions,
+        'title' => 'รายงานสรุปคำแนะนำการดูแล'
+      ],
+      "Care_Instructions_Report_All.pdf",
+      'A4-L'
+    );
   }
 }

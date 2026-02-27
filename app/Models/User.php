@@ -26,7 +26,8 @@ class User extends Model implements AuthenticatableContract
         'Address',
         'Phone',
         'Image_User',
-        'line_token'
+        'line_token',
+        'is_admin_permanent'
     ];
     public $timestamps = false;
 

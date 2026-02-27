@@ -90,10 +90,15 @@
                     <x-slot name="header">
                         <h4 class="mb-0">ข้อมูลประวัติส่วนตัวของผู้สูงอายุ</h4>
                         <div class="d-flex gap-2">
+                            <a href="{{ route('staff.workflow.start') }}"
+                                class="btn btn-warning d-flex align-items-center btn-lg"
+                                style="font-size: 1.1rem; padding: 10px 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+                                <i class="fas fa-play-circle me-2 fs-4"></i> เริ่มงานวันนี้
+                            </a>
                             <a href="{{ route('add-elderly') }}" class="btn btn-primary d-flex align-items-center">
                                 <i class="fas fa-plus me-2"></i> เพิ่มผู้สูงอายุ
                             </a>
-                            <a href="{{ route('elderly-report') }}" class="btn btn-outline-success">
+                            <a href="{{ route('elderly-report') }}" class="btn btn-outline-success d-flex align-items-center">
                                 <i class="fas fa-print me-2"></i> พิมพ์รายงานสรุป
                             </a>
                         </div>
@@ -209,7 +214,8 @@
             <x-slot name="header">
                 <h4 class="mb-0">รายชื่อผู้สูงอายุที่ต้องประเมิน</h4>
                 <div class="d-flex gap-2">
-                    <a href="{{ route('report.ci.confirm') }}" class="btn btn-outline-primary d-flex align-items-center">
+                    <a href="{{ route('care_instructions.index', ['unconfirmed' => 'true']) }}"
+                        class="btn btn-outline-primary d-flex align-items-center">
                         <i class="fas fa-list-check me-2"></i> รายการที่รอยืนยัน
                     </a>
                 </div>
@@ -220,6 +226,9 @@
                     ['label' => 'ชื่อ-นามสกุล', 'class' => 'text-center'],
                     ['label' => 'อายุ', 'class' => 'text-center'],
                     ['label' => 'กลุ่ม ADL', 'class' => 'text-center'],
+                    ['label' => 'คะแนน ADL', 'class' => 'text-center'],
+                    ['label' => 'ผู้ดูแลล่าสุด', 'class' => 'text-center'],
+                    ['label' => 'สถานะคำแนะนำ', 'class' => 'text-center'],
                     ['label' => 'การจัดการ', 'class' => 'text-center']
                 ]">
                 @foreach ($elderlys as $elderly)
@@ -237,19 +246,64 @@
                             </span>
                         </td>
                         <td class="text-center">
-                            <div class="btn-group">
-                                <button class="btn btn-sm btn-outline-info me-2" data-bs-toggle="modal"
-                                    data-bs-target="#adlModal-{{ $elderly->ID_Elderly }}">
-                                    <i class="fas fa-file-medical"></i> ADL
-                                </button>
-                                <button class="btn btn-sm btn-outline-info me-2" data-bs-toggle="modal"
-                                    data-bs-target="#cgDatesModal-{{ $elderly->ID_Elderly }}">
-                                    <i class="fas fa-user-nurse"></i> CG
-                                </button>
-                                <a href="{{ route('ci.create', ['elderly_id' => $elderly->ID_Elderly]) }}"
-                                    class="btn btn-sm btn-primary">
-                                    <i class="fas fa-comment-medical me-1"></i> ให้คำแนะนำ
+                            @if($elderly->barthel_adl)
+                                <span class="badge badge-sm bg-info">{{ $elderly->barthel_adl->Score_ADL }} คะแนน</span>
+                            @else
+                                <span class="text-muted small">-</span>
+                            @endif
+                        </td>
+                        <td class="text-center">
+                            @if($elderly->care_giver)
+                                <div class="d-flex flex-column align-items-center">
+                                    <span class="text-sm font-weight-bold">{{ $elderly->care_giver->Name_CG }}</span>
+                                    <span
+                                        class="text-xs text-muted">{{ \Carbon\Carbon::parse($elderly->care_giver->Date_CG)->format('d/m/Y') }}</span>
+                                </div>
+                            @else
+                                <span class="text-muted small">ไม่มีข้อมูล</span>
+                            @endif
+                        </td>
+                        <td class="text-center">
+                            @php
+                                $hasToday = $elderly->care_instructions->where('Date_CI', now()->toDateString())->isNotEmpty();
+                                $hasPending = $elderly->care_instructions->whereNull('Confirm')->isNotEmpty();
+                            @endphp
+
+                            @if($hasToday)
+                                <a href="{{ route('care_instructions.index', ['elderly_id' => $elderly->ID_Elderly]) }}"
+                                    class="badge rounded-pill bg-gradient-success" style="cursor: pointer; text-decoration: none;">
+                                    บันทึกแล้ววันนี้
                                 </a>
+                            @elseif($hasPending)
+                                <a href="{{ route('care_instructions.index', ['elderly_id' => $elderly->ID_Elderly, 'unconfirmed' => 'true']) }}"
+                                    class="badge rounded-pill bg-gradient-warning" style="cursor: pointer; text-decoration: none;">
+                                    รอสตาฟยืนยัน
+                                </a>
+                            @else
+                                <span class="text-muted small">ยังไม่มีคำแนะนำ</span>
+                            @endif
+                        </td>
+                        <td class="text-center">
+                            <div class="btn-group">
+                                <button class="btn btn-sm btn-outline-info me-2" data-toggle="modal"
+                                    data-target="#adlModal-{{ $elderly->ID_Elderly }}" title="ดูรายละเอียด ADL">
+                                    <i class="fas fa-file-medical"></i>
+                                </button>
+                                <button class="btn btn-sm btn-outline-info me-2" data-toggle="modal"
+                                    data-target="#cgDatesModal-{{ $elderly->ID_Elderly }}" title="ดูรายละเอียด CG">
+                                    <i class="fas fa-user-nurse"></i>
+                                </button>
+                                @if($hasToday)
+                                    <a href="{{ route('care_instructions.create', ['elderly_id' => $elderly->ID_Elderly]) }}"
+                                        class="btn btn-sm btn-secondary disabled" aria-disabled="true">
+                                        <i class="fas fa-check me-1"></i> ให้คำแนะนำแล้ว
+                                    </a>
+                                @else
+                                    <a href="{{ route('care_instructions.create', ['elderly_id' => $elderly->ID_Elderly]) }}"
+                                        class="btn btn-sm btn-primary">
+                                        <i class="fas fa-comment-medical me-1"></i> ให้คำแนะนำ
+                                    </a>
+                                @endif
                             </div>
                         </td>
                     </tr>
@@ -257,44 +311,20 @@
             </x-data-table>
         </x-card>
 
-        <x-dashboard-doctor-modals :elderlys="$elderlys" />
+        @push('modals')
+            <x-dashboard-doctor-modals :elderlys="$elderlys" />
+        @endpush
     @endif
 @endsection
 
 @push('scripts')
     @if($role === 'Admin')
         <x-dashboard-admin-scripts />
-        <script>
-            function confirmDelete(id) {
-                Swal.fire({
-                    title: 'ยืนยันการลบ?',
-                    text: "บัญชีนี้จะถูกลบถาวร!",
-                    icon: 'warning',
-                    showCancelButton: true,
-                    confirmButtonText: 'ลบ',
-                    cancelButtonText: 'ยกเลิก',
-                    confirmButtonColor: '#ea0606'
-                }).then((result) => {
-                    if (result.isConfirmed) document.getElementById('delete-form-' + id).submit();
-                });
-            }
+        <script>     function confirmDelete(id) { Swal.fire({ title: 'ยืนยันการลบ?', text: "บัญชีนี้จะถูกลบถาวร!", icon: 'warning', showCancelButton: true, confirmButtonText: 'ลบ', cancelButtonText: 'ยกเลิก', confirmButtonColor: '#ea0606' }).then((result) => { if (result.isConfirmed) document.getElementById('delete-form-' + id).submit(); }); }
         </script>
     @elseif($role === 'Staff')
         <x-dashboard-staff-scripts :ageGroups="$ageGroups" :adlGroups="$adlGroups" :elderlyLocations="$elderlyLocations" />
-        <script>
-            function confirmDeleteElderly(id) {
-                Swal.fire({
-                    title: 'ยืนยันการลบ?',
-                    text: "ข้อมูลผู้สูงอายุนี้จะถูกลบถาวร!",
-                    icon: 'warning',
-                    showCancelButton: true,
-                    confirmButtonText: 'ลบ',
-                    cancelButtonText: 'ยกเลิก',
-                    confirmButtonColor: '#ea0606'
-                }).then((result) => {
-                    if (result.isConfirmed) document.getElementById('delete-elderly-form-' + id).submit();
-                });
-            }
+        <script>     function confirmDeleteElderly(id) { Swal.fire({ title: 'ยืนยันการลบ?', text: "ข้อมูลผู้สูงอายุนี้จะถูกลบถาวร!", icon: 'warning', showCancelButton: true, confirmButtonText: 'ลบ', cancelButtonText: 'ยกเลิก', confirmButtonColor: '#ea0606' }).then((result) => { if (result.isConfirmed) document.getElementById('delete-elderly-form-' + id).submit(); }); }
         </script>
     @elseif($role === 'Doctor')
         <x-dashboard-doctor-scripts />

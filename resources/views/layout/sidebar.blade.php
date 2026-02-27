@@ -3,10 +3,18 @@
     $roleNames = [
         'Admin' => 'ผู้ดูแลระบบ',
         'Staff' => 'เจ้าหน้าที่',
-        'Doctor' => 'นายแพทย์'
+        'Doctor' => 'นายแพทย์',
+        'Pharmacist' => 'เภสัชกร'
     ];
     $currentRoleName = $roleNames[$role] ?? 'ผู้ใช้งาน';
 @endphp
+
+<!-- Standard Fonts & Icons for Sidebar -->
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+<!-- Theme CSS mapping for icons if missed -->
+<link href="{{ url('assets/css/nucleo-icons.css') }}" rel="stylesheet" />
+<link href="{{ url('assets/css/nucleo-svg.css') }}" rel="stylesheet" />
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <aside class="sidenav navbar navbar-vertical navbar-expand-xs border-0 border-radius-xl my-3 fixed-start ms-3"
@@ -19,7 +27,7 @@
         </a>
     </div>
     <hr class="horizontal light mt-0 mb-2">
-    <div class="collapse navbar-collapse w-auto" id="sidenav-collapse-main">
+    <div class="w-auto" id="sidenav-collapse-main" style="display: block;">
         <ul class="navbar-nav">
             <li class="nav-item">
                 <a class="nav-link text-white {{ Request::is('/') ? 'active bg-gradient-primary' : '' }}"
@@ -42,6 +50,7 @@
                         @if($role === 'Admin') จัดการข้อมูลผู้ใช้
                         @elseif($role === 'Staff') จัดการข้อมูลผู้สูงอายุ
                         @elseif($role === 'Doctor') อ่านข้อมูลและให้คำแนะนำ
+                        @elseif($role === 'Pharmacist') จัดการคลังยา
                         @else แดชบอร์ด
                         @endif
                     </span>
@@ -63,13 +72,17 @@
 
             {{-- Staff Specific --}}
             @if($role === 'Staff')
+                <li class="nav-item mt-3">
+                    <h6 class="ps-4 ms-2 text-uppercase text-xs text-white font-weight-bolder opacity-8">
+                        แบบประเมินผู้สูงอายุ</h6>
+                </li>
                 <li class="nav-item">
                     <a class="nav-link text-white {{ Request::is('adl-show') ? 'active bg-gradient-primary' : '' }}"
                         href="{{ route('adl.index') }}">
                         <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
                             <i class="material-icons opacity-10">assessment</i>
                         </div>
-                        <span class="nav-link-text ms-1">ทำแบบประเมิน (ADL)</span>
+                        <span class="nav-link-text ms-1">ประเมินกิจวัตร (ADL)</span>
                     </a>
                 </li>
                 <li class="nav-item">
@@ -78,7 +91,7 @@
                         <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
                             <i class="material-icons opacity-10">elderly</i>
                         </div>
-                        <span class="nav-link-text ms-1">การประเมินผู้สูงอายุ (TAI)</span>
+                        <span class="nav-link-text ms-1">ประเมินสุขภาพ (TAI)</span>
                     </a>
                 </li>
                 <li class="nav-item">
@@ -87,17 +100,22 @@
                         <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
                             <i class="material-icons opacity-10">assignment</i>
                         </div>
-                        <span class="nav-link-text ms-1">การปฏิบัติงานผู้ดูแลผู้สูงอายุ (CG)</span>
+                        <span class="nav-link-text ms-1">ประเมินผู้ดูแล (CG)</span>
                     </a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link text-white {{ Request::is('acg-show') ? 'active bg-gradient-primary' : '' }}"
                         href="{{ route('acg.index') }}">
                         <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
-                            <i class="material-icons opacity-10">elderly</i>
+                            <i class="material-icons opacity-10">directions_walk</i>
                         </div>
-                        <span class="nav-link-text ms-1">กิจกรรมการดูแลผู้สูงอายุ (ACG)</span>
+                        <span class="nav-link-text ms-1">บันทึกเยี่ยมบ้าน (ACG)</span>
                     </a>
+                </li>
+
+                <li class="nav-item mt-3">
+                    <h6 class="ps-4 ms-2 text-uppercase text-xs text-white font-weight-bolder opacity-8">รายงานและคำแนะนำ
+                    </h6>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link text-white {{ Request::is('performance-report') ? 'active bg-gradient-primary' : '' }}"
@@ -105,14 +123,14 @@
                         <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
                             <i class="material-icons opacity-10">analytics</i>
                         </div>
-                        <span class="nav-link-text ms-1">รายงานผลการปฏิบัติงาน</span>
+                        <span class="nav-link-text ms-1">รายงานการปฏิบัติงาน</span>
                     </a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link text-white {{ Request::is('care-instructions') && !request('unconfirmed') ? 'active bg-gradient-primary' : '' }}"
                         href="{{ route('care_instructions.index') }}">
                         <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
-                            <i class="material-icons opacity-10">announcement</i>
+                            <i class="material-icons opacity-10">fact_check</i>
                         </div>
                         <span class="nav-link-text ms-1">จัดการข้อมูลคำแนะนำ</span>
                     </a>
@@ -124,6 +142,28 @@
                             <i class="material-icons opacity-10">announcement</i>
                         </div>
                         <span class="nav-link-text ms-1">คำแนะนำ (รอยืนยัน)</span>
+                    </a>
+                </li>
+            @endif
+
+            {{-- Pharmacist Specific --}}
+            @if($role === 'Pharmacist' || $role === 'Admin')
+                <li class="nav-item">
+                    <a class="nav-link text-white {{ request('unconfirmed') ? 'active bg-gradient-primary' : '' }}"
+                        href="{{ route('care_instructions.index', ['unconfirmed' => 'true']) }}">
+                        <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
+                            <i class="material-icons opacity-10">announcement</i>
+                        </div>
+                        <span class="nav-link-text ms-1">คำแนะนำ (รอยืนยัน)</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link text-white {{ Request::is('medicines*') ? 'active bg-gradient-primary' : '' }}"
+                        href="{{ route('medicines.index') }}">
+                        <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
+                            <i class="material-icons opacity-10">local_pharmacy</i>
+                        </div>
+                        <span class="nav-link-text ms-1">จัดการคลังยา</span>
                     </a>
                 </li>
             @endif

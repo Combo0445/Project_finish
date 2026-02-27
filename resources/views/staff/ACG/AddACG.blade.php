@@ -94,7 +94,8 @@
         }
 
         .button-container {
-            text-align: right; /* ย้ายปุ่มไปทางขวา */
+            text-align: right;
+            /* ย้ายปุ่มไปทางขวา */
         }
     </style>
 </head>
@@ -131,7 +132,7 @@
                     <li class="nav-item">
                         <a class="nav-link" id="problem-tab" data-toggle="tab" href="#problem" role="tab"
                             aria-controls="problem" aria-selected="false">ปัญหาและแนวทางแก้ไข</a>
-                    </li>                    
+                    </li>
                 </ul>
 
                 <!-- Tab content -->
@@ -153,11 +154,13 @@
                             </div>
                             <div class="form-group">
                                 <label for="activity_date">ลงเวลากิจกรรมการดูแลผู้สูงอายุ</label>
-                                <input type="date" id="activity_date" name="activity_date" class="form-control" required>
+                                <input type="date" id="activity_date" name="activity_date" class="form-control"
+                                    required>
                             </div>
                             <div class="form-group">
                                 <label for="evaluate">ประเมิน/ติดตามอาการ</label>
-                                <select id="evaluate" name="evaluate" class="form-control" style="height: 45px;" required>
+                                <select id="evaluate" name="evaluate" class="form-control" style="height: 45px;"
+                                    required>
                                     <option value="">-- กรุณาเลือก --</option>
                                     <option value="ประเมิน">ประเมิน</option>
                                     <option value="ติดตามอาการ">ติดตามอาการ</option>
@@ -168,97 +171,112 @@
 
                     <!-- Health Activities Tab -->
                     <div class="tab-pane fade" id="health" role="tabpanel" aria-labelledby="health-tab">
-<br>
+                        <br>
                         <div class="form-check">
-                            <input class="form-check-input" type="checkbox" value="ทำแผล" id="dress_the_wound" name="dress_the_wound">
+                            <input class="form-check-input" type="checkbox" value="ทำแผล" id="dress_the_wound"
+                                name="dress_the_wound">
                             <label class="form-check-label" for="dress_the_wound">ทำแผล</label>
                         </div>
-<br>
+                        <br>
                         <div class="form-check">
-                            <input class="form-check-input" type="checkbox" value="ฟื้นฟูสภาพฯ" id="rehabilitate" name="rehabilitate">
+                            <input class="form-check-input" type="checkbox" value="ฟื้นฟูสภาพฯ" id="rehabilitate"
+                                name="rehabilitate">
                             <label class="form-check-label" for="rehabilitate">ฟื้นฟูสภาพฯ</label>
                         </div>
-<br>
+                        <br>
                         <div class="form-check">
-                            <input class="form-check-input" type="checkbox" value="ทำความสะอาดร่างกาย" id="clean_body" name="clean_body">
+                            <input class="form-check-input" type="checkbox" value="ทำความสะอาดร่างกาย" id="clean_body"
+                                name="clean_body">
                             <label class="form-check-label" for="clean_body">ทำความสะอาดร่างกาย</label>
                         </div>
-<br>
+                        <br>
                         <div class="form-check">
-                            <input class="form-check-input" type="checkbox" value="ดูแลเรื่องยา" id="take_care_medicine" name="take_care_medicine">
+                            <input class="form-check-input" type="checkbox" value="ดูแลเรื่องยา" id="take_care_medicine"
+                                name="take_care_medicine">
                             <label class="form-check-label" for="take_care_medicine">ดูแลเรื่องยา</label>
                         </div>
-<br>
+                        <br>
                         <div class="form-check">
-                            <input class="form-check-input" type="checkbox" value="ดูแลให้อาหาร" id="take_care_feeding" name="take_care_feeding">
+                            <input class="form-check-input" type="checkbox" value="ดูแลให้อาหาร" id="take_care_feeding"
+                                name="take_care_feeding">
                             <label class="form-check-label" for="take_care_feeding">ดูแลให้อาหาร</label>
                         </div>
-<br>
+                        <br>
                         <div class="form-check">
-                            <input class="form-check-input" type="checkbox" value="การจัดสิ่งแวดล้อม" id="environmental" name="environmental">
+                            <input class="form-check-input" type="checkbox" value="การจัดสิ่งแวดล้อม" id="environmental"
+                                name="environmental">
                             <label class="form-check-label" for="environmental">การจัดสิ่งแวดล้อม</label>
                         </div>
-<br>
+                        <br>
                         <div class="form-check">
-                            <input class="form-check-input" type="checkbox" value="พาออกกำลังกาย" id="take_exercise" name="take_exercise">
+                            <input class="form-check-input" type="checkbox" value="พาออกกำลังกาย" id="take_exercise"
+                                name="take_exercise">
                             <label class="form-check-label" for="take_exercise">พาออกกำลังกาย</label>
                         </div>
-<br>
+                        <br>
                         <div class="form-check">
                             <div>
-                                <input class="form-check-input" type="checkbox" value="ให้คำแนะนำ/ปรึกษา" id="give_advice_consult" name="give_advice_consult">
+                                <input class="form-check-input" type="checkbox" value="ให้คำแนะนำ/ปรึกษา"
+                                    id="give_advice_consult" name="give_advice_consult">
                                 <label class="form-check-label" for="give_advice_consult">ให้คำแนะนำ/ปรึกษา</label>
                             </div>
                         </div>
-<br>
+                        <br>
                         <div class="form-check">
                             <div>
-                                <input class="form-check-input" type="checkbox" value="พาพบแพทย์" id="take_to_see_a_doctor" name="take_to_see_a_doctor">
+                                <input class="form-check-input" type="checkbox" value="พาพบแพทย์"
+                                    id="take_to_see_a_doctor" name="take_to_see_a_doctor">
                                 <label class="form-check-label" for="take_to_see_a_doctor">พาพบแพทย์</label>
                             </div>
                         </div>
-<br>
+                        <br>
                         <div class="form-group">
                             <label for="other_specified">อื่น ๆ ระบุ</label>
-                            <input type="text" id="other_specified" name="other_specified" class="form-control" required>
+                            <input type="text" id="other_specified" name="other_specified" class="form-control"
+                                required>
                         </div>
-<br>
+                        <br>
                     </div>
 
                     <!-- Social Activities Tab -->
                     <div class="tab-pane fade" id="social" role="tabpanel" aria-labelledby="social-tab">
-<br>
+                        <br>
                         <div class="form-check">
-                            <input class="form-check-input" type="checkbox" value="พาไปทำบุญ" id="take_to_make_merit" name="take_to_make_merit">
+                            <input class="form-check-input" type="checkbox" value="พาไปทำบุญ" id="take_to_make_merit"
+                                name="take_to_make_merit">
                             <label class="form-check-label" for="take_to_make_merit">พาไปทำบุญ</label>
                         </div>
-<br>
+                        <br>
                         <div class="form-check">
-                            <input class="form-check-input" type="checkbox" value="พาไปจ่ายตลาด" id="take_to_market" name="take_to_market">
+                            <input class="form-check-input" type="checkbox" value="พาไปจ่ายตลาด" id="take_to_market"
+                                name="take_to_market">
                             <label class="form-check-label" for="take_to_market">พาไปจ่ายตลาด</label>
                         </div>
-<br>
+                        <br>
                         <div class="form-check">
-                            <input class="form-check-input" type="checkbox" value="พาไปพบเพื่อน" id="take_to_meet_friends" name="take_to_meet_friends">
+                            <input class="form-check-input" type="checkbox" value="พาไปพบเพื่อน"
+                                id="take_to_meet_friends" name="take_to_meet_friends">
                             <label class="form-check-label" for="take_to_meet_friends">พาไปพบเพื่อน</label>
                         </div>
-<br>
+                        <br>
                         <div class="form-check">
-                            <input class="form-check-input" type="checkbox" value="พาไปรับเบี้ย" id="take_to_allowance" name="take_to_allowance">
+                            <input class="form-check-input" type="checkbox" value="พาไปรับเบี้ย" id="take_to_allowance"
+                                name="take_to_allowance">
                             <label class="form-check-label" for="take_to_allowance">พาไปรับเบี้ย</label>
                         </div>
-<br>
+                        <br>
                         <div class="form-check">
-                            <input class="form-check-input" type="checkbox" value="พูดคุยเป็นเพื่อน" id="talk_as_friends" name="talk_as_friends">
+                            <input class="form-check-input" type="checkbox" value="พูดคุยเป็นเพื่อน"
+                                id="talk_as_friends" name="talk_as_friends">
                             <label class="form-check-label" for="talk_as_friends">พูดคุยเป็นเพื่อน</label>
                         </div>
-<br>
+                        <br>
                         <div class="form-group">
                             <label for="other_social_specified">อื่น ๆ ระบุ</label>
                             <input type="text" id="other_social_specified" name="other_social_specified"
                                 class="form-control" required>
                         </div>
-<br>
+                        <br>
                     </div>
                     <!-- Problem & Solution Tab -->
                     <div class="tab-pane fade" id="problem" role="tabpanel" aria-labelledby="problem-tab">
@@ -273,11 +291,11 @@
                     </div>
 
                 </div>
-                <div class="button-container">
+                <div class="button-container hidden" id="action-buttons">
                     <button class="btn btn-success mt-3" type="submit">บันทึก</button>
                     <a href="{{ route('acg.index') }}" class="btn btn-danger mt-3">ยกเลิก</a>
                 </div>
-            </form>
+                </form>
             </div>
         </div>
     </div>
@@ -313,15 +331,13 @@
 
         // Dynamically display the submit button only on the last tab
         $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
-            if (e.target.id === "social-tab") {
-                $('button[type="submit"]').removeClass('hidden');
+            if (e.target.id === "problem-tab") {
+                $('#action-buttons').removeClass('hidden');
             } else {
-                $('button[type="submit"]').addClass('hidden');
+                $('#action-buttons').addClass('hidden');
             }
         });
     </script>
 </body>
 
 </html>
-
-

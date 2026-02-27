@@ -16,13 +16,15 @@ use App\Http\Controllers\TAIController;
 use App\Http\Controllers\PerformanceReportController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\MedicineController;
+use App\Http\Controllers\MedicineLotController;
 
 /* |-------------------------------------------------------------------------- | Web Routes |-------------------------------------------------------------------------- | | Here is where you can register web routes for your application. These | routes are loaded by the RouteServiceProvider and all of them will | be assigned to the "web" middleware group. Make something great! | */
 
 Route::get('/', function () {
-    $sliders = App\Models\Slider::all();
-    $news = App\Models\News::all();
-    $visitorCount = 12344865; // ตัวอย่างข้อมูล
+    $sliders = App\Models\Slider::orderBy('id', 'desc')->get();
+    $news = App\Models\News::orderBy('id', 'desc')->get();
+
     $adlAssessmentCount = BarthelAdl::count();
     $cgAssessmentCount = CareGiver::count();
 
@@ -32,7 +34,7 @@ Route::get('/', function () {
         'กลุ่มติดเตียง' => BarthelAdl::where('Group_ADL', 'กลุ่มติดเตียง')->count(),
     ];
 
-    return view('welcome', compact('sliders', 'news', 'visitorCount', 'adlAssessmentCount', 'cgAssessmentCount', 'adlGroupCounts'));
+    return view('welcome', compact('sliders', 'news', 'adlAssessmentCount', 'cgAssessmentCount', 'adlGroupCounts'));
 })->name('welcome');
 
 Route::get('/news/{id}', function ($id) {
@@ -127,9 +129,20 @@ Route::middleware(['CheckLogin', 'IsAdmin'])->group(function () {
     Route::post('sliders/store', [AdminController::class, 'storeSlider'])->name('admin.sliders.store');
     Route::put('sliders/{id}', [AdminController::class, 'updateSlider'])->name('admin.sliders.update');
     Route::delete('sliders/{id}', [AdminController::class, 'destroySlider'])->name('admin.sliders.destroy');
+
+    // Role Impersonation (Admin Only)
+    Route::get('switch-role/{role}', [AdminController::class, 'switchRole'])->name('admin.switch-role');
+});
+
+// Revert Role is outside IsAdmin because when impersonating, they might fail IsAdmin check
+Route::middleware(['CheckLogin'])->group(function () {
+    Route::get('revert-role', [AdminController::class, 'revertRole'])->name('admin.revert-role');
 });
 
 Route::middleware(['CheckLogin', 'IsStaff'])->group(function () {
+    // Guided Workflow
+    Route::get('staff/workflow/start', [\App\Http\Controllers\StaffWorkflowController::class, 'start'])->name('staff.workflow.start');
+
     // Elderly Management
     Route::get('add-elderly', [ElderlyController::class, 'Addelderly'])->name('add-elderly');
     Route::post('/store-elderly', [ElderlyController::class, 'Storeelderly'])->name('store-elderly');
@@ -192,6 +205,7 @@ Route::middleware(['CheckLogin', 'IsStaff'])->group(function () {
     Route::get('report-cg/{id}', [ReportController::class, 'ReportCG'])->name('report.cg');
     Route::get('report-all-acg', [ReportController::class, 'ReportACGAll'])->name('report.all.acg');
     Route::get('report-acg/{id}', [ReportController::class, 'ReportACG'])->name('report.acg');
+    Route::get('/report-all-tai', [ReportController::class, 'ReportTAIAll'])->name('report.all.tai');
     Route::get('report-ci-confirm', [ReportController::class, 'ReportCIConfirm'])->name('report.ci.confirm');
     Route::get('/report-ci-single/{id}', [ReportController::class, 'ReportCI_Single'])->name('report.ci.single');
     Route::get('elderly-report', [ElderlyController::class, 'showReport'])->name('elderly-report');
@@ -200,8 +214,6 @@ Route::middleware(['CheckLogin', 'IsStaff'])->group(function () {
     Route::get('report-tai-pdf/{id}', [ReportController::class, 'ReportTAI'])->name('report.tai.pdf');
     Route::get('report-adl-pdf/{id}', [ReportController::class, 'ReportADL'])->name('report.adl.pdf');
     Route::get('report-acg-pdf/{id}', [ReportController::class, 'ReportACG'])->name('report.acg.pdf');
-    Route::get('report-ci-pdf/{id}', [ReportController::class, 'ReportCI_Single'])->name('report.ci.pdf');
-
     Route::get('performance-report/{id}/export-pdf', [ReportController::class, 'ReportPerformanceReport'])->name('performanceReport.exportPDF');
 
     // Export Functions
@@ -209,6 +221,12 @@ Route::middleware(['CheckLogin', 'IsStaff'])->group(function () {
     Route::get('/export-cg', [CGExportController::class, 'export'])->name('cg.export');
     Route::get('/export-tai', [TAIController::class, 'ExportTAI'])->name('tai.export');
 
+});
+
+Route::middleware(['CheckLogin', 'IsPharmacist'])->group(function () {
+    // Medicines Management
+    Route::resource('medicines', MedicineController::class)->except(['show']);
+    Route::resource('medicines.lots', MedicineLotController::class)->only(['create', 'store']);
 });
 
 
@@ -219,6 +237,10 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/care-instructions', [\App\Http\Controllers\CareInstructionController::class, 'store'])->name('care_instructions.store');
     Route::get('/care-instructions/{id}/edit', [\App\Http\Controllers\CareInstructionController::class, 'edit'])->name('care_instructions.edit');
     Route::put('/care-instructions/{id}', [\App\Http\Controllers\CareInstructionController::class, 'update'])->name('care_instructions.update');
+
+    // PDF Reports (Accessible by Doctor & Staff)
+    Route::get('report-ci-pdf/{id}', [ReportController::class, 'ReportCI_Single'])->name('report.ci.pdf');
+    Route::get('report-ci-all-pdf', [ReportController::class, 'ReportCI_All'])->name('report.ci.all.pdf');
     Route::delete('/care-instructions/{id}', [\App\Http\Controllers\CareInstructionController::class, 'destroy'])->name('care_instructions.destroy');
     Route::put('/care-instructions/{id}/confirm', [\App\Http\Controllers\CareInstructionController::class, 'confirm'])->name('care_instructions.confirm');
     Route::put('/care-instructions/{id}/unconfirm', [\App\Http\Controllers\CareInstructionController::class, 'unconfirm'])->name('care_instructions.unconfirm');

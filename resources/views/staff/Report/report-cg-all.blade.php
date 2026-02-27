@@ -1,50 +1,27 @@
-<!DOCTYPE html>
-<html lang="en">
+@extends('layouts.reports')
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>รายงาน CG ทั้งหมด</title>
+@section('title', 'รายงาน CG ทั้งหมด')
+@section('report_title', 'รายงานการปฏิบัติงานของผู้ดูแลผู้สูงอายุทั้งหมด')
 
-</head>
-
-<body>
-
-    <div class="container">
-        <h5>
-            <img src="{{ $logo }}" alt="Logo" style="height: 40px; width: auto; padding-bottom: 15px;">
-            รายงานการปฏิบัติงานของผู้ดูแลผู้สูงอายุทั้งหมด
-        </h5>
-        <table>
-            <thead>
+@section('content')
+    <table>
+        <thead>
+            <tr>
+                <th style="text-align: center;">วันที่</th>
+                <th style="text-align: center;">ชื่อผู้สูงอายุ</th>
+                <th style="text-align: center;">ชื่อผู้ดูแลผู้สูงอายุ</th>
+                <th style="text-align: center;">กลุ่ม ADL</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach ($cgs as $cg)
                 <tr>
-                    <th>วันที่</th>
-                    <th>ชื่อผู้สูงอายุ</th>
-                    <th>ชื่อผู้ดูแลผู้สูงอายุ</th>
-                    <th>กลุ่ม ADL</th>
+                    <td style="text-align: center;">{{ $cg->Date_CG ?: 'ไม่มีข้อมูล' }}</td>
+                    <td style="text-align: center;">{{ $cg->Name_Elderly ?: 'ไม่มีข้อมูล' }}</td>
+                    <td style="text-align: center;">{{ $cg->Name_CG ?: 'ไม่มีข้อมูล' }}</td>
+                    <td style="text-align: center;">{{ $cg->Group_ADL ?: 'ไม่มีข้อมูล' }}</td>
                 </tr>
-            </thead>
-            <tbody>
-                @foreach ($cgs as $index => $cg)
-                    @if ($index % 17 == 0 && $index != 0)
-                        <tr class="page-break">
-                            <th>วันที่</th>
-                            <th>ชื่อผู้สูงอายุ</th>
-                            <th>ชื่อผู้ดูแลผู้สูงอายุ</th>
-                            <th>กลุ่ม ADL</th>
-                        </tr>
-                    @endif
-                    <tr>
-                        <td>{{ $cg->Date_CG ?: 'ไม่มีข้อมูล' }}</td>
-                        <td>{{ $cg->Name_Elderly ?: 'ไม่มีข้อมูล' }}</td>
-                        <td>{{ $cg->Name_CG ?: 'ไม่มีข้อมูล' }}</td>
-                        <td>{{ $cg->Group_ADL ?: 'ไม่มีข้อมูล' }}</td>
-                    </tr>
-                @endforeach
-            </tbody>
-        </table>
-    </div>
-
-</body>
-
-</html>
+            @endforeach
+        </tbody>
+    </table>
+@endsection

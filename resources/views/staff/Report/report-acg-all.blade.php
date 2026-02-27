@@ -1,51 +1,25 @@
-<!DOCTYPE html>
-<html lang="en">
+@extends('layouts.reports')
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>รายงานกิจกรรมผู้ดูแลผู้สูงอายุทั้งหมด</title>
-    <link href="{{ url('assets/css/argon-dashboard.css') }}" rel="stylesheet" />
-    <link href="{{ url('assets/css/nucleo-icons.css') }}" rel="stylesheet" />
-    <link href="{{ url('assets/css/nucleo-svg.css') }}" rel="stylesheet" />
+@section('title', 'รายงานกิจกรรมผู้ดูแลผู้สูงอายุทั้งหมด')
+@section('report_title', 'รายงานกิจกรรมผู้ดูแลผู้สูงอายุทั้งหมด')
 
-</head>
-
-<body>
-
-    <div class="container">
-        <h5 style="text-align: center;">
-            <img src="{{ $logo }}" alt="Logo"
-                style="height: 40px; margin-bottom: 10px; display: block; margin-left: auto; margin-right: auto;">
-            รายงานกิจกรรมผู้ดูแลผู้สูงอายุทั้งหมด
-        </h5>
-        <table>
-            <thead>
+@section('content')
+    <table>
+        <thead>
+            <tr>
+                <th style="text-align: center;">วันที่</th>
+                <th style="text-align: center;">ชื่อผู้สูงอายุ</th>
+                <th style="text-align: center;">ชื่อผู้ดูแลผู้สูงอายุ</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach($activities as $activity)
                 <tr>
-                    <th>วันที่</th>
-                    <th>ชื่อผู้สูงอายุ</th>
-                    <th>ชื่อผู้ดูแลผู้สูงอายุ</th>
+                    <td style="text-align: center;">{{ $activity->Date_ACG }}</td>
+                    <td style="text-align: center;">{{ $activity->caregiver->Name_Elderly ?? '-' }}</td>
+                    <td style="text-align: center;">{{ $activity->caregiver->Name_CG ?? '-' }}</td>
                 </tr>
-            </thead>
-            <tbody>
-                @foreach($activities as $index => $activity)
-                    @if ($index % 17 == 0 && $index != 0)
-                        <tr class="page-break">
-                            <th>วันที่</th>
-                            <th>ชื่อผู้สูงอายุ</th>
-                            <th>ชื่อผู้ดูแลผู้สูงอายุ</th>
-                        </tr>
-                    @endif
-                    <tr>
-                        <td>{{ $activity->Date_ACG }}</td>
-                        <td>{{ $activity->caregiver->Name_Elderly }}</td>
-                        <td>{{ $activity->caregiver->Name_CG }}</td>
-                    </tr>
-                @endforeach
-            </tbody>
-        </table>
-
-    </div>
-</body>
-
-</html>
+            @endforeach
+        </tbody>
+    </table>
+@endsection

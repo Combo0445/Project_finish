@@ -187,25 +187,26 @@ class CGController extends Controller
 
             $careGiver = CareGiver::findOrFail($id);
 
-            // ลบรูปเก่าออกจาก storage
-            if ($careGiver->Picture) {
-                $oldImages = json_decode($careGiver->Picture, true);
-                foreach ($oldImages as $oldPath) {
-                    Storage::disk('public')->delete($oldPath);
-                }
-            }
-
             // บันทึกรูปใหม่
-            $picturePaths = [];
             if ($request->hasFile('Picture')) {
+                // ลบรูปเก่าออกจาก storage เฉพาะเมื่อมีการอัปโหลดใหม่
+                if ($careGiver->Picture) {
+                    $oldImages = json_decode($careGiver->Picture, true);
+                    if (is_array($oldImages)) {
+                        foreach ($oldImages as $oldPath) {
+                            Storage::disk('public')->delete($oldPath);
+                        }
+                    }
+                }
+
+                $picturePaths = [];
                 foreach ($request->file('Picture') as $picture) {
                     $path = $picture->store('pictures', 'public');
                     $picturePaths[] = $path;
                 }
                 $careGiverData['Picture'] = json_encode($picturePaths);
-            } else {
-                $careGiverData['Picture'] = null; // หากไม่อัปใหม่ ให้ล้างรูปเก่า
             }
+            // ถ้าไม่มีรูปใหม่ ไม่ต้องเซตเป็น null เพื่อรักษาของเดิมไว้
 
             $careGiver->update($careGiverData);
 

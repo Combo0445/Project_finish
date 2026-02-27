@@ -18,7 +18,6 @@ class DashboardController extends Controller
         $user = Auth::user();
         if (!$user)
             return redirect()->route('login');
-
         switch ($user->Type_Personnel) {
             case 'Admin':
                 return $this->adminDashboard();
@@ -26,6 +25,8 @@ class DashboardController extends Controller
                 return $this->staffDashboard($request);
             case 'Doctor':
                 return $this->doctorDashboard($request);
+            case 'Pharmacist':
+                return redirect()->route('medicines.index');
             default:
                 return redirect()->route('welcome');
         }
@@ -33,7 +34,7 @@ class DashboardController extends Controller
 
     private function adminDashboard()
     {
-        $users = User::all();
+        $users = User::orderBy('ID_User', 'desc')->get();
         return view('dashboard', compact('users'));
     }
 
@@ -59,7 +60,9 @@ class DashboardController extends Controller
             $this->applyAgeFilter($query, $ageRange);
         }
 
-        $elderlies = $query->paginate(20)->withQueryString();
+        $elderlies = $query->paginate(20);
+        /** @var \Illuminate\Pagination\LengthAwarePaginator $elderlies */
+        $elderlies->withQueryString();
 
         // Stats & Charts
         $adlGroups = [
@@ -90,7 +93,7 @@ class DashboardController extends Controller
     private function doctorDashboard(Request $request)
     {
         $user = Auth::user();
-        $query = Elderly::with(['barthel_adl', 'care_giver']);
+        $query = Elderly::with(['barthel_adl', 'care_giver', 'care_instructions']);
 
         // Doctor's assigned group filter
         $typeDoctor = $user->Type_Doctor;
@@ -105,7 +108,9 @@ class DashboardController extends Controller
             $this->applyAgeFilter($query, $request->age_range);
         }
 
-        $elderlys = $query->paginate(20)->withQueryString();
+        $elderlys = $query->paginate(20);
+        /** @var \Illuminate\Pagination\LengthAwarePaginator $elderlys */
+        $elderlys->withQueryString();
 
         $stats = [
             'total_patients' => $elderlys->total(),

@@ -9,6 +9,9 @@ use App\Http\Requests\ElderlyRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
+use App\Models\CareGiver;
+use App\Models\ActivityCaregiver;
 
 class ElderlyController extends Controller
 {
@@ -20,22 +23,24 @@ class ElderlyController extends Controller
     public function Storeelderly(ElderlyRequest $request)
     {
 
-        $elderly = new Elderly();
-        $elderly->fill($request->only(['Name_Elderly', 'Gender', 'Birthday', 'Address', 'Phone_Elderly']));
+        DB::transaction(function () use ($request) {
+            $elderly = new Elderly();
+            $elderly->fill($request->only(['Name_Elderly', 'Gender', 'Birthday', 'Address', 'Phone_Elderly']));
 
-        if ($request->hasFile('Image_Elderly')) {
-            $imagePath = $request->file('Image_Elderly')->store('elderly_images', 'public');
-            $elderly->Image_Elderly = $imagePath;
-        }
+            if ($request->hasFile('Image_Elderly')) {
+                $imagePath = $request->file('Image_Elderly')->store('elderly_images', 'public');
+                $elderly->Image_Elderly = $imagePath;
+            }
 
-        $elderly->save();
+            $elderly->save();
 
-        $addressElderly = new AddressElderly();
-        $addressElderly->ID_Elderly = $elderly->ID_Elderly;
-        $addressElderly->Name_Elderly = $elderly->Name_Elderly;
-        $addressElderly->Latitude_position = $request->input('Latitude_position');
-        $addressElderly->Longitude_position = $request->input('Longitude_position');
-        $addressElderly->save();
+            $addressElderly = new AddressElderly();
+            $addressElderly->ID_Elderly = $elderly->ID_Elderly;
+            $addressElderly->Name_Elderly = $elderly->Name_Elderly;
+            $addressElderly->Latitude_position = $request->input('Latitude_position');
+            $addressElderly->Longitude_position = $request->input('Longitude_position');
+            $addressElderly->save();
+        });
 
         return redirect()->back()->with('success', 'เพิ่มข้อมูลผู้สูงอายุเรียบร้อยแล้ว');
     }
@@ -51,30 +56,29 @@ class ElderlyController extends Controller
 
     public function Updateelderly(ElderlyRequest $request, $id)
     {
-        $elderly = Elderly::findOrFail($id);
+        DB::transaction(function () use ($request, $id) {
+            $elderly = Elderly::findOrFail($id);
+            $elderly->fill($request->only(['Name_Elderly', 'Gender', 'Birthday', 'Address', 'Phone_Elderly']));
 
-        $elderly->fill($request->only(['Name_Elderly', 'Gender', 'Birthday', 'Address', 'Phone_Elderly']));
-
-        if ($request->hasFile('Image_Elderly')) {
-            // Delete old image
-            if ($elderly->Image_Elderly) {
-                Storage::disk('public')->delete($elderly->Image_Elderly);
+            if ($request->hasFile('Image_Elderly')) {
+                if ($elderly->Image_Elderly) {
+                    Storage::disk('public')->delete($elderly->Image_Elderly);
+                }
+                $imagePath = $request->file('Image_Elderly')->store('elderly_images', 'public');
+                $elderly->Image_Elderly = $imagePath;
             }
 
-            $imagePath = $request->file('Image_Elderly')->store('elderly_images', 'public');
-            $elderly->Image_Elderly = $imagePath;
-        }
+            $elderly->save();
 
-        $elderly->save();
-
-        $addressElderly = AddressElderly::where('ID_Elderly', $id)->first();
-        if (!$addressElderly) {
-            $addressElderly = new AddressElderly();
-            $addressElderly->ID_Elderly = $id;
-        }
-        $addressElderly->Latitude_position = $request->input('Latitude_position');
-        $addressElderly->Longitude_position = $request->input('Longitude_position');
-        $addressElderly->save();
+            $addressElderly = AddressElderly::where('ID_Elderly', $id)->first();
+            if (!$addressElderly) {
+                $addressElderly = new AddressElderly();
+                $addressElderly->ID_Elderly = $id;
+            }
+            $addressElderly->Latitude_position = $request->input('Latitude_position');
+            $addressElderly->Longitude_position = $request->input('Longitude_position');
+            $addressElderly->save();
+        });
 
         return redirect()->route('dashboard')->with('success', 'อัปเดตข้อมูลผู้สูงอายุเรียบร้อยแล้ว');
     }
@@ -145,15 +149,15 @@ class ElderlyController extends Controller
     {
         $today = $request->query('date', now()->toDateString());
 
-        $adlDone = \App\Models\BarthelAdl::where('ID_Elderly', $id)
+        $adlDone = BarthelAdl::where('ID_Elderly', $id)
             ->whereDate('created_at', $today)
             ->exists();
 
-        $cgDone = \App\Models\CareGiver::where('ID_Elderly', $id)
+        $cgDone = CareGiver::where('ID_Elderly', $id)
             ->where('Date_CG', $today)
             ->exists();
 
-        $acgDone = \App\Models\ActivityCaregiver::where('Date_ACG', $today)
+        $acgDone = ActivityCaregiver::where('Date_ACG', $today)
             ->whereHas('caregiver', function ($query) use ($id) {
                 $query->where('ID_Elderly', $id);
             })

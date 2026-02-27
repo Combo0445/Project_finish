@@ -42,10 +42,60 @@
                 padding-top: 60px;
             }
         }
+
+        /* Staff Accessibility Mode (Level 1 UX for อสม.) */
+        body.staff-accessible {
+            font-size: 1.15rem;
+            /* ~20% larger base font */
+            color: #333;
+            /* Darker text for higher contrast */
+        }
+
+        body.staff-accessible h1,
+        body.staff-accessible h2,
+        body.staff-accessible h3,
+        body.staff-accessible h4,
+        body.staff-accessible h5,
+        body.staff-accessible h6 {
+            font-weight: 700 !important;
+            color: #222;
+        }
+
+        body.staff-accessible .btn {
+            font-size: 1.1rem !important;
+            /* Larger text on buttons */
+            padding: 12px 24px !important;
+            /* Bigger tap targets */
+            font-weight: bold;
+        }
+
+        body.staff-accessible table td,
+        body.staff-accessible table th {
+            font-size: 1.1rem !important;
+            padding: 15px !important;
+            /* Taller rows for easy tapping */
+        }
+
+        body.staff-accessible .badge {
+            font-size: 0.95rem !important;
+            padding: 8px 12px;
+        }
+
+        body.staff-accessible .nav-link-text {
+            font-size: 1.15rem !important;
+            font-weight: 600;
+        }
     </style>
 </head>
 
-<body>
+@php
+    $bodyClass = '';
+    if (auth()->check() && auth()->user()->Type_Personnel === 'Staff') {
+        $bodyClass = 'staff-accessible';
+    }
+@endphp
+
+<body class="{{ $bodyClass }}">
     @include('layout.nav')
 
     <main class="main-content position-relative h-100 border-radius-lg">
@@ -61,6 +111,7 @@
     <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
+    @stack('modals')
     @stack('scripts')
 </body>
 

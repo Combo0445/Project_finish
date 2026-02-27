@@ -11,13 +11,13 @@ use App\Models\User;
 class IsStaff
 {
     public function handle(Request $request, Closure $next)
-{
-    $user = Auth::user(); 
+    {
+        $user = Auth::user();
 
-    if ($user && $user->Type_Personnel === 'Staff') {
-        return $next($request);
+        if ($user && $user->Type_Personnel === 'Staff') {
+            return $next($request);
+        }
+
+        return redirect('error')->with('fail', 'คุณไม่มีสิทธิ์เข้าถึงส่วนนี้');
     }
-
-    return redirect('error')->with('fail', 'คุณไม่มีสิทธิ์เข้าถึงส่วนนี้');
-}
 }

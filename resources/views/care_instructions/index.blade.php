@@ -10,9 +10,11 @@
                     <h4>ข้อมูลคำแนะนำการดูแล</h4>
 
                     @if(Auth::user()->Type_Personnel == 'Doctor')
-                        <button id="generate-pdf" class="btn btn-success">
-                            <i class="fas fa-print"></i> พิมพ์รายงาน
-                        </button>
+                        <a href="{{ route('report.ci.all.pdf', request()->query()) }}" target="_blank"
+                            class="badge rounded-pill bg-gradient-success border-0 px-3 py-2"
+                            style="cursor: pointer; font-size: 14px; text-decoration: none;">
+                            <i class="fas fa-print me-2"></i> พิมพ์รายงานทั้งหมด (PDF)
+                        </a>
                     @endif
                 </div>
                 <div class="card-body px-3 pt-3 pb-2">
@@ -62,21 +64,36 @@
                                             <td class="text-center">{{ $ci->Name_Staff }}</td>
                                         @endif
 
-                                        <td class="text-center text-wrap" style="max-width:300px;">{{ $ci->Care_instructions }}
+                                        <td class="text-center text-wrap" style="max-width:300px;">
+                                            {{ \Illuminate\Support\Str::limit($ci->Care_instructions, 50) }}
                                         </td>
 
                                         <td class="text-center">
                                             @if($ci->Confirm)
-                                                <span class="badge bg-success">ยืนยันแล้ว</span>
+                                                <a href="{{ route('report.ci.pdf', ['id' => $ci->ID_CI]) }}" target="_blank"
+                                                    class="badge rounded-pill bg-gradient-success" title="คลิกเพื่อพิมพิ์รายงาน">
+                                                    ยืนยันแล้ว
+                                                </a>
                                             @else
-                                                <span class="badge bg-warning">รอยืนยัน</span>
+                                                <a href="{{ route('report.ci.pdf', ['id' => $ci->ID_CI]) }}" target="_blank"
+                                                    class="badge rounded-pill bg-gradient-warning"
+                                                    title="คลิกเพื่อพิมพิ์รายงาน (ยังไม่ยืนยัน)">
+                                                    รอยืนยัน
+                                                </a>
                                             @endif
                                         </td>
 
                                         <td class="text-center">
-                                            <!-- Both can search location -->
-                                            <a href="{{ route('search-location', ['id' => $ci->elderly->ID_Elderly]) }}"
-                                                target="_blank" class="btn btn-info btn-sm">ที่อยู่</a>
+                                            <!-- View Details Button -->
+                                            <button type="button" class="btn btn-info btn-sm" data-toggle="modal" data-target="#viewCiModal{{ $ci->ID_CI }}">
+                                                ดูคำแนะนำ
+                                            </button>
+
+                                            <!-- Location Button -->
+                                            @if(Auth::user()->Type_Personnel != 'Pharmacist')
+                                                <a href="{{ route('search-location', ['id' => $ci->elderly->ID_Elderly]) }}"
+                                                    target="_blank" class="btn btn-secondary btn-sm">ที่อยู่</a>
+                                            @endif
 
                                             <!-- Staff Level Controls -->
                                             @if(Auth::user()->Type_Personnel == 'Staff')
@@ -85,14 +102,7 @@
                                                         method="POST" style="display:inline-block;">
                                                         @csrf
                                                         @method('PUT')
-                                                        <button type="submit" class="btn btn-success btn-sm">ยืนยัน</button>
-                                                    </form>
-                                                @else
-                                                    <form action="{{ route('care_instructions.unconfirm', ['id' => $ci->ID_CI]) }}"
-                                                        method="POST" style="display:inline-block;">
-                                                        @csrf
-                                                        @method('PUT')
-                                                        <button type="submit" class="btn btn-secondary btn-sm">ยกเลิก</button>
+                                                        <button type="submit" class="btn btn-success btn-sm">ยืนยันรับทราบ</button>
                                                     </form>
                                                 @endif
                                             @endif
@@ -115,6 +125,77 @@
                                 @endforeach
                             </tbody>
                         </table>
+                        
+                        <!-- View Modals (Moved outside table for DataTables compatibility) -->
+                        @foreach($careInstructions as $ci)
+                            <div class="modal fade" id="viewCiModal{{ $ci->ID_CI }}" tabindex="-1" aria-labelledby="viewCiModalLabel{{ $ci->ID_CI }}" aria-hidden="true">
+                                <div class="modal-dialog modal-lg">
+                                    <div class="modal-content">
+                                        <div class="modal-header bg-gradient-info text-white">
+                                            <h5 class="modal-title text-white" id="viewCiModalLabel{{ $ci->ID_CI }}">รายละเอียดคำแนะนำ: {{ $ci->Name_Elderly }}</h5>
+                                            <button type="button" class="close text-dark" data-dismiss="modal" aria-label="Close">
+                                                <span aria-hidden="true">&times;</span>
+                                            </button>
+                                        </div>
+                                        <div class="modal-body text-start border-bottom-0">
+                                            <div class="row mb-3">
+                                                <div class="col-md-6">
+                                                    <strong>วันที่:</strong> {{ current(explode(' ', $ci->Date_CI)) }}<br>
+                                                    <strong>แพทย์ผู้สั่ง:</strong> {{ $ci->Name_Doctor }}<br>
+                                                    <strong>เจ้าหน้าที่รับผิดชอบ:</strong> {{ $ci->Name_Staff ?? 'ไม่ระบุ' }}
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <strong>สถานะ:</strong> 
+                                                    @if($ci->Confirm)
+                                                        <span class="text-success fw-bold">ยืนยันแล้ว</span>
+                                                    @else
+                                                        <span class="text-warning fw-bold">รอการยืนยัน</span>
+                                                    @endif
+                                                </div>
+                                            </div>
+                                            
+                                            <div class="card bg-light mb-3">
+                                                <div class="card-body">
+                                                    <h6 class="card-title">คำแนะนำจากแพทย์</h6>
+                                                    <p class="card-text" style="white-space: pre-line;">{{ $ci->Care_instructions }}</p>
+                                                </div>
+                                            </div>
+
+                                            @if($ci->prescriptions && $ci->prescriptions->count() > 0)
+                                                <h6>รายการยาที่ต้องเตรียม/จ่าย</h6>
+                                                <table class="table table-bordered table-sm mb-0">
+                                                    <thead class="table-primary">
+                                                        <tr>
+                                                            <th class="text-center">ชื่อยา</th>
+                                                            <th class="text-center">จำนวนที่สั่ง</th>
+                                                            <th class="text-center">วิธีใช้ (Dosage)</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        @foreach($ci->prescriptions as $rx)
+                                                            <tr>
+                                                                <td>{{ $rx->medicine ? $rx->medicine->Trade_Name : 'ไม่ทราบชื่อยา' }}</td>
+                                                                <td class="text-center">{{ $rx->amount }} {{ $rx->medicine ? $rx->medicine->Unit : '' }}</td>
+                                                                <td>{{ $rx->dosage ?: '-' }}</td>
+                                                            </tr>
+                                                        @endforeach
+                                                    </tbody>
+                                                </table>
+                                            @else
+                                                <div class="alert alert-secondary text-sm mb-0">ไม่มีรายการสั่งยาในคำแนะนำนี้</div>
+                                            @endif
+                                        </div>
+                                        <div class="modal-footer">
+                                            <a href="{{ route('report.ci.pdf', ['id' => $ci->ID_CI]) }}" target="_blank" class="btn btn-success">
+                                                <i class="fas fa-print me-2"></i> พิมพ์รายงาน
+                                            </a>
+                                            <button type="button" class="btn btn-secondary" data-dismiss="modal">ปิด</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        @endforeach
+
                         {{ $careInstructions->appends(request()->query())->links() }}
                     </div>
                 </div>
@@ -127,10 +208,29 @@
     <!-- Include DataTables JS -->
     <link rel="stylesheet" href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.min.css">
     <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.2/html2pdf.bundle.min.js"></script>
+    {{-- html2pdf removed --}}
 
     <script>
         $(document).ready(function () {
+            @if(session('success'))
+                Swal.fire({
+                    icon: 'success',
+                    title: 'สำเร็จ',
+                    text: '{!! session('success') !!}',
+                    timer: 3000,
+                    showConfirmButton: false
+                });
+            @endif
+
+            @if(session('error'))
+                Swal.fire({
+                    icon: 'error',
+                    title: 'ข้อผิดพลาด',
+                    text: '{!! session('error') !!}',
+                    confirmButtonColor: '#3085d6',
+                    confirmButtonText: 'ตกลง'
+                });
+            @endif
             $('#ciTable').DataTable({
                 "language": {
                     "paginate": { "previous": "ก่อนหน้า", "next": "ถัดไป" },

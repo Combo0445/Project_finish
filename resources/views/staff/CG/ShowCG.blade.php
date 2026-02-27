@@ -10,9 +10,9 @@
                 <a href="{{ route('cg.create') }}" class="btn btn-primary">
                     <i class="fas fa-plus"></i> เพิ่ม CG
                 </a>
-                <button id="generate-pdf" class="btn btn-success">
+                <a href="{{ route('report.all.cg') }}" target="_blank" class="btn btn-success">
                     <i class="fas fa-print"></i>
-                </button>
+                </a>
                 <a href="{{ route('cg.export') }}" class="btn btn-primary btn-sm">Export Excel</a>
             </div>
         </x-slot>
@@ -50,8 +50,8 @@
                                 {{ $displayText }}
                             </td>
                             <td class="text-center">
-                                <a href="javascript:void(0);" class="btn btn-success btn-sm"
-                                    onclick="generatePdf('{{ $cg->ID_CG }}')">
+                                <a href="{{ route('report.cg', ['id' => $cg->ID_CG]) }}" target="_blank"
+                                    class="btn btn-success btn-sm">
                                     ออกรายงาน
                                 </a>
                                 <a href="{{ route('cg.edit', ['id' => $cg->ID_CG]) }}"
@@ -114,85 +114,6 @@
             });
         }
 
-        function generatePdf(id) {
-            const url = `/cg/report/${id}`;
-            fetch(url)
-                .then(response => response.text())
-                .then(data => {
-                    const parser = new DOMParser();
-                    const doc = parser.parseFromString(data, 'text/html');
-                    const element = doc.querySelector('.container');
-                    const style = document.createElement('style');
-                    style.innerHTML = `
-                        * { font-family: 'Arial', sans-serif !important; color: black !important; background-color: white !important; }
-                        h5 { text-align: center; margin-bottom: 20px; font-size: 24px; }
-                        table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
-                        table, th, td { border: 1px solid black; }
-                        th, td { padding: 8px; text-align: left; }
-                    `;
-                    element.appendChild(style);
-                    const opt = {
-                        margin: 0.5,
-                        filename: 'รายงาน_CG.pdf',
-                        jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' }
-                    };
-                    html2pdf().set(opt).from(element).output('blob').then(function (pdfBlob) {
-                        const pdfUrl = URL.createObjectURL(pdfBlob);
-                        const pdfWindow = window.open();
-                        pdfWindow.location.href = pdfUrl;
-                    });
-                });
-        }
-
-        document.getElementById('generate-pdf').addEventListener('click', function () {
-            var filteredData = $('#cgTable').DataTable().rows({ filter: 'applied' }).data().toArray();
-            if (filteredData.length === 0) {
-                Swal.fire('ไม่พบข้อมูลที่ตรงกับการค้นหา', '', 'error');
-                return;
-            }
-
-            var reportContent = document.createElement('div');
-            reportContent.innerHTML = `
-                <style>
-                    * { font-family: 'Open Sans', Arial, sans-serif !important; color: black !important; background-color: white !important; }
-                    h5 { font-size: 20px; margin: 0; text-align: center; }
-                    table { width: 100%; border-collapse: collapse; margin-bottom: 20px; font-size: 14px; }
-                    th, td { padding: 8px; text-align: center; border: 1px solid black; }
-                </style>
-                <h5>รายงานการปฏิบัติงานผู้ดูแลผู้สูงอายุ (CG)</h5>
-                <table>
-                    <thead>
-                        <tr>
-                            <th>วันที่</th>
-                            <th>ชื่อผู้สูงอายุ</th>
-                            <th>ชื่อผู้ดูแล</th>
-                            <th>ประเภทผู้สูงอายุ</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        ${filteredData.map(row => `
-                            <tr>
-                                <td>${row[0]}</td>
-                                <td>${row[1]}</td>
-                                <td>${row[2]}</td>
-                                <td>${row[3]}</td>
-                            </tr>
-                        `).join('')}
-                    </tbody>
-                </table>
-            `;
-
-            const opt = {
-                margin: 0.5,
-                filename: 'รายงาน_CG_ทั้งหมด.pdf',
-                jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' }
-            };
-
-            html2pdf().set(opt).from(reportContent).output('blob').then(function (pdfBlob) {
-                var pdfUrl = URL.createObjectURL(pdfBlob);
-                var pdfWindow = window.open();
-                pdfWindow.location.href = pdfUrl;
-            });
-        });
+        // Script removed to use server-side PDF instead for better formatting consistency (18px font)
     </script>
 @endpush

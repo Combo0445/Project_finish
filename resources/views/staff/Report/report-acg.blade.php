@@ -4,6 +4,75 @@
 @section('report_title', 'รายงานกิจกรรมการดูแลผู้สูงอายุ')
 @section('reporter_name', $acg->Name_User)
 
+@push('styles')
+    <style>
+        body {
+            font-size: 18px !important;
+            color: #000 !important;
+            line-height: 1.1 !important;
+        }
+
+        .report-title h1 {
+            color: #000 !important;
+            margin-bottom: 5px !important;
+        }
+
+        .section-title {
+            color: #000 !important;
+            background-color: #f0f0f0 !important;
+            padding: 3px 5px !important;
+            margin-top: 8px !important;
+            margin-bottom: 5px !important;
+            border-left: 5px solid #000 !important;
+            border-bottom: 1px solid #000 !important;
+            font-weight: bold;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 5px !important;
+            color: #000 !important;
+        }
+
+        th,
+        td {
+            border: 1px solid #000 !important;
+            padding: 3px 6px !important;
+            font-size: 18px !important;
+            color: #000 !important;
+            vertical-align: top;
+        }
+
+        th {
+            background-color: #e0e0e0 !important;
+            font-weight: bold;
+            width: 35%;
+        }
+
+        p {
+            margin: 0 0 5px 0 !important;
+            font-size: 18px !important;
+            color: #000 !important;
+        }
+
+        .report-footer {
+            margin-top: 10px !important;
+            color: #000 !important;
+        }
+
+        /* Prevent page breaks */
+        table,
+        tr,
+        td,
+        th,
+        div.section-title,
+        p {
+            page-break-inside: avoid !important;
+        }
+    </style>
+@endpush
+
 @section('content')
     <div class="section-title">ข้อมูลทั่วไป</div>
     <table>

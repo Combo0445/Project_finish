@@ -10,13 +10,24 @@ class CareInstruction extends Model
     protected $table = 'care_instructions';
     protected $primaryKey = 'ID_CI';
     protected $fillable = [
-        'ID_Elderly', 'Date_CI', 'Name_Elderly', 'Name_Doctor', 'Name_Staff', 'Confirm', 'Care_instructions'
+        'ID_Elderly',
+        'Date_CI',
+        'Name_Elderly',
+        'Name_Doctor',
+        'Name_Staff',
+        'Confirm',
+        'Care_instructions'
     ];
     public $timestamps = false;
 
     public function elderly()
     {
         return $this->belongsTo(Elderly::class, 'ID_Elderly', 'ID_Elderly');
+    }
+
+    public function prescriptions()
+    {
+        return $this->hasMany(Prescription::class, 'care_instruction_id', 'ID_CI');
     }
 }
 

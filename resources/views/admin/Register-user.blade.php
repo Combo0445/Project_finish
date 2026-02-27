@@ -8,6 +8,9 @@
     <title>Register User</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="{{ url('assets/css/nucleo-icons.css') }}" rel="stylesheet" />
+    <link href="{{ url('assets/css/nucleo-svg.css') }}" rel="stylesheet" />
+    <link href="{{ url('assets/css/argon-dashboard.css') }}" rel="stylesheet" />
 </head>
 
 <body>
@@ -25,10 +28,25 @@
                     </div>
                 @endif
 
+                @if ($errors->any())
+                    <div class="alert alert-danger">
+                        <ul class="mb-0">
+                            @foreach ($errors->all() as $error)
+                                <li>{{ $error }}</li>
+                            @endforeach
+                        </ul>
+                    </div>
+                @endif
+
                 <form method="POST" action="{{ route('register.submit') }}">
                     @csrf
                     <div class="form-group mb-3">
-                        <label for="Username">ชื่อผู้ใช้</label>
+                        <label for="Name_User">ชื่อ-นามสกุล (Name)</label>
+                        <input type="text" id="Name_User" name="Name_User" class="form-control" required>
+                    </div>
+
+                    <div class="form-group mb-3">
+                        <label for="Username">ชื่อผู้ใช้ (Username)</label>
                         <input type="text" id="Username" name="Username" class="form-control" required>
                     </div>
                     <div class="form-group mb-3">
@@ -43,6 +61,16 @@
                     </div>
 
                     <div class="form-group mb-3">
+                        <label for="Phone">เบอร์โทรศัพท์ (Phone)</label>
+                        <input type="text" id="Phone" name="Phone" class="form-control">
+                    </div>
+
+                    <div class="form-group mb-3">
+                        <label for="Address">ที่อยู่ (Address)</label>
+                        <textarea id="Address" name="Address" class="form-control" rows="3"></textarea>
+                    </div>
+
+                    <div class="form-group mb-3">
                         <label for="Type_Personnel">ประเภทบุคลากร</label>
                         <select id="Type_Personnel" name="Type_Personnel" class="form-control" required>
                             <option value="">เลือกประเภทบุคลากร</option>
@@ -50,7 +78,7 @@
                                 @if ($personnel->Type_Personnel !== 'Admin')
                                     <option value="{{ $personnel->ID_Personnel }}">
                                         @php
-                                            $roles = ['Staff' => 'เจ้าหน้าที่', 'Doctor' => 'แพทย์'];
+                                            $roles = ['Staff' => 'เจ้าหน้าที่', 'Doctor' => 'แพทย์', 'Pharmacist' => 'เภสัชกร'];
                                         @endphp
                                         {{ $roles[$personnel->Type_Personnel] ?? $personnel->Type_Personnel }}
                                     </option>

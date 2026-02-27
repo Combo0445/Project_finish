@@ -18,13 +18,13 @@ class IsAdmin
      * @return \Illuminate\Http\Response|\Illuminate\Http\RedirectResponse
      */
     public function handle(Request $request, Closure $next)
-{
-    $user = Auth::user(); 
+    {
+        $user = Auth::user();
 
-    if ($user && $user->Type_Personnel === 'Admin') {
-        return $next($request);
+        if ($user && $user->Type_Personnel === 'Admin') {
+            return $next($request);
+        }
+
+        return redirect('error')->with('fail', 'คุณไม่มีสิทธิ์เข้าถึงส่วนนี้');
     }
-
-    return redirect('error')->with('fail', 'คุณไม่มีสิทธิ์เข้าถึงส่วนนี้');
-}
 }
