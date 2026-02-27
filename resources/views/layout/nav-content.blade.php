@@ -26,21 +26,6 @@
         <div class="user-info">
             @php
                 $user = Auth::user();
-                $avatarSrc = '';
-                if ($user && $user->Image_User) {
-                    $avatarSrc = url($user->Image_User);
-                } else {
-                    $type = $user->Type_Personnel ?? '';
-                    if ($type === 'Admin') {
-                        $avatarSrc = asset('images-user/Admin.jpg');
-                    } elseif ($type === 'Staff') {
-                        $avatarSrc = asset('images-user/Staff.png');
-                    } elseif ($type === 'Doctor') {
-                        $avatarSrc = asset('images-user/Doctor.png');
-                    } else {
-                        $avatarSrc = asset('images/Logo.png');
-                    }
-                }
             @endphp
             @if($user->is_admin_permanent && $user->Type_Personnel !== 'Admin')
                 <span class="badge bg-warning text-dark me-3"
@@ -49,7 +34,7 @@
                 </span>
             @endif
             <a href="{{ url('profile-user') }}">
-                <img src="{{ $avatarSrc }}" alt="Profile Image">
+                <img src="{{ $user->image_url }}" alt="Profile Image">
                 <span>{{ $user->Name_User ?? '' }}</span>
             </a>
             <div class="notifications dropdown">

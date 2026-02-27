@@ -34,20 +34,7 @@
                 @foreach ($users as $u)
                     <tr>
                         <td class="text-center">
-                            @php
-                                $avatar = 'Logo.png';
-                                if ($u->Image_User) {
-                                    $avatar = $u->Image_User;
-                                } else {
-                                    $avatarMap = [
-                                        'Admin' => 'images-user/Admin.jpg',
-                                        'Staff' => 'images-user/Staff.png',
-                                        'Doctor' => 'images-user/Doctor.png',
-                                    ];
-                                    $avatar = $avatarMap[$u->Type_Personnel] ?? 'Logo.png';
-                                }
-                            @endphp
-                            <img src="{{ url($avatar) }}" alt="Avatar" class="avatar avatar-sm me-3 rounded-circle">
+                            <img src="{{ $u->image_url }}" alt="Avatar" class="avatar avatar-sm me-3 rounded-circle">
                         </td>
                         <td class="text-center">{{ $u->Name_User ?: 'ไม่มีข้อมูล' }}</td>
                         <td class="text-center">{{ $u->Username ?: 'ไม่มีข้อมูล' }}</td>
@@ -116,8 +103,8 @@
                         @foreach ($elderlies as $elderly)
                             <tr>
                                 <td class="text-center">
-                                    <img src="{{ url($elderly->Image_Elderly ? 'storage/' . $elderly->Image_Elderly : 'storage/default.png') }}"
-                                        alt="Elderly Image" class="avatar avatar-sm rounded-circle">
+                                    <img src="{{ $elderly->image_url }}" alt="Elderly Image"
+                                        class="avatar avatar-sm rounded-circle">
                                 </td>
                                 <td class="text-center">{{ $elderly->Name_Elderly }}</td>
                                 <td class="text-center">{{ \Carbon\Carbon::parse($elderly->Birthday)->age }} ปี</td>
@@ -234,8 +221,7 @@
                 @foreach ($elderlys as $elderly)
                     <tr>
                         <td class="text-center">
-                            <img src="{{ url($elderly->Image_Elderly ? 'storage/' . $elderly->Image_Elderly : 'storage/default.png') }}"
-                                alt="Elderly" class="avatar avatar-sm rounded-circle">
+                            <img src="{{ $elderly->image_url }}" alt="Elderly" class="avatar avatar-sm rounded-circle">
                         </td>
                         <td class="text-center">{{ $elderly->Name_Elderly }}</td>
                         <td class="text-center">{{ \Carbon\Carbon::parse($elderly->Birthday)->age }} ปี</td>

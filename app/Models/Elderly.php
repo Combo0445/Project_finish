@@ -27,16 +27,20 @@ class Elderly extends Model
     // Return a full URL for the image or a gender-based avatar when missing
     public function getImageUrlAttribute()
     {
-        if ($this->Image_Elderly) {
-            return url('storage/' . $this->Image_Elderly);
+        if ($this->Image_Elderly && \Illuminate\Support\Facades\Storage::disk('public')->exists($this->Image_Elderly)) {
+            return asset('storage/' . $this->Image_Elderly);
+        }
+
+        if ($this->Image_Elderly && file_exists(public_path($this->Image_Elderly))) {
+            return asset($this->Image_Elderly);
         }
 
         // Choose avatar based on Gender
         $gender = $this->Gender ?? '';
-        if (strtolower($gender) === 'ชาย') {
+        if ($gender === 'ชาย') {
             return asset('images/avatar_male.svg');
         }
-        if (strtolower($gender) === 'หญิง') {
+        if ($gender === 'หญิง') {
             return asset('images/avatar_female.svg');
         }
 

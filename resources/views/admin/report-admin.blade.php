@@ -18,12 +18,19 @@
             @foreach ($users as $user)
                 <tr>
                     <td style="text-align: center;">
-                        @if($user->Image_User)
-                            <img src="{{ 'data:image/png;base64,' . base64_encode(file_get_contents(public_path($user->Image_User))) }}"
-                                style="height: 40px; border-radius: 50%;">
-                        @else
-                            -
-                        @endif
+                        @php
+                            $imageUrl = $user->image_url;
+                            $src = $imageUrl;
+                            // For mPDF, if it's a local file, try to base64 encode it for better compatibility
+                            if (strpos($imageUrl, asset('')) !== false) {
+                                $relativePath = str_replace(asset(''), '', $imageUrl);
+                                $fullPath = public_path($relativePath);
+                                if (file_exists($fullPath)) {
+                                    $src = 'data:image/' . pathinfo($fullPath, PATHINFO_EXTENSION) . ';base64,' . base64_encode(file_get_contents($fullPath));
+                                }
+                            }
+                        @endphp
+                        <img src="{{ $src }}" style="height: 40px; border-radius: 50%;">
                     </td>
                     <td style="text-align: center;">{{ $user->Name_User }}</td>
                     <td style="text-align: center;">{{ $user->Type_Personnel }}</td>

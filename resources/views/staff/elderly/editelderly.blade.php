@@ -93,10 +93,9 @@
                                 </label>
 
                                 <center>
-                                    @if($elderly->Image_Elderly)
+                                    @if($elderly->image_url)
                                         <div id="current-image-container" style="margin-top: 15px;">
-                                            <img src="{{ url('storage/' . $elderly->Image_Elderly) }}" alt="Elderly Image"
-                                                id="current-image">
+                                            <img src="{{ $elderly->image_url }}" alt="Elderly Image" id="current-image">
                                         </div>
                                     @endif
                                     <div id="new-image-container" style="display: none; margin-top: 15px;">

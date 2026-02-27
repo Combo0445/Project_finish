@@ -115,11 +115,7 @@
                     @endif
                     <tr>
                         <td>
-                            @if($elderly->Image_Elderly)
-                                <img src="{{ url('storage/' . $elderly->Image_Elderly) }}" alt="Elderly Image" width="50">
-                            @else
-                                <img src="{{ url('storage/default.png') }}" alt="Elderly Image" width="50">
-                            @endif
+                            <img src="{{ $elderly->image_url }}" alt="Elderly Image" width="50" style="border-radius: 5px;">
                         </td>
                         <td>{{ $elderly->Name_Elderly }}</td>
                         <td>{{ $elderly->Address }}</td>

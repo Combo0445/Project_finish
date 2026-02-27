@@ -103,7 +103,6 @@
             border-radius: 10px;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
-
     </style>
 </head>
 
@@ -112,7 +111,8 @@
 
     <div class="container mt-5">
         <h4>แก้ไขโปรไฟล์</h4>
-        <form action="{{ route('update-profile') }}" method="POST" enctype="multipart/form-data" onsubmit="concatenateAddress()">
+        <form action="{{ route('update-profile') }}" method="POST" enctype="multipart/form-data"
+            onsubmit="concatenateAddress()">
             @csrf
             <div class="form-group">
                 <label for="Name_User">ชื่อ-สกุล</label>
@@ -151,7 +151,8 @@
 
             <div class="form-group">
                 <label for="Postal_Code">รหัสไปรษณีย์:</label>
-                <input type="text" id="Postal_Code" name="Postal_Code" class="form-control" value="{{ $user->Postal_Code }}" readonly>
+                <input type="text" id="Postal_Code" name="Postal_Code" class="form-control"
+                    value="{{ $user->Postal_Code }}" readonly>
             </div>
 
             <div class="form-group">
@@ -164,8 +165,9 @@
                 <label for="Image_User" class="custom-file-upload">
                     เลือกรูปภาพ
                 </label>
-                <input type="file" id="Image_User" name="Image_User" class="form-control" accept="image/*" style="display: none;" onchange="previewImage(event)">
-                <img id="image-preview" src="#" alt="Image Preview" />
+                <input type="file" id="Image_User" name="Image_User" class="form-control" accept="image/*"
+                    style="display: none;" onchange="previewImage(event)">
+                <img id="image-preview" src="{{ $user->image_url }}" alt="Image Preview" style="display: block;" />
             </div>
 
 
@@ -228,9 +230,9 @@
                                     // Set postal code after subdistrict is set
                                     postalCodeField.val(subdistrict.zip_code); // Set postal code based on selected subdistrict
                                 }
-                            }, ); //ตั้งการหน่วงเวลาในการทำงาน
+                            },); //ตั้งการหน่วงเวลาในการทำงาน
                         }
-                    }, ); // ตั้งการหน่วงเวลาในการทำงาน
+                    },); // ตั้งการหน่วงเวลาในการทำงาน
                 }
             }
         }
@@ -269,14 +271,14 @@
         });
 
         // Handle subdistrict (Tambon) selection and set postal code
-$('#Subdistrict').change(function () {
-    let selectedZipCode = $(this).find(':selected').data('zipcode');
+        $('#Subdistrict').change(function () {
+            let selectedZipCode = $(this).find(':selected').data('zipcode');
 
-    // Set the postal code automatically after subdistrict is selected
-    if (selectedZipCode) {
-        $('#Postal_Code').val(selectedZipCode);
-    }
-});
+            // Set the postal code automatically after subdistrict is selected
+            if (selectedZipCode) {
+                $('#Postal_Code').val(selectedZipCode);
+            }
+        });
 
 
 
@@ -298,7 +300,7 @@ $('#Subdistrict').change(function () {
 
             if (file) {
                 const reader = new FileReader();
-                reader.onload = function(e) {
+                reader.onload = function (e) {
                     imagePreview.src = e.target.result;
                     imagePreview.style.display = 'block';
                 }

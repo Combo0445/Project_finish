@@ -40,4 +40,19 @@ class User extends Model implements AuthenticatableContract
         'email_verified_at' => 'datetime',
     ];
 
+    /**
+     * Get the user's avatar URL.
+     * Uses UI-Avatars for falling back if no physical image exists.
+     */
+    public function getImageUrlAttribute()
+    {
+        if ($this->Image_User && file_exists(public_path($this->Image_User))) {
+            return asset($this->Image_User);
+        }
+
+        // Fallback to UI Avatars with Name_User or Username
+        $name = $this->Name_User ?: $this->Username;
+        $background = str_pad(dechex(mt_rand(0xFFFFFF / 2, 0xFFFFFF)), 6, '0', STR_PAD_LEFT);
+        return "https://ui-avatars.com/api/?name=" . urlencode($name) . "&background={$background}&color=fff&size=128";
+    }
 }

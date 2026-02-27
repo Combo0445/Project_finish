@@ -90,7 +90,7 @@
     <div class="row">
         <div class="col-12">
             <div class="profile-container">
-                <img src="{{ url($user->Image_User ?? 'path/to/default/image.png') }}" alt="Profile Image">
+                <img src="{{ $user->image_url }}" alt="Profile Image">
                 <h3>{{ $user->Name_User }}</h3>
                 <p>
                     @if($user->Type_Personnel === 'Staff')
