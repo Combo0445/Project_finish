@@ -9,11 +9,17 @@ class PersonnelSeeder extends Seeder
 {
     public function run(): void
     {
-        $types = ['Admin', 'Staff', 'Doctor'];
+        $types = [
+            1 => 'Admin',
+            2 => 'Staff',
+            3 => 'Doctor',
+            4 => 'Pharmacist',
+        ];
 
-        foreach ($types as $type) {
-            Personnel::updateOrCreate(
-            ['Type_Personnel' => $type]
+        foreach ($types as $id => $type) {
+            \App\Models\Personnel::updateOrCreate(
+                ['ID_Personnel' => $id],
+                ['Type_Personnel' => $type]
             );
         }
     }
