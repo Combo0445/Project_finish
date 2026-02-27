@@ -144,6 +144,9 @@
                             </span>
                         @endif
                     </td>
+                    <td class="text-center">
+                        @if($ci->Confirm)
+                            <span class="status-confirmed">ยืนยันแล้ว</span>
                         @else
                             <span class="status-pending">รอยืนยัน</span>
                         @endif
