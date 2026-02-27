@@ -259,7 +259,7 @@ class CareInstructionController extends Controller
                 foreach ($careInstruction->prescriptions as $prescription) {
                     if ($prescription->medicine_id) {
                         // Lock the medicine row
-                        $medicine = \App\Models\Medicine::where('id', $prescription->medicine_id)->lockForUpdate()->first();
+                        $medicine = Medicine::where('id', $prescription->medicine_id)->lockForUpdate()->first();
 
                         if ($medicine && $prescription->amount > $medicine->stock) {
                             throw new \Exception('สต็อกยา ' . $medicine->name . ' ไม่เพียงพอ (ต้องการ: ' . $prescription->amount . ', มีอยู่: ' . $medicine->stock . ')');
@@ -272,7 +272,7 @@ class CareInstructionController extends Controller
                     if (!$prescription->medicine_id)
                         continue;
 
-                    $medicine = \App\Models\Medicine::where('id', $prescription->medicine_id)->lockForUpdate()->first();
+                    $medicine = Medicine::where('id', $prescription->medicine_id)->lockForUpdate()->first();
                     if (!$medicine)
                         continue;
 
@@ -330,7 +330,7 @@ class CareInstructionController extends Controller
                 foreach ($careInstruction->prescriptions as $prescription) {
                     if ($prescription->dispensed && $prescription->medicine_id) {
 
-                        $medicine = \App\Models\Medicine::where('id', $prescription->medicine_id)->lockForUpdate()->first();
+                        $medicine = Medicine::where('id', $prescription->medicine_id)->lockForUpdate()->first();
 
                         if ($medicine) {
                             $medicine->increment('stock', $prescription->amount);
