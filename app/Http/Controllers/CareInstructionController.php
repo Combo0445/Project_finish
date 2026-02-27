@@ -44,7 +44,8 @@ class CareInstructionController extends Controller
         } elseif ($user->Type_Personnel == 'Staff') {
             // Staff can see all instructions, so no additional filter is applied.
         } elseif ($user->Type_Personnel == 'Pharmacist') {
-            // Pharmacists see all instructions to prepare medicine, but usually only look at unconfirmed
+            // Pharmacists see all instructions to prepare medicine
+            // No additional filter for now, they can see the whole list
         }
 
         // Feature Toggle: Filter Unconfirmed Only via Query Parameter
@@ -246,7 +247,7 @@ class CareInstructionController extends Controller
     public function confirm($id)
     {
         $role = session('impersonate_role', Auth::user()->Type_Personnel);
-        if ($role !== 'Staff') {
+        if ($role !== 'Staff' && $role !== 'Pharmacist' && $role !== 'Admin') {
             abort(403, 'Unauthorized action.');
         }
 
@@ -317,7 +318,7 @@ class CareInstructionController extends Controller
     public function unconfirm($id)
     {
         $role = session('impersonate_role', Auth::user()->Type_Personnel);
-        if ($role !== 'Staff') {
+        if ($role !== 'Staff' && $role !== 'Pharmacist' && $role !== 'Admin') {
             abort(403, 'Unauthorized action.');
         }
 
