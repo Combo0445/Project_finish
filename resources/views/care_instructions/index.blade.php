@@ -69,46 +69,84 @@
                                         </td>
 
                                         <td class="text-center">
-                                            @if($ci->Confirm)
-                                                <a href="{{ route('report.ci.pdf', ['id' => $ci->ID_CI]) }}" target="_blank"
-                                                    class="badge rounded-pill bg-gradient-success" title="คลิกเพื่อพิมพิ์รายงาน">
-                                                    ยืนยันแล้ว
-                                                </a>
-                                            @else
-                                                <a href="{{ route('report.ci.pdf', ['id' => $ci->ID_CI]) }}" target="_blank"
-                                                    class="badge rounded-pill bg-gradient-warning"
-                                                    title="คลิกเพื่อพิมพิ์รายงาน (ยังไม่ยืนยัน)">
-                                                    รอยืนยัน
-                                                </a>
-                                            @endif
+                                            <div class="d-flex flex-column align-items-center gap-1">
+                                                <!-- Plan Acknowledgment Status -->
+                                                @if($ci->Confirm)
+                                                    <a href="{{ route('report.ci.pdf', ['id' => $ci->ID_CI]) }}" target="_blank"
+                                                        class="badge rounded-pill bg-gradient-success" title="คลิกเพื่อพิมพิ์รายงาน">
+                                                        แผน: ยืนยันแล้ว
+                                                    </a>
+                                                @else
+                                                    <span class="badge rounded-pill bg-gradient-secondary">แผน: รอยืนยัน</span>
+                                                @endif
+
+                                                <!-- Medication Status (Only if meds exist) -->
+                                                @if($ci->prescriptions->count() > 0)
+                                                    @if($ci->Confirm_Medication)
+                                                        <span class="badge rounded-pill bg-gradient-info">ยา: เตรียมแล้ว</span>
+                                                    @else
+                                                        <span class="badge rounded-pill bg-gradient-warning">ยา: รอเตรียม</span>
+                                                    @endif
+                                                @endif
+                                            </div>
                                         </td>
 
                                         <td class="text-center">
                                             <!-- View Details Button -->
-                                            <button type="button" class="btn btn-info btn-sm" data-toggle="modal" data-target="#viewCiModal{{ $ci->ID_CI }}">
-                                                ดูคำแนะนำ
+                                            <button type="button" class="btn btn-info btn-sm" data-toggle="modal"
+                                                data-target="#viewCiModal{{ $ci->ID_CI }}">
+                                                ดูรายละเอียด
                                             </button>
 
+                                            @php 
+                                                $role = session('impersonate_role', Auth::user()->Type_Personnel);
+                                            @endphp
+
+                                            <!-- Pharmacist Action: Dispense -->
+                                            @if(($role == 'Pharmacist' || $role == 'Admin') && $ci->prescriptions->count() > 0 && empty($ci->Confirm_Medication))
+                                                <form action="{{ route('care_instructions.dispense', ['id' => $ci->ID_CI]) }}"
+                                                    method="POST" style="display:inline-block;">
+                                                    @csrf
+                                                    @method('PUT')
+                                                    <button type="submit" class="btn btn-primary btn-sm">จ่ายยา/ตัดสต็อก</button>
+                                                </form>
+                                            @endif
+
+                                            <!-- Staff Action: Acknowledge (Blocked by medication if exists) -->
+                                            @if(($role == 'Staff' || $role == 'Admin') && empty($ci->Confirm))
+                                                @php
+                                                    $isBlockedByMed = ($ci->prescriptions->count() > 0 && empty($ci->Confirm_Medication));
+                                                @endphp
+                                                <form action="{{ route('care_instructions.confirm', ['id' => $ci->ID_CI]) }}"
+                                                    method="POST" style="display:inline-block;">
+                                                    @csrf
+                                                    @method('PUT')
+                                                    <button type="submit" class="btn btn-success btn-sm" {{ $isBlockedByMed ? 'disabled title=กรุณารอเภสัชกรจ่ายยาก่อน' : '' }}>
+                                                        ยืนยันรับทราบ
+                                                    </button>
+                                                </form>
+                                            @endif
+
+                                            <!-- Unconfirm Actions -->
+                                            @if($role == 'Admin' || ($role == 'Staff' && $ci->Confirm) || ($role == 'Pharmacist' && $ci->Confirm_Medication))
+                                                <form action="{{ route('care_instructions.unconfirm', ['id' => $ci->ID_CI]) }}"
+                                                    method="POST" style="display:inline-block;">
+                                                    @csrf
+                                                    @method('PUT')
+                                                    <button type="submit" class="btn btn-outline-danger btn-sm" onclick="return confirm('คุณแน่ใจหรือไม่ที่จะยกเลิกการยืนยัน?')">
+                                                        ยกเลิก
+                                                    </button>
+                                                </form>
+                                            @endif
+
                                             <!-- Location Button -->
-                                            @if(Auth::user()->Type_Personnel != 'Pharmacist')
+                                            @if($role != 'Pharmacist')
                                                 <a href="{{ route('search-location', ['id' => $ci->elderly->ID_Elderly]) }}"
                                                     target="_blank" class="btn btn-secondary btn-sm">ที่อยู่</a>
                                             @endif
 
-                                            <!-- Staff Level Controls -->
-                                            @if(Auth::user()->Type_Personnel == 'Staff')
-                                                @if(empty($ci->Confirm))
-                                                    <form action="{{ route('care_instructions.confirm', ['id' => $ci->ID_CI]) }}"
-                                                        method="POST" style="display:inline-block;">
-                                                        @csrf
-                                                        @method('PUT')
-                                                        <button type="submit" class="btn btn-success btn-sm">ยืนยันรับทราบ</button>
-                                                    </form>
-                                                @endif
-                                            @endif
-
                                             <!-- Doctor Level Controls -->
-                                            @if(Auth::user()->Type_Personnel == 'Doctor')
+                                            @if($role == 'Doctor')
                                                 <a href="{{ route('care_instructions.edit', ['id' => $ci->ID_CI]) }}"
                                                     class="btn btn-warning btn-sm">แก้ไข</a>
                                                 <form id="delete-ci-form-{{ $ci->ID_CI }}"
@@ -125,15 +163,18 @@
                                 @endforeach
                             </tbody>
                         </table>
-                        
+
                         <!-- View Modals (Moved outside table for DataTables compatibility) -->
                         @foreach($careInstructions as $ci)
-                            <div class="modal fade" id="viewCiModal{{ $ci->ID_CI }}" tabindex="-1" aria-labelledby="viewCiModalLabel{{ $ci->ID_CI }}" aria-hidden="true">
+                            <div class="modal fade" id="viewCiModal{{ $ci->ID_CI }}" tabindex="-1"
+                                aria-labelledby="viewCiModalLabel{{ $ci->ID_CI }}" aria-hidden="true">
                                 <div class="modal-dialog modal-lg">
                                     <div class="modal-content">
                                         <div class="modal-header bg-gradient-info text-white">
-                                            <h5 class="modal-title text-white" id="viewCiModalLabel{{ $ci->ID_CI }}">รายละเอียดคำแนะนำ: {{ $ci->Name_Elderly }}</h5>
-                                            <button type="button" class="close text-dark" data-dismiss="modal" aria-label="Close">
+                                            <h5 class="modal-title text-white" id="viewCiModalLabel{{ $ci->ID_CI }}">
+                                                รายละเอียดคำแนะนำ: {{ $ci->Name_Elderly }}</h5>
+                                            <button type="button" class="close text-dark" data-dismiss="modal"
+                                                aria-label="Close">
                                                 <span aria-hidden="true">&times;</span>
                                             </button>
                                         </div>
@@ -145,19 +186,29 @@
                                                     <strong>เจ้าหน้าที่รับผิดชอบ:</strong> {{ $ci->Name_Staff ?? 'ไม่ระบุ' }}
                                                 </div>
                                                 <div class="col-md-6">
-                                                    <strong>สถานะ:</strong> 
+                                                    <strong>สถานะแผนการดูแล:</strong>
                                                     @if($ci->Confirm)
-                                                        <span class="text-success fw-bold">ยืนยันแล้ว</span>
+                                                        <span class="text-success fw-bold">ยืนยันรับทราบแล้ว</span>
                                                     @else
                                                         <span class="text-warning fw-bold">รอการยืนยัน</span>
                                                     @endif
+                                                    <br>
+                                                    @if($ci->prescriptions->count() > 0)
+                                                        <strong>สถานะยา:</strong>
+                                                        @if($ci->Confirm_Medication)
+                                                            <span class="text-info fw-bold">เตรียมยา/ตัดสต็อกแล้ว</span>
+                                                        @else
+                                                            <span class="text-danger fw-bold">รอเภสัชกรเตรียมยา</span>
+                                                        @endif
+                                                    @endif
                                                 </div>
                                             </div>
-                                            
+
                                             <div class="card bg-light mb-3">
                                                 <div class="card-body">
                                                     <h6 class="card-title">คำแนะนำจากแพทย์</h6>
-                                                    <p class="card-text" style="white-space: pre-line;">{{ $ci->Care_instructions }}</p>
+                                                    <p class="card-text" style="white-space: pre-line;">
+                                                        {{ $ci->Care_instructions }}</p>
                                                 </div>
                                             </div>
 
@@ -174,8 +225,9 @@
                                                     <tbody>
                                                         @foreach($ci->prescriptions as $rx)
                                                             <tr>
-                                                                <td>{{ $rx->medicine ? $rx->medicine->Trade_Name : 'ไม่ทราบชื่อยา' }}</td>
-                                                                <td class="text-center">{{ $rx->amount }} {{ $rx->medicine ? $rx->medicine->Unit : '' }}</td>
+                                                                <td>{{ $rx->medicine ? $rx->medicine->name : 'ไม่ทราบชื่อยา' }}</td>
+                                                                <td class="text-center">{{ $rx->amount }}
+                                                                    {{ $rx->medicine ? $rx->medicine->type : '' }}</td>
                                                                 <td>{{ $rx->dosage ?: '-' }}</td>
                                                             </tr>
                                                         @endforeach
@@ -186,7 +238,8 @@
                                             @endif
                                         </div>
                                         <div class="modal-footer">
-                                            <a href="{{ route('report.ci.pdf', ['id' => $ci->ID_CI]) }}" target="_blank" class="btn btn-success">
+                                            <a href="{{ route('report.ci.pdf', ['id' => $ci->ID_CI]) }}" target="_blank"
+                                                class="btn btn-success">
                                                 <i class="fas fa-print me-2"></i> พิมพ์รายงาน
                                             </a>
                                             <button type="button" class="btn btn-secondary" data-dismiss="modal">ปิด</button>

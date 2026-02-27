@@ -16,6 +16,7 @@ class CareInstruction extends Model
         'Name_Doctor',
         'Name_Staff',
         'Confirm',
+        'Confirm_Medication',
         'Care_instructions'
     ];
     public $timestamps = false;

@@ -244,6 +244,7 @@ Route::middleware(['auth'])->group(function () {
     Route::delete('/care-instructions/{id}', [\App\Http\Controllers\CareInstructionController::class, 'destroy'])->name('care_instructions.destroy');
     Route::put('/care-instructions/{id}/confirm', [\App\Http\Controllers\CareInstructionController::class, 'confirm'])->name('care_instructions.confirm');
     Route::put('/care-instructions/{id}/unconfirm', [\App\Http\Controllers\CareInstructionController::class, 'unconfirm'])->name('care_instructions.unconfirm');
+    Route::put('/care-instructions/{id}/dispense', [\App\Http\Controllers\CareInstructionController::class, 'dispense'])->name('care_instructions.dispense');
 });
 
 // Doctor-only roles no longer need a dedicated routing block as 

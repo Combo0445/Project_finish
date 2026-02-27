@@ -243,15 +243,19 @@ class CareInstructionController extends Controller
         return redirect()->route('care_instructions.index')->with('success', 'ลบคำแนะนำการดูแลเรียบร้อยแล้ว');
     }
 
-    // Role Methods for Staff Only
-    public function confirm($id)
+    // Role Methods for Pharmacist/Admin Only - Dispensing Medication
+    public function dispense($id)
     {
         $role = session('impersonate_role', Auth::user()->Type_Personnel);
-        if ($role !== 'Staff' && $role !== 'Pharmacist' && $role !== 'Admin') {
+        if ($role !== 'Pharmacist' && $role !== 'Admin') {
             abort(403, 'Unauthorized action.');
         }
 
         $careInstruction = CareInstruction::with('prescriptions.medicine')->findOrFail($id);
+
+        if ($careInstruction->prescriptions->count() === 0) {
+            return redirect()->back()->with('error', 'ไม่สามารถกดยืนยันจ่ายยาได้เนื่องจากไม่มีรายการยา');
+        }
 
         try {
             \Illuminate\Support\Facades\DB::transaction(function () use ($careInstruction) {
@@ -306,13 +310,33 @@ class CareInstructionController extends Controller
                     $prescription->update(['dispensed' => true]);
                 }
 
-                $careInstruction->update(['Confirm' => 'ยืนยัน']);
+                $careInstruction->update(['Confirm_Medication' => 'เตรียมยาแล้ว']);
             });
 
-            return redirect()->back()->with('success', 'คำแนะนำการดูแลยืนยันและตัดสต็อกยาเรียบร้อยแล้ว');
+            return redirect()->back()->with('success', 'เตรียมยาและตัดสต็อกเรียบร้อยแล้ว สตาฟฟ์สามารถดำเนินการรับทราบแผนต่อได้');
         } catch (\Exception $e) {
             return redirect()->back()->with('error', $e->getMessage());
         }
+    }
+
+    // Acknowledge Care Plan - Staff Only
+    public function confirm($id)
+    {
+        $role = session('impersonate_role', Auth::user()->Type_Personnel);
+        if ($role !== 'Staff' && $role !== 'Admin') {
+            abort(403, 'Unauthorized action.');
+        }
+
+        $careInstruction = CareInstruction::findOrFail($id);
+
+        // STRICTURE: If there are prescriptions, they MUST be dispensed first
+        if ($careInstruction->prescriptions()->count() > 0 && empty($careInstruction->Confirm_Medication)) {
+            return redirect()->back()->with('error', 'ไม่สามารถยืนยันรับทราบได้ กรุณารอเภสัชกรเตรียมยาและตัดสต็อกให้เรียบร้อยก่อน');
+        }
+
+        $careInstruction->update(['Confirm' => 'ยืนยัน']);
+
+        return redirect()->back()->with('success', 'ยืนยันรับทราบแผนการดูแลเรียบร้อยแล้ว');
     }
 
     public function unconfirm($id)
@@ -325,43 +349,49 @@ class CareInstructionController extends Controller
         $careInstruction = CareInstruction::with('prescriptions.medicine')->findOrFail($id);
 
         try {
-            \Illuminate\Support\Facades\DB::transaction(function () use ($careInstruction) {
-                // Restore stock
-                foreach ($careInstruction->prescriptions as $prescription) {
-                    if ($prescription->dispensed && $prescription->medicine_id) {
-
-                        $medicine = Medicine::where('id', $prescription->medicine_id)->lockForUpdate()->first();
-
-                        if ($medicine) {
-                            $medicine->increment('stock', $prescription->amount);
-
-                            // Try to find the latest lot to return the stock to, locking it
-                            $latestLot = \App\Models\MedicineLot::where('medicine_id', $prescription->medicine_id)
-                                ->orderBy('created_at', 'desc')
-                                ->lockForUpdate()
-                                ->first();
-
-                            if ($latestLot) {
-                                $latestLot->increment('stock', $prescription->amount);
-                            } else {
-                                // Fallback if no lot exists
-                                \App\Models\MedicineLot::create([
-                                    'medicine_id' => $prescription->medicine_id,
-                                    'lot_number' => 'RETURN-' . date('Ymd_His'),
-                                    'stock' => $prescription->amount
-                                ]);
-                            }
-                            $prescription->update(['dispensed' => false]);
-                        }
-                    }
+            \Illuminate\Support\Facades\DB::transaction(function () use ($careInstruction, $role) {
+                // If Staff: just unconfirm the plan
+                if ($role === 'Staff' || $role === 'Admin') {
+                    $careInstruction->update(['Confirm' => null]);
                 }
 
-                $careInstruction->update(['Confirm' => null]);
+                // If Pharmacist (or Admin wanting to reverse stock): restore stock
+                if ($role === 'Pharmacist' || $role === 'Admin') {
+                    foreach ($careInstruction->prescriptions as $prescription) {
+                        if ($prescription->dispensed && $prescription->medicine_id) {
+
+                            $medicine = Medicine::where('id', $prescription->medicine_id)->lockForUpdate()->first();
+
+                            if ($medicine) {
+                                $medicine->increment('stock', $prescription->amount);
+
+                                // Try to find the latest lot to return the stock to, locking it
+                                $latestLot = \App\Models\MedicineLot::where('medicine_id', $prescription->medicine_id)
+                                    ->orderBy('created_at', 'desc')
+                                    ->lockForUpdate()
+                                    ->first();
+
+                                if ($latestLot) {
+                                    $latestLot->increment('stock', $prescription->amount);
+                                } else {
+                                    // Fallback if no lot exists
+                                    \App\Models\MedicineLot::create([
+                                        'medicine_id' => $prescription->medicine_id,
+                                        'lot_number' => 'RETURN-' . date('Ymd_His'),
+                                        'stock' => $prescription->amount
+                                    ]);
+                                }
+                                $prescription->update(['dispensed' => false]);
+                            }
+                        }
+                    }
+                    $careInstruction->update(['Confirm_Medication' => null]);
+                }
             });
 
-            return redirect()->back()->with('success', 'ยกเลิกการยืนยันและคืนสต็อกยาแล้ว');
+            return redirect()->back()->with('success', 'ยกเลิกการยืนยันเรียบร้อยแล้ว');
         } catch (\Exception $e) {
-            return redirect()->back()->with('error', 'เกิดข้อผิดพลาดในการคืนสต็อก: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'เกิดข้อผิดพลาดในการยกเลิก: ' . $e->getMessage());
         }
     }
 }
