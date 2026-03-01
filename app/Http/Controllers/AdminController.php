@@ -189,6 +189,7 @@ class AdminController extends Controller
             }
 
             return redirect()->route('admin.layout-admin')->with('success', 'เพิ่มข่าวเรียบร้อยแล้ว');
+        } catch (\Exception $e) {
             \Log::error('News Store Error: ' . $e->getMessage());
             return redirect()->back()->with('error', 'เกิดข้อผิดพลาดในการเพิ่มข่าว กรุณาลองใหม่อีกครั้ง');
         }
@@ -227,6 +228,7 @@ class AdminController extends Controller
             }
 
             return redirect()->route('admin.layout-admin')->with('success', 'อัปเดตข่าวสารสำเร็จแล้ว');
+        } catch (\Exception $e) {
             \Log::error('News Update Error: ' . $e->getMessage());
             return redirect()->back()->with('error', 'เกิดข้อผิดพลาดในการแก้ไขข่าว กรุณาลองใหม่อีกครั้ง');
         }

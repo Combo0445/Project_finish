@@ -132,6 +132,7 @@ class CGController extends Controller
             $cg->save();
 
             return redirect()->route('cg.create')->with('success', 'เพิ่ม Care Giver สำเร็จแล้ว!');
+        } catch (\Exception $e) {
             \Log::error('CG Store Error: ' . $e->getMessage());
             return redirect()->back()->with('error', 'เกิดข้อผิดพลาดในการบันทึกข้อมูล กรุณาลองใหม่อีกครั้ง');
         }
@@ -226,6 +227,7 @@ class CGController extends Controller
             ]);
 
             return redirect()->route('cg.index')->with('success', 'อัปเดตข้อมูล Care Giver สำเร็จแล้ว!');
+        } catch (\Exception $e) {
             \Log::error('CG Update Error: ' . $e->getMessage());
             return redirect()->back()->with('error', 'เกิดข้อผิดพลาดในการแก้ไขข้อมูล กรุณาลองใหม่อีกครั้ง');
         }
