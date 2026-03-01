@@ -16,8 +16,6 @@ use App\Http\Controllers\TAIController;
 use App\Http\Controllers\PerformanceReportController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\DashboardController;
-use App\Http\Controllers\MedicineController;
-use App\Http\Controllers\MedicineLotController;
 
 /* |-------------------------------------------------------------------------- | Web Routes |-------------------------------------------------------------------------- | | Here is where you can register web routes for your application. These | routes are loaded by the RouteServiceProvider and all of them will | be assigned to the "web" middleware group. Make something great! | */
 
@@ -50,7 +48,7 @@ Route::controller(AuthController::class)->group(function () {
 
     Route::get('homepage', 'Homepage');
     Route::get('login', 'login');
-    Route::post('/login', 'loginUser')->name('login.submit');
+    Route::post('/login', 'loginUser')->name('login.submit')->middleware('throttle:5,1');
     Route::post('/logout', 'logout')->name('logout');
     Route::get('dashboard-Doctor', 'Dashboard_Dcotor');
 
@@ -97,6 +95,10 @@ Route::middleware(['auth'])->group(function () {
     Route::get('profile-user', [ProfileController::class, 'showProfile'])->name('profile-user');
     Route::get('edit-profile', [ProfileController::class, 'editProfile'])->name('edit-profile');
     Route::post('/update-profile', [ProfileController::class, 'updateProfile'])->name('update-profile');
+
+    // Shared Profile Access
+    Route::get('elderly-profile/{id}', [ElderlyController::class, 'showProfile'])->name('elderly.profile');
+    Route::get('check-assessment-today/{id}', [ElderlyController::class, 'checkAssessmentToday'])->name('check.assessment.today');
 });
 
 Route::middleware(['CheckLogin', 'IsAdmin'])->group(function () {
@@ -132,6 +134,9 @@ Route::middleware(['CheckLogin', 'IsAdmin'])->group(function () {
 
     // Role Impersonation (Admin Only)
     Route::get('switch-role/{role}', [AdminController::class, 'switchRole'])->name('admin.switch-role');
+
+    // Audit Logs
+    Route::get('audit-logs', [App\Http\Controllers\AuditLogController::class, 'index'])->name('audit-logs.index');
 });
 
 // Revert Role is outside IsAdmin because when impersonating, they might fail IsAdmin check
@@ -150,8 +155,6 @@ Route::middleware(['CheckLogin', 'IsStaff'])->group(function () {
     Route::put('/update-elderly/{id}', [ElderlyController::class, 'Updateelderly'])->name('update-elderly');
     Route::delete('/delete-elderly/{id}', [ElderlyController::class, 'Deleteelderly'])->name('delete-elderly');
     Route::get('search-location/{id}', [ElderlyController::class, 'searchLocation'])->name('search-location');
-    Route::get('elderly-profile/{id}', [ElderlyController::class, 'showProfile'])->name('elderly.profile');
-    Route::get('check-assessment-today/{id}', [ElderlyController::class, 'checkAssessmentToday'])->name('check.assessment.today');
 
     // ADL Assessment
     Route::get('adl-show', [ADLController::class, 'index'])->name('adl.index');
@@ -223,11 +226,6 @@ Route::middleware(['CheckLogin', 'IsStaff'])->group(function () {
 
 });
 
-Route::middleware(['CheckLogin', 'IsPharmacist'])->group(function () {
-    // Medicines Management
-    Route::resource('medicines', MedicineController::class)->except(['show']);
-    Route::resource('medicines.lots', MedicineLotController::class)->only(['create', 'store']);
-});
 
 
 Route::middleware(['auth'])->group(function () {
@@ -244,7 +242,6 @@ Route::middleware(['auth'])->group(function () {
     Route::delete('/care-instructions/{id}', [\App\Http\Controllers\CareInstructionController::class, 'destroy'])->name('care_instructions.destroy');
     Route::put('/care-instructions/{id}/confirm', [\App\Http\Controllers\CareInstructionController::class, 'confirm'])->name('care_instructions.confirm');
     Route::put('/care-instructions/{id}/unconfirm', [\App\Http\Controllers\CareInstructionController::class, 'unconfirm'])->name('care_instructions.unconfirm');
-    Route::put('/care-instructions/{id}/dispense', [\App\Http\Controllers\CareInstructionController::class, 'dispense'])->name('care_instructions.dispense');
 });
 
 // Doctor-only roles no longer need a dedicated routing block as 

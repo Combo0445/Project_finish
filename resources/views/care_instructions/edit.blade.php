@@ -65,29 +65,7 @@
                                 placeholder="พิมพ์คำแนะนำการดูแลที่นี่..." required>{{ $careInstruction->Care_instructions }}</textarea>
                         </div>
                         
-                        <!-- Medication Section -->
-                        <div class="form-group mt-4 border p-3 bg-light rounded">
-                            <h5 class="mb-3 text-primary"><i class="fas fa-pills me-2"></i> สั่งยา (Prescriptions)</h5>
-                            <div class="table-responsive">
-                                <table class="table table-sm" id="prescriptionTable">
-                                    <thead>
-                                        <tr>
-                                            <th style="width: 40%">ชื่อยา (Medicine)</th>
-                                            <th style="width: 15%">จำนวน (Amount)</th>
-                                            <th style="width: 40%">วิธีรับประทาน (Dosage)</th>
-                                            <th style="width: 5%"></th>
-                                        </tr>
-                                    </thead>
-                                    <tbody id="prescriptionBody">
-                                        <!-- Row template -->
-                                    </tbody>
-                                </table>
-                            </div>
-                            <button type="button" class="btn btn-sm btn-outline-success mt-2" id="addPrescriptionBtn">
-                                <i class="fas fa-plus"></i> เพิ่มรายการยา
-                            </button>
-                        </div>
-                        
+
                         <div class="mt-4 mb-3">
                             <button type="submit" class="btn btn-success me-2">บันทึกการเปลี่ยนแปลง</button>
                             <a href="{{ url()->previous() }}" class="btn btn-secondary">ยกเลิก</a>
@@ -163,52 +141,6 @@
             textarea.focus();
         });
 
-        // Prescription Logic
-        const addBtn = document.getElementById('addPrescriptionBtn');
-        const pBody = document.getElementById('prescriptionBody');
-        let prescriptionIndex = 0;
-
-        const medicinesData = @json($medicines);
-        const existingPrescriptions = @json($careInstruction->prescriptions);
-
-        function addRow(preselectedMedId = null, amount = 1, dosage = '') {
-            let optionsHtml = '<option value="">-- เลือกยา --</option>';
-            medicinesData.forEach(function(med) {
-                const isSelected = preselectedMedId == med.id ? 'selected' : '';
-                optionsHtml += `<option value="${med.id}" ${isSelected}>${med.name} (${med.type}) - คงเหลือ: ${med.stock}</option>`;
-            });
-
-            const tr = document.createElement('tr');
-            tr.innerHTML = `
-                <td>
-                    <select name="prescriptions[${prescriptionIndex}][medicine_id]" class="form-select form-select-sm" required>
-                        ${optionsHtml}
-                    </select>
-                </td>
-                <td>
-                    <input type="number" name="prescriptions[${prescriptionIndex}][amount]" class="form-control form-control-sm" min="1" value="${amount}" required>
-                </td>
-                <td>
-                    <input type="text" name="prescriptions[${prescriptionIndex}][dosage]" class="form-control form-control-sm" value="${dosage}" placeholder="เช่น 1 เม็ด หลังอาหารเช้า-เย็น">
-                </td>
-                <td class="text-center align-middle">
-                    <button type="button" class="btn btn-sm btn-danger px-2 py-1 mb-0 remove-row-btn"><i class="fas fa-trash"></i></button>
-                </td>
-            `;
-            pBody.appendChild(tr);
-            prescriptionIndex++;
-            
-            tr.querySelector('.remove-row-btn').addEventListener('click', function() {
-                tr.remove();
-            });
-        }
-
-        // Initialize with existing
-        if(existingPrescriptions && existingPrescriptions.length > 0) {
-            existingPrescriptions.forEach(p => addRow(p.medicine_id, p.amount, p.dosage || ''));
-        }
-
-        addBtn.addEventListener('click', () => addRow());
     });
 </script>
 @endpush

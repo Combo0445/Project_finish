@@ -71,8 +71,8 @@ class ProfileController extends Controller
             $user->save();
 
             return redirect()->route('profile-user')->with('success', 'อัปเดตโปรไฟล์สำเร็จแล้ว');
-        } catch (\Exception $e) {
-            return redirect()->back()->with('error', 'เกิดข้อผิดพลาดในการอัปเดตโปรไฟล์: ' . $e->getMessage());
+            \Log::error('Profile Update Error: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'เกิดข้อผิดพลาดในการอัปเดตโปรไฟล์ กรุณาลองใหม่อีกครั้ง');
         }
     }
 }

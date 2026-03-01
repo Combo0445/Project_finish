@@ -20,16 +20,25 @@ class ADLController extends Controller
     public function index(Request $request)
     {
         $search = $request->get('search');
+        $date = $request->get('date', now()->toDateString());
 
-        $adls = BarthelAdl::with('elderly')->paginate(20);
+        $query = BarthelAdl::with('elderly');
+
+        if ($date) {
+            $query->whereDate('created_at', $date);
+        }
+
+        $adls = $query->paginate(20);
+        $adls->appends($request->all());
 
         return view('staff.ADL.ShowADL', compact('adls'));
     }
 
-    public function create()
+    public function create(Request $request)
     {
         $elderlies = Elderly::select('ID_Elderly', 'Name_Elderly')->get();
-        return view('staff.ADL.ADL', compact('elderlies'));
+        $selected_elderly_id = $request->query('elderly_id');
+        return view('staff.ADL.ADL', compact('elderlies', 'selected_elderly_id'));
     }
 
     public function submitADL(Request $request)

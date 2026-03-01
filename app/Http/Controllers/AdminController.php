@@ -21,7 +21,6 @@ class AdminController extends Controller
             (object) ['ID_Personnel' => 1, 'Type_Personnel' => 'Admin'],
             (object) ['ID_Personnel' => 2, 'Type_Personnel' => 'Staff'],
             (object) ['ID_Personnel' => 3, 'Type_Personnel' => 'Doctor'],
-            (object) ['ID_Personnel' => 4, 'Type_Personnel' => 'Pharmacist'],
         ]);
 
         return view('admin.register-user', compact('personnelTypes'));
@@ -34,7 +33,6 @@ class AdminController extends Controller
             1 => 'Admin',
             2 => 'Staff',
             3 => 'Doctor',
-            4 => 'Pharmacist',
         ];
 
         $personnelId = (int) $request->Type_Personnel;
@@ -64,9 +62,6 @@ class AdminController extends Controller
             case 'Doctor':
                 $user->Image_User = 'images-user/Doctor.png';
                 $user->Type_Doctor = $request->Type_Elderly ?? '';
-                break;
-            case 'Pharmacist':
-                $user->Image_User = 'images-user/Pharmacist.png'; // Need to provide a default image or use staff
                 break;
             default:
                 $user->Image_User = '';
@@ -131,7 +126,6 @@ class AdminController extends Controller
             'Admin' => 1,
             'Staff' => 2,
             'Doctor' => 3,
-            'Pharmacist' => 4,
         ];
 
         if (isset($personnelMap[$newType])) {
@@ -149,7 +143,6 @@ class AdminController extends Controller
                 'Admin' => 'images-user/Admin.jpg',
                 'Staff' => 'images-user/Staff.png',
                 'Doctor' => 'images-user/Doctor.png',
-                'Pharmacist' => 'images-user/Pharmacist.png',
             ];
 
             // If the user currently has a default image from a previous role, update it to the new role's default
@@ -196,8 +189,8 @@ class AdminController extends Controller
             }
 
             return redirect()->route('admin.layout-admin')->with('success', 'เพิ่มข่าวเรียบร้อยแล้ว');
-        } catch (\Exception $e) {
-            return redirect()->back()->with('error', 'เกิดข้อผิดพลาดในการเพิ่มข่าว: ' . $e->getMessage());
+            \Log::error('News Store Error: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'เกิดข้อผิดพลาดในการเพิ่มข่าว กรุณาลองใหม่อีกครั้ง');
         }
     }
 
@@ -216,9 +209,10 @@ class AdminController extends Controller
 
             // ถ้ามีการอัปโหลดรูปภาพใหม่ ให้ลบรูปภาพเก่าออก
             if ($request->hasFile('images')) {
+                $imageService = app(\App\Services\ImageUploadService::class);
                 // ลบรูปภาพเก่าทั้งหมดที่เกี่ยวข้องกับข่าวนี้
                 foreach ($news->images as $oldImage) {
-                    Storage::disk('public')->delete($oldImage->image_path);
+                    $imageService->deleteSingleImage($oldImage->image_path);
                     $oldImage->delete();
                 }
 
@@ -233,8 +227,8 @@ class AdminController extends Controller
             }
 
             return redirect()->route('admin.layout-admin')->with('success', 'อัปเดตข่าวสารสำเร็จแล้ว');
-        } catch (\Exception $e) {
-            return redirect()->back()->with('error', 'เกิดข้อผิดพลาดในการแก้ไขข่าว: ' . $e->getMessage());
+            \Log::error('News Update Error: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'เกิดข้อผิดพลาดในการแก้ไขข่าว กรุณาลองใหม่อีกครั้ง');
         }
     }
 
@@ -243,9 +237,10 @@ class AdminController extends Controller
     {
         $news = News::findOrFail($id);
 
+        $imageService = app(\App\Services\ImageUploadService::class);
         // ลบรูปภาพที่เกี่ยวข้องทั้งหมดในตาราง NewsImage
         foreach ($news->images as $image) {
-            Storage::disk('public')->delete($image->image_path);
+            $imageService->deleteSingleImage($image->image_path);
             $image->delete();
         }
 
@@ -265,10 +260,8 @@ class AdminController extends Controller
 
         $slider = new Slider();
         $slider->fill($request->only(['image']));
-        if ($request->hasFile('image')) {
-            $path = $request->file('image')->store('slider_images', 'public');
-            $slider->image = $path;
-        }
+        $imageService = app(\App\Services\ImageUploadService::class);
+        $slider->image = $imageService->handleSingleUpload($request->file('image'), 'slider_images');
 
         $slider->save();
 
@@ -284,12 +277,8 @@ class AdminController extends Controller
         $slider = Slider::findOrFail($id);
 
         if ($request->hasFile('image')) {
-            // Delete old image
-            if ($slider->image) {
-                Storage::disk('public')->delete($slider->image);
-            }
-            $path = $request->file('image')->store('slider_images', 'public');
-            $slider->image = $path;
+            $imageService = app(\App\Services\ImageUploadService::class);
+            $slider->image = $imageService->handleSingleUpload($request->file('image'), 'slider_images', $slider->image);
         }
 
         $slider->save();
@@ -301,10 +290,8 @@ class AdminController extends Controller
     {
         $slider = Slider::findOrFail($id);
 
-        // Delete image
-        if ($slider->image) {
-            Storage::disk('public')->delete($slider->image);
-        }
+        $imageService = app(\App\Services\ImageUploadService::class);
+        $imageService->deleteSingleImage($slider->image);
 
         $slider->delete();
 

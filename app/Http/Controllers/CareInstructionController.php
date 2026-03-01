@@ -7,8 +7,6 @@ use App\Models\CareInstruction;
 use App\Models\Elderly;
 use App\Models\CareGiver;
 use App\Models\User;
-use App\Models\Medicine;
-use App\Models\Prescription;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 
@@ -27,7 +25,7 @@ class CareInstructionController extends Controller
     public function index(Request $request)
     {
         $user = Auth::user();
-        $query = CareInstruction::with(['elderly', 'prescriptions.medicine']);
+        $query = CareInstruction::with(['elderly']);
 
         // Role-Based Filtering
         if ($user->Type_Personnel == 'Doctor') {
@@ -43,9 +41,6 @@ class CareInstructionController extends Controller
             });
         } elseif ($user->Type_Personnel == 'Staff') {
             // Staff can see all instructions, so no additional filter is applied.
-        } elseif ($user->Type_Personnel == 'Pharmacist') {
-            // Pharmacists see all instructions to prepare medicine
-            // No additional filter for now, they can see the whole list
         }
 
         // Feature Toggle: Filter Unconfirmed Only via Query Parameter
@@ -91,9 +86,7 @@ class CareInstructionController extends Controller
             ->take(5)
             ->get();
 
-        $medicines = Medicine::select('id', 'name', 'stock', 'type')->get();
-
-        return view('care_instructions.create', compact('elderly', 'reporter', 'staffMembers', 'history', 'medicines'));
+        return view('care_instructions.create', compact('elderly', 'reporter', 'staffMembers', 'history'));
     }
 
     public function store(Request $request)
@@ -120,19 +113,6 @@ class CareInstructionController extends Controller
             'Name_Staff',
             'Care_instructions',
         ]));
-
-        if ($request->has('prescriptions')) {
-            foreach ($request->prescriptions as $prescriptionData) {
-                if (!empty($prescriptionData['medicine_id']) && !empty($prescriptionData['amount'])) {
-                    Prescription::create([
-                        'care_instruction_id' => $ci->ID_CI,
-                        'medicine_id' => $prescriptionData['medicine_id'],
-                        'amount' => $prescriptionData['amount'],
-                        'dosage' => $prescriptionData['dosage'] ?? null,
-                    ]);
-                }
-            }
-        }
 
         $staff = User::where('Name_User', $request->Name_Staff)->first();
         if ($staff && $this->notificationService) {
@@ -170,9 +150,7 @@ class CareInstructionController extends Controller
             ->take(5)
             ->get();
 
-        $medicines = Medicine::select('id', 'name', 'stock', 'type')->get();
-
-        return view('care_instructions.edit', compact('careInstruction', 'elderly', 'reporter', 'staffMembers', 'history', 'medicines'));
+        return view('care_instructions.edit', compact('careInstruction', 'elderly', 'reporter', 'staffMembers', 'history'));
     }
 
     public function update(Request $request, $id)
@@ -201,21 +179,6 @@ class CareInstructionController extends Controller
             'Care_instructions',
         ]));
 
-        // Delete all old prescriptions and recreate them
-        $careInstruction->prescriptions()->delete();
-        if ($request->has('prescriptions')) {
-            foreach ($request->prescriptions as $prescriptionData) {
-                if (!empty($prescriptionData['medicine_id']) && !empty($prescriptionData['amount'])) {
-                    Prescription::create([
-                        'care_instruction_id' => $careInstruction->ID_CI,
-                        'medicine_id' => $prescriptionData['medicine_id'],
-                        'amount' => $prescriptionData['amount'],
-                        'dosage' => $prescriptionData['dosage'] ?? null,
-                    ]);
-                }
-            }
-        }
-
         $staff = User::where('Name_User', $request->Name_Staff)->first();
         if ($staff && $this->notificationService) {
             $this->notificationService->notifyCareInstruction(
@@ -243,82 +206,6 @@ class CareInstructionController extends Controller
         return redirect()->route('care_instructions.index')->with('success', 'ลบคำแนะนำการดูแลเรียบร้อยแล้ว');
     }
 
-    // Role Methods for Pharmacist/Admin Only - Dispensing Medication
-    public function dispense($id)
-    {
-        $role = session('impersonate_role', Auth::user()->Type_Personnel);
-        if ($role !== 'Pharmacist' && $role !== 'Admin') {
-            abort(403, 'Unauthorized action.');
-        }
-
-        $careInstruction = CareInstruction::with('prescriptions.medicine')->findOrFail($id);
-
-        if ($careInstruction->prescriptions->count() === 0) {
-            return redirect()->back()->with('error', 'ไม่สามารถกดยืนยันจ่ายยาได้เนื่องจากไม่มีรายการยา');
-        }
-
-        try {
-            \Illuminate\Support\Facades\DB::transaction(function () use ($careInstruction) {
-                // Validation for stock with locks
-                foreach ($careInstruction->prescriptions as $prescription) {
-                    if ($prescription->medicine_id) {
-                        // Lock the medicine row
-                        $medicine = Medicine::where('id', $prescription->medicine_id)->lockForUpdate()->first();
-
-                        if ($medicine && $prescription->amount > $medicine->stock) {
-                            throw new \Exception('สต็อกยา ' . $medicine->name . ' ไม่เพียงพอ (ต้องการ: ' . $prescription->amount . ', มีอยู่: ' . $medicine->stock . ')');
-                        }
-                    }
-                }
-
-                // Dispense logic (FIFO)
-                foreach ($careInstruction->prescriptions as $prescription) {
-                    if (!$prescription->medicine_id)
-                        continue;
-
-                    $medicine = Medicine::where('id', $prescription->medicine_id)->lockForUpdate()->first();
-                    if (!$medicine)
-                        continue;
-
-                    $amountToDispense = $prescription->amount;
-
-                    // Get lots that have stock, ordered by expiry date (FIFO) and lock them
-                    $lots = \App\Models\MedicineLot::where('medicine_id', $prescription->medicine_id)
-                        ->where('stock', '>', 0)
-                        ->orderByRaw('exp_date IS NULL, exp_date ASC') // nulls last
-                        ->orderBy('mfd_date', 'asc')
-                        ->lockForUpdate()
-                        ->get();
-
-                    foreach ($lots as $lot) {
-                        if ($amountToDispense <= 0)
-                            break;
-
-                        if ($lot->stock >= $amountToDispense) {
-                            $lot->decrement('stock', $amountToDispense);
-                            $amountToDispense = 0;
-                        } else {
-                            $amountToDispense -= $lot->stock;
-                            $lot->update(['stock' => 0]);
-                        }
-                    }
-
-                    // Deduct total stock from medicine
-                    $medicine->decrement('stock', $prescription->amount);
-
-                    // Mark prescription as dispensed
-                    $prescription->update(['dispensed' => true]);
-                }
-
-                $careInstruction->update(['Confirm_Medication' => 'เตรียมยาแล้ว']);
-            });
-
-            return redirect()->back()->with('success', 'เตรียมยาและตัดสต็อกเรียบร้อยแล้ว สตาฟฟ์สามารถดำเนินการรับทราบแผนต่อได้');
-        } catch (\Exception $e) {
-            return redirect()->back()->with('error', $e->getMessage());
-        }
-    }
-
     // Acknowledge Care Plan - Staff Only
     public function confirm($id)
     {
@@ -329,11 +216,6 @@ class CareInstructionController extends Controller
 
         $careInstruction = CareInstruction::findOrFail($id);
 
-        // STRICTURE: If there are prescriptions, they MUST be dispensed first
-        if ($careInstruction->prescriptions()->count() > 0 && empty($careInstruction->Confirm_Medication)) {
-            return redirect()->back()->with('error', 'ไม่สามารถยืนยันรับทราบได้ กรุณารอเภสัชกรเตรียมยาและตัดสต็อกให้เรียบร้อยก่อน');
-        }
-
         $careInstruction->update(['Confirm' => 'ยืนยัน']);
 
         return redirect()->back()->with('success', 'ยืนยันรับทราบแผนการดูแลเรียบร้อยแล้ว');
@@ -342,56 +224,18 @@ class CareInstructionController extends Controller
     public function unconfirm($id)
     {
         $role = session('impersonate_role', Auth::user()->Type_Personnel);
-        if ($role !== 'Staff' && $role !== 'Pharmacist' && $role !== 'Admin') {
+        if ($role !== 'Staff' && $role !== 'Admin') {
             abort(403, 'Unauthorized action.');
         }
 
-        $careInstruction = CareInstruction::with('prescriptions.medicine')->findOrFail($id);
+        $careInstruction = CareInstruction::findOrFail($id);
 
         try {
-            \Illuminate\Support\Facades\DB::transaction(function () use ($careInstruction, $role) {
-                // If Staff: just unconfirm the plan
-                if ($role === 'Staff' || $role === 'Admin') {
-                    $careInstruction->update(['Confirm' => null]);
-                }
-
-                // If Pharmacist (or Admin wanting to reverse stock): restore stock
-                if ($role === 'Pharmacist' || $role === 'Admin') {
-                    foreach ($careInstruction->prescriptions as $prescription) {
-                        if ($prescription->dispensed && $prescription->medicine_id) {
-
-                            $medicine = Medicine::where('id', $prescription->medicine_id)->lockForUpdate()->first();
-
-                            if ($medicine) {
-                                $medicine->increment('stock', $prescription->amount);
-
-                                // Try to find the latest lot to return the stock to, locking it
-                                $latestLot = \App\Models\MedicineLot::where('medicine_id', $prescription->medicine_id)
-                                    ->orderBy('created_at', 'desc')
-                                    ->lockForUpdate()
-                                    ->first();
-
-                                if ($latestLot) {
-                                    $latestLot->increment('stock', $prescription->amount);
-                                } else {
-                                    // Fallback if no lot exists
-                                    \App\Models\MedicineLot::create([
-                                        'medicine_id' => $prescription->medicine_id,
-                                        'lot_number' => 'RETURN-' . date('Ymd_His'),
-                                        'stock' => $prescription->amount
-                                    ]);
-                                }
-                                $prescription->update(['dispensed' => false]);
-                            }
-                        }
-                    }
-                    $careInstruction->update(['Confirm_Medication' => null]);
-                }
-            });
-
+            $careInstruction->update(['Confirm' => null]);
             return redirect()->back()->with('success', 'ยกเลิกการยืนยันเรียบร้อยแล้ว');
         } catch (\Exception $e) {
-            return redirect()->back()->with('error', 'เกิดข้อผิดพลาดในการยกเลิก: ' . $e->getMessage());
+            \Log::error('CareInstruction Void Error: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'เกิดข้อผิดพลาดในการยกเลิก กรุณาลองใหม่อีกครั้ง');
         }
     }
 }

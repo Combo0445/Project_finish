@@ -80,14 +80,6 @@
                                                     <span class="badge rounded-pill bg-gradient-secondary">แผน: รอยืนยัน</span>
                                                 @endif
 
-                                                <!-- Medication Status (Only if meds exist) -->
-                                                @if($ci->prescriptions->count() > 0)
-                                                    @if($ci->Confirm_Medication)
-                                                        <span class="badge rounded-pill bg-gradient-info">ยา: เตรียมแล้ว</span>
-                                                    @else
-                                                        <span class="badge rounded-pill bg-gradient-warning">ยา: รอเตรียม</span>
-                                                    @endif
-                                                @endif
                                             </div>
                                         </td>
 
@@ -102,33 +94,20 @@
                                                 $role = session('impersonate_role', Auth::user()->Type_Personnel);
                                             @endphp
 
-                                            <!-- Pharmacist Action: Dispense -->
-                                            @if(($role == 'Pharmacist' || $role == 'Admin') && $ci->prescriptions->count() > 0 && empty($ci->Confirm_Medication))
-                                                <form action="{{ route('care_instructions.dispense', ['id' => $ci->ID_CI]) }}"
-                                                    method="POST" style="display:inline-block;">
-                                                    @csrf
-                                                    @method('PUT')
-                                                    <button type="submit" class="btn btn-primary btn-sm">จ่ายยา/ตัดสต็อก</button>
-                                                </form>
-                                            @endif
-
-                                            <!-- Staff Action: Acknowledge (Blocked by medication if exists) -->
+                                            <!-- Staff Action: Acknowledge -->
                                             @if(($role == 'Staff' || $role == 'Admin') && empty($ci->Confirm))
-                                                @php
-                                                    $isBlockedByMed = ($ci->prescriptions->count() > 0 && empty($ci->Confirm_Medication));
-                                                @endphp
                                                 <form action="{{ route('care_instructions.confirm', ['id' => $ci->ID_CI]) }}"
                                                     method="POST" style="display:inline-block;">
                                                     @csrf
                                                     @method('PUT')
-                                                    <button type="submit" class="btn btn-success btn-sm" {{ $isBlockedByMed ? 'disabled title=กรุณารอเภสัชกรจ่ายยาก่อน' : '' }}>
+                                                    <button type="submit" class="btn btn-success btn-sm">
                                                         ยืนยันรับทราบ
                                                     </button>
                                                 </form>
                                             @endif
 
                                             <!-- Unconfirm Actions -->
-                                            @if($role == 'Admin' || ($role == 'Staff' && $ci->Confirm) || ($role == 'Pharmacist' && $ci->Confirm_Medication))
+                                            @if($role == 'Admin' || ($role == 'Staff' && $ci->Confirm))
                                                 <form action="{{ route('care_instructions.unconfirm', ['id' => $ci->ID_CI]) }}"
                                                     method="POST" style="display:inline-block;">
                                                     @csrf
@@ -140,10 +119,8 @@
                                             @endif
 
                                             <!-- Location Button -->
-                                            @if($role != 'Pharmacist')
-                                                <a href="{{ route('search-location', ['id' => $ci->elderly->ID_Elderly]) }}"
-                                                    target="_blank" class="btn btn-secondary btn-sm">ที่อยู่</a>
-                                            @endif
+                                            <a href="{{ route('search-location', ['id' => $ci->elderly->ID_Elderly]) }}"
+                                                target="_blank" class="btn btn-secondary btn-sm">ที่อยู่</a>
 
                                             <!-- Doctor Level Controls -->
                                             @if($role == 'Doctor')
@@ -193,14 +170,6 @@
                                                         <span class="text-warning fw-bold">รอการยืนยัน</span>
                                                     @endif
                                                     <br>
-                                                    @if($ci->prescriptions->count() > 0)
-                                                        <strong>สถานะยา:</strong>
-                                                        @if($ci->Confirm_Medication)
-                                                            <span class="text-info fw-bold">เตรียมยา/ตัดสต็อกแล้ว</span>
-                                                        @else
-                                                            <span class="text-danger fw-bold">รอเภสัชกรเตรียมยา</span>
-                                                        @endif
-                                                    @endif
                                                 </div>
                                             </div>
 
@@ -212,30 +181,7 @@
                                                 </div>
                                             </div>
 
-                                            @if($ci->prescriptions && $ci->prescriptions->count() > 0)
-                                                <h6>รายการยาที่ต้องเตรียม/จ่าย</h6>
-                                                <table class="table table-bordered table-sm mb-0">
-                                                    <thead class="table-primary">
-                                                        <tr>
-                                                            <th class="text-center">ชื่อยา</th>
-                                                            <th class="text-center">จำนวนที่สั่ง</th>
-                                                            <th class="text-center">วิธีใช้ (Dosage)</th>
-                                                        </tr>
-                                                    </thead>
-                                                    <tbody>
-                                                        @foreach($ci->prescriptions as $rx)
-                                                            <tr>
-                                                                <td>{{ $rx->medicine ? $rx->medicine->name : 'ไม่ทราบชื่อยา' }}</td>
-                                                                <td class="text-center">{{ $rx->amount }}
-                                                                    {{ $rx->medicine ? $rx->medicine->type : '' }}</td>
-                                                                <td>{{ $rx->dosage ?: '-' }}</td>
-                                                            </tr>
-                                                        @endforeach
-                                                    </tbody>
-                                                </table>
-                                            @else
-                                                <div class="alert alert-secondary text-sm mb-0">ไม่มีรายการสั่งยาในคำแนะนำนี้</div>
-                                            @endif
+
                                         </div>
                                         <div class="modal-footer">
                                             <a href="{{ route('report.ci.pdf', ['id' => $ci->ID_CI]) }}" target="_blank"

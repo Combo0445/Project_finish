@@ -78,7 +78,7 @@
                                 @if ($personnel->Type_Personnel !== 'Admin')
                                     <option value="{{ $personnel->ID_Personnel }}">
                                         @php
-                                            $roles = ['Staff' => 'เจ้าหน้าที่', 'Doctor' => 'แพทย์', 'Pharmacist' => 'เภสัชกร'];
+                                            $roles = ['Staff' => 'เจ้าหน้าที่', 'Doctor' => 'แพทย์'];
                                         @endphp
                                         {{ $roles[$personnel->Type_Personnel] ?? $personnel->Type_Personnel }}
                                     </option>

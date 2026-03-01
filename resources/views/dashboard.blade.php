@@ -110,14 +110,22 @@
                                 <td class="text-center">{{ \Carbon\Carbon::parse($elderly->Birthday)->age }} ปี</td>
                                 <td class="text-center">{{ $elderly->Phone_Elderly }}</td>
                                 <td class="text-center">
-                                    <span class="badge badge-sm bg-gradient-{{ $elderly->barthel_adl ? 'success' : 'secondary' }}">
-                                        {{ $elderly->barthel_adl ? 'ประเมินแล้ว' : 'ยังไม่ประเมิน' }}
-                                    </span>
+                                    <a
+                                        href="{{ $elderly->barthel_adl ? route('adl.index') : route('adl.create', ['elderly_id' => $elderly->ID_Elderly]) }}">
+                                        <span
+                                            class="badge badge-sm bg-gradient-{{ $elderly->barthel_adl ? 'success' : 'secondary' }}">
+                                            {{ $elderly->barthel_adl ? 'ประเมินแล้ว' : 'ยังไม่ประเมิน' }}
+                                        </span>
+                                    </a>
                                 </td>
                                 <td class="text-center">
-                                    <span class="badge badge-sm bg-gradient-{{ $elderly->care_giver ? 'success' : 'secondary' }}">
-                                        {{ $elderly->care_giver ? 'บันทึกแล้ว' : 'ยังไม่บันทึก' }}
-                                    </span>
+                                    <a
+                                        href="{{ $elderly->care_giver ? route('cg.index') : route('cg.create', ['elderly_id' => $elderly->ID_Elderly]) }}">
+                                        <span
+                                            class="badge badge-sm bg-gradient-{{ $elderly->care_giver ? 'success' : 'secondary' }}">
+                                            {{ $elderly->care_giver ? 'บันทึกแล้ว' : 'ยังไม่บันทึก' }}
+                                        </span>
+                                    </a>
                                 </td>
                                 <td class="text-center">
                                     <div class="btn-group">

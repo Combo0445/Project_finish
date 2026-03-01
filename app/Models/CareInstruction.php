@@ -4,9 +4,11 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class CareInstruction extends Model
 {
+    use HasFactory, SoftDeletes;
     protected $table = 'care_instructions';
     protected $primaryKey = 'ID_CI';
     protected $fillable = [
@@ -16,7 +18,6 @@ class CareInstruction extends Model
         'Name_Doctor',
         'Name_Staff',
         'Confirm',
-        'Confirm_Medication',
         'Care_instructions'
     ];
     public $timestamps = false;
@@ -24,11 +25,6 @@ class CareInstruction extends Model
     public function elderly()
     {
         return $this->belongsTo(Elderly::class, 'ID_Elderly', 'ID_Elderly');
-    }
-
-    public function prescriptions()
-    {
-        return $this->hasMany(Prescription::class, 'care_instruction_id', 'ID_CI');
     }
 }
 

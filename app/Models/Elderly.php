@@ -5,10 +5,11 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use App\Traits\LogsActivity;
 
 class Elderly extends Model
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory, SoftDeletes, LogsActivity;
 
     protected $table = 'elderlys';
     protected $primaryKey = 'ID_Elderly';
@@ -23,6 +24,23 @@ class Elderly extends Model
     ];
 
     public $timestamps = false;
+
+    /**
+     * Boot the model to handle cascading soft deletes.
+     */
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::deleting(function ($elderly) {
+            // Cascade delete on related assessments
+            $elderly->barthel_adl()->delete();
+            $elderly->care_giver()->delete();
+            $elderly->score_tai()->delete();
+            $elderly->care_instructions()->delete();
+            $elderly->performance_reports()->delete();
+        });
+    }
 
     // Return a full URL for the image or a gender-based avatar when missing
     public function getImageUrlAttribute()
@@ -86,5 +104,10 @@ class Elderly extends Model
     public function care_instructions()
     {
         return $this->hasMany(CareInstruction::class, 'ID_Elderly', 'ID_Elderly');
+    }
+
+    public function performance_reports()
+    {
+        return $this->hasMany(PerformanceReport::class, 'ID_Elderly', 'ID_Elderly');
     }
 }

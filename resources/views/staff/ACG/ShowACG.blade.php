@@ -5,14 +5,24 @@
 @section('content')
     <x-card>
         <x-slot name="header">
-            <h4>การประเมินกิจกรรมการดูแลผู้สูงอายุ (ACG)</h4>
-            <div class="d-flex gap-2">
-                <a href="{{ route('activities.create') }}" class="btn btn-primary">
-                    <i class="fas fa-plus"></i> เพิ่ม ACG
-                </a>
-                <a href="{{ route('report.all.acg') }}" target="_blank" class="btn btn-success">
-                    <i class="fas fa-print"></i>
-                </a>
+            <div
+                class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center gap-3 w-100">
+                <h4 class="mb-0">การประเมินกิจกรรมการดูแลผู้สูงอายุ (ACG)</h4>
+                <div class="d-flex flex-wrap gap-2 align-items-center">
+                    <form action="{{ route('acg.index') }}" method="GET" class="d-flex gap-2 align-items-center me-2">
+                        <input type="date" name="date" class="form-control form-control-sm" value="{{ request('date') }}">
+                        <button type="submit" class="btn btn-sm btn-dark mb-0">ค้นหา</button>
+                        @if(request('date'))
+                            <a href="{{ route('acg.index') }}" class="btn btn-sm btn-link mb-0 text-secondary">ล้าง</a>
+                        @endif
+                    </form>
+                    <a href="{{ route('activities.create') }}" class="btn btn-primary btn-sm mb-0">
+                        <i class="fas fa-plus"></i> เพิ่ม ACG
+                    </a>
+                    <a href="{{ route('report.all.acg') }}" target="_blank" class="btn btn-success btn-sm mb-0">
+                        <i class="fas fa-print"></i>
+                    </a>
+                </div>
             </div>
         </x-slot>
 
@@ -53,6 +63,9 @@
                     @endforeach
                 </tbody>
             </table>
+            <div class="mt-3 px-3">
+                {{ $activities->links() }}
+            </div>
         </div>
     </x-card>
 @endsection

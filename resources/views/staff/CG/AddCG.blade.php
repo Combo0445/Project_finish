@@ -199,10 +199,19 @@
                                         onchange="fetchElderlyDetails()" required>
                                         <option value="">เลือกผู้สูงอายุ</option>
                                         @foreach ($elderlys as $elderly)
-                                            <option value="{{ $elderly->ID_ADL }}">{{ $elderly->elderly->Name_Elderly }}
+                                            <option value="{{ $elderly->ID_ADL }}" 
+                                                {{ (isset($selected_elderly_id) && $selected_elderly_id == $elderly->ID_ADL) ? 'selected' : '' }}>
+                                                {{ $elderly->elderly->Name_Elderly }}
                                             </option>
                                         @endforeach
                                     </select>
+                                    @if(isset($selected_elderly_id))
+                                        <script>
+                                            window.onload = function() {
+                                                fetchElderlyDetails();
+                                            };
+                                        </script>
+                                    @endif
                                 </div>
                             </div>
 

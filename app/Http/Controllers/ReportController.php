@@ -144,7 +144,7 @@ class ReportController extends Controller
 
   public function ReportCI_Single($id)
   {
-    $ci = CareInstruction::with(['elderly', 'prescriptions.medicine'])->findOrFail($id);
+    $ci = CareInstruction::with(['elderly'])->findOrFail($id);
     return $this->generatePdfResponse('staff.Report.report-ci-pdf', ['ci' => $ci], ($ci->Name_Elderly ?? "Report") . "_CI.pdf");
   }
 
@@ -177,14 +177,14 @@ class ReportController extends Controller
 
   public function ReportCIConfirm()
   {
-    $careInstructions = CareInstruction::whereNotNull('Confirm')->paginate(20);
+    $careInstructions = CareInstruction::with('elderly')->whereNotNull('Confirm')->paginate(20);
     return view('staff.Report.report-ci-confirm', compact('careInstructions'));
   }
 
   public function ReportCI_All(Request $request)
   {
     $user = auth()->user();
-    $query = CareInstruction::with(['elderly', 'prescriptions.medicine'])->orderBy('Date_CI', 'desc');
+    $query = CareInstruction::with(['elderly'])->orderBy('Date_CI', 'desc');
 
     // Apply the same filtering as the index page
     if ($user->Type_Personnel == 'Doctor') {

@@ -6,14 +6,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@yield('title', 'รายงาน')</title>
     <style>
-        body {
-            font-family: 'sarabun', sans-serif;
-            font-size: 18px;
-            line-height: 1.2;
-            color: #000;
-            margin: 0;
-            padding: 5px;
-        }
+        font-family: 'sarabun',
+        sans-serif;
+        font-size: 18px;
+        font-weight: bold;
+        line-height: 1.2;
+        color: #000;
+        margin: 0;
+        padding: 5px;
 
         .container {
             max-width: 800px;
@@ -30,7 +30,8 @@
         .logo {
             width: 80px;
             height: auto;
-            margin-bottom: 10px;
+            margin: 0 auto 10px auto;
+            display: block;
         }
 
         .report-title {
@@ -40,6 +41,7 @@
             margin: 0;
             text-transform: uppercase;
             line-height: 1.2;
+            text-align: center;
         }
 
         .report-meta {

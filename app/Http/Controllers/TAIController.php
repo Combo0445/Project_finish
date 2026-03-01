@@ -12,9 +12,17 @@ use Maatwebsite\Excel\Facades\Excel;
 
 class TAIController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $tai = ScoreTAI::with(['elderly', 'user'])->paginate(20);
+        $query = ScoreTAI::with(['elderly', 'user']);
+
+        $date = $request->get('date', now()->toDateString());
+        if ($date) {
+            $query->whereDate('updated_at', $date);
+        }
+
+        $tai = $query->paginate(20);
+        $tai->appends($request->all());
         return view('staff.TAI.ShowTAI', compact('tai'));
     }
 
@@ -50,14 +58,14 @@ class TAIController extends Controller
 
         // Update or create CareGiver record
         $cg = CareGiver::updateOrCreate(
-        ['ID_ADL' => $tai->ID_ADL, 'ID_Elderly' => $tai->ID_Elderly],
-        [
-            'Name_Elderly' => $elderly->Name_Elderly,
-            'Birthday' => $elderly->Birthday,
-            'Address' => $elderly->Address,
-            'Group_ADL' => $request->group,
-            'Date_CG' => now()->toDateString(),
-        ]
+            ['ID_ADL' => $tai->ID_ADL, 'ID_Elderly' => $tai->ID_Elderly],
+            [
+                'Name_Elderly' => $elderly->Name_Elderly,
+                'Birthday' => $elderly->Birthday,
+                'Address' => $elderly->Address,
+                'Group_ADL' => $request->group,
+                'Date_CG' => now()->toDateString(),
+            ]
         );
 
         return redirect()->route('tai.index')->with('success', 'บันทึกการประเมิน TAI เรียบร้อยแล้ว');

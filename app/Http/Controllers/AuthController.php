@@ -38,10 +38,6 @@ class AuthController extends Controller
         if (Hash::check($request->password, $user->Password)) {
             Auth::login($user);
 
-            if ($user->Type_Personnel === 'Pharmacist') {
-                return redirect()->intended('medicines');
-            }
-
             return redirect()->intended('dashboard');
         }
 

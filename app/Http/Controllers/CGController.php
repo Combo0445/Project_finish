@@ -23,14 +23,21 @@ class CGController extends Controller
                 ->orWhere('Name_CG', 'like', '%' . $request->search . '%');
         }
 
+        $date = $request->get('date', now()->toDateString());
+        if ($date) {
+            $query->whereDate('Date_CG', $date);
+        }
+
         $careGivers = $query->paginate(20);
+        $careGivers->appends($request->all());
         return view('staff.CG.ShowCG', compact('careGivers'));
     }
 
-    public function create()
+    public function create(Request $request)
     {
         $elderlys = BarthelAdl::with('elderly')->get();
-        return view('staff.CG.AddCG', compact('elderlys'));
+        $selected_elderly_id = $request->query('elderly_id');
+        return view('staff.CG.AddCG', compact('elderlys', 'selected_elderly_id'));
     }
 
     public function store(CareGiverRequest $request)
@@ -113,24 +120,20 @@ class CGController extends Controller
                 return redirect()->back()->withErrors(['ID_ADL' => 'ไม่พบข้อมูล ADL สำหรับผู้สูงอายุที่เลือก']);
             }
 
-            $picturePaths = [];
-
             if ($request->hasFile('Picture')) {
-                foreach ($request->file('Picture') as $picture) {
-                    $path = $picture->store('pictures', 'public');
-                    $picturePaths[] = $path;
-                }
+                $service = app(\App\Services\ImageUploadService::class);
+                $careGiverData['Picture'] = $service->handleMultipleUploads($request->file('Picture'), 'pictures');
+            } else {
+                $careGiverData['Picture'] = json_encode([]);
             }
-
-            $careGiverData['Picture'] = json_encode($picturePaths);
 
             $cg = new CareGiver();
             $cg->fill($careGiverData);
             $cg->save();
 
             return redirect()->route('cg.create')->with('success', 'เพิ่ม Care Giver สำเร็จแล้ว!');
-        } catch (\Exception $e) {
-            return redirect()->back()->with('error', 'เกิดข้อผิดพลาดในการบันทึกข้อมูล: ' . $e->getMessage());
+            \Log::error('CG Store Error: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'เกิดข้อผิดพลาดในการบันทึกข้อมูล กรุณาลองใหม่อีกครั้ง');
         }
     }
 
@@ -189,22 +192,10 @@ class CGController extends Controller
 
             // บันทึกรูปใหม่
             if ($request->hasFile('Picture')) {
+                $service = app(\App\Services\ImageUploadService::class);
                 // ลบรูปเก่าออกจาก storage เฉพาะเมื่อมีการอัปโหลดใหม่
-                if ($careGiver->Picture) {
-                    $oldImages = json_decode($careGiver->Picture, true);
-                    if (is_array($oldImages)) {
-                        foreach ($oldImages as $oldPath) {
-                            Storage::disk('public')->delete($oldPath);
-                        }
-                    }
-                }
-
-                $picturePaths = [];
-                foreach ($request->file('Picture') as $picture) {
-                    $path = $picture->store('pictures', 'public');
-                    $picturePaths[] = $path;
-                }
-                $careGiverData['Picture'] = json_encode($picturePaths);
+                $service->deleteMultipleImages($careGiver->Picture);
+                $careGiverData['Picture'] = $service->handleMultipleUploads($request->file('Picture'), 'pictures');
             }
             // ถ้าไม่มีรูปใหม่ ไม่ต้องเซตเป็น null เพื่อรักษาของเดิมไว้
 
@@ -235,8 +226,8 @@ class CGController extends Controller
             ]);
 
             return redirect()->route('cg.index')->with('success', 'อัปเดตข้อมูล Care Giver สำเร็จแล้ว!');
-        } catch (\Exception $e) {
-            return redirect()->back()->with('error', 'เกิดข้อผิดพลาดในการแก้ไขข้อมูล: ' . $e->getMessage());
+            \Log::error('CG Update Error: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'เกิดข้อผิดพลาดในการแก้ไขข้อมูล กรุณาลองใหม่อีกครั้ง');
         }
     }
 
@@ -245,12 +236,7 @@ class CGController extends Controller
         $careGiver = CareGiver::findOrFail($id);
 
         if ($careGiver->Picture) {
-            $images = json_decode($careGiver->Picture, true);
-            if (is_array($images)) {
-                foreach ($images as $oldPath) {
-                    Storage::disk('public')->delete($oldPath);
-                }
-            }
+            app(\App\Services\ImageUploadService::class)->deleteMultipleImages($careGiver->Picture);
         }
 
         $careGiver->delete();
@@ -260,7 +246,7 @@ class CGController extends Controller
 
     public function showACG(Request $request)
     {
-        $query = ActivityCaregiver::query();
+        $query = ActivityCaregiver::with(['caregiver']);
 
         if ($request->has('search')) {
             $query->whereHas('caregiver', function ($q) use ($request) {
@@ -268,10 +254,13 @@ class CGController extends Controller
             });
         }
 
-        // // เพิ่มการเรียงลำดับจากใหม่ไปเก่า
-        // $activities = $query->orderBy('ID_CG', 'desc')->get();
+        $date = $request->get('date', now()->toDateString());
+        if ($date) {
+            $query->whereDate('Date_ACG', $date);
+        }
 
-        $activities = $query->get();
+        $activities = $query->paginate(20);
+        $activities->appends($request->all());
         return view('staff.ACG.ShowACG', compact('activities'));
     }
 

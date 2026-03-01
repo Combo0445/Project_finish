@@ -5,12 +5,12 @@
     <meta charset="UTF-8">
     <title>{{ $title ?? 'รายงานคำแนะนำการดูแล' }}</title>
     <style>
-        body {
-            font-family: 'sarabun', sans-serif;
-            font-size: 18px;
-            color: #000;
-            line-height: 1.2;
-        }
+        font-family: 'sarabun',
+        sans-serif;
+        font-size: 18px;
+        font-weight: bold;
+        color: #000;
+        line-height: 1.2;
 
         .header-table {
             width: 100%;
@@ -95,25 +95,18 @@
 
 <body>
 
-    <!-- Header -->
-    <table class="header-table">
-        <tr>
-            <td width="15%">
-                @if(!empty($logo))
-                    <img src="{{ $logo }}" class="logo">
-                @endif
-            </td>
-            <td width="45%" class="agency-info">
-                <div class="text-bold" style="font-size: 20px;">
-                    ระบบประเมินความสามารถในการดำเนินกิจวัตรประจำวันของผู้สูงอายุ</div>
-                <div>เทศบาลตำบลห้วยราช จังหวัดบุรีรัมย์</div>
-                <div>พิมพ์เมื่อ: {{ \Carbon\Carbon::now()->translatedFormat('d F Y H:i') }} น.</div>
-            </td>
-            <td width="40%" class="report-title">
-                {{ $title ?? 'รายงานคำแนะนำการดูแล' }}
-            </td>
-        </tr>
-    </table>
+    <div style="text-align: center; margin-bottom: 20px; border-bottom: 2px solid #2d5a27; padding-bottom: 15px;">
+        @if(!empty($logo))
+            <img src="{{ $logo }}" class="logo" style="margin: 0 auto 10px auto; display: block;">
+        @endif
+        <div class="text-bold" style="font-size: 22px;">ระบบประเมินความสามารถในการดำเนินกิจวัตรประจำวันของผู้สูงอายุ
+        </div>
+        <div style="font-size: 18px; font-weight: normal;">เทศบาลตำบลห้วยราช จังหวัดบุรีรัมย์</div>
+        <div class="report-title" style="margin-top: 10px; text-align: center;">{{ $title ?? 'รายงานคำแนะนำการดูแล' }}
+        </div>
+        <div style="font-size: 16px; font-weight: normal; margin-top: 5px;">พิมพ์เมื่อ:
+            {{ \Carbon\Carbon::now()->translatedFormat('d F Y H:i') }} น.</div>
+    </div>
 
     <!-- Main Table -->
     <table class="data-table">
@@ -134,16 +127,8 @@
                     <td class="text-bold">{{ $ci->Name_Elderly }}</td>
                     <td>{{ $ci->Name_Doctor }}</td>
                     <td>
-                        {{ $ci->Care_instructions }}
-                        @if($ci->prescriptions && $ci->prescriptions->count() > 0)
-                            <br><span style="color: #000; font-weight: bold;">จ่ายยา:</span>
-                            <span>
-                                @foreach($ci->prescriptions as $p)
-                                    {{ $p->medicine->name ?? 'ไม่ระบุ' }} ({{ $p->amount }}),
-                                @endforeach
-                            </span>
-                        @endif
-                    </td>
+                    <td>{{ $ci->Name_Staff ?? '-' }}</td>
+                    <td>{{ $ci->Care_instructions }}</td>
                     <td class="text-center">
                         @if($ci->Confirm)
                             <span class="status-confirmed">ยืนยันแล้ว</span>

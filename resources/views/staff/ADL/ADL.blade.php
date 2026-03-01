@@ -146,7 +146,9 @@
                                 <select name="elderly_id" id="elderly_id" class="form-control form-control-lg" required>
                                     <option value="" disabled selected>-- กรุณาเลือก --</option>
                                     @foreach($elderlies as $elderly)
-                                        <option value="{{ $elderly->ID_Elderly }}">{{ $elderly->Name_Elderly }}</option>
+                                        <option value="{{ $elderly->ID_Elderly }}" {{ (isset($selected_elderly_id) && $selected_elderly_id == $elderly->ID_Elderly) ? 'selected' : '' }}>
+                                            {{ $elderly->Name_Elderly }}
+                                        </option>
                                     @endforeach
                                 </select>
                             </div>

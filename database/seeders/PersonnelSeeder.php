@@ -13,7 +13,6 @@ class PersonnelSeeder extends Seeder
             1 => 'Admin',
             2 => 'Staff',
             3 => 'Doctor',
-            4 => 'Pharmacist',
         ];
 
         foreach ($types as $id => $type) {

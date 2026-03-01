@@ -13,15 +13,25 @@
 @section('content')
     <x-card>
         <x-slot name="header">
-            <h4>ประเมินความสามารถในการดำเนินชีวิตประจำวัน (ADL)</h4>
-            <div class="d-flex gap-2">
-                <a href="{{ route('adl.create') }}" class="btn btn-primary">
-                    <i class="fas fa-plus"></i> เพิ่ม ADL
-                </a>
-                <a href="{{ route('report.all.adl') }}" target="_blank" class="btn btn-success">
-                    <i class="fas fa-print"></i>
-                </a>
-                <a href="{{ route('adl.export') }}" class="btn btn-primary btn-sm">Export Excel</a>
+            <div
+                class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center gap-3 w-100">
+                <h4 class="mb-0">ประเมินความสามารถในการดำเนินชีวิตประจำวัน (ADL)</h4>
+                <div class="d-flex flex-wrap gap-2 align-items-center">
+                    <form action="{{ route('adl.index') }}" method="GET" class="d-flex gap-2 align-items-center me-2">
+                        <input type="date" name="date" class="form-control form-control-sm" value="{{ request('date') }}">
+                        <button type="submit" class="btn btn-sm btn-dark mb-0">ค้นหา</button>
+                        @if(request('date'))
+                            <a href="{{ route('adl.index') }}" class="btn btn-sm btn-link mb-0 text-secondary">ล้าง</a>
+                        @endif
+                    </form>
+                    <a href="{{ route('adl.create') }}" class="btn btn-primary btn-sm mb-0">
+                        <i class="fas fa-plus"></i> เพิ่ม ADL
+                    </a>
+                    <a href="{{ route('report.all.adl') }}" target="_blank" class="btn btn-success btn-sm mb-0">
+                        <i class="fas fa-print"></i>
+                    </a>
+                    <a href="{{ route('adl.export') }}" class="btn btn-primary btn-sm mb-0">Export Excel</a>
+                </div>
             </div>
         </x-slot>
 
@@ -203,37 +213,37 @@
 
             var reportContent = document.createElement('div');
             reportContent.innerHTML = `
-                            <style>
-                                * { font-family: 'Open Sans', Arial, sans-serif !important; color: black !important; background-color: white !important; }
-                                h5 { font-size: 20px; margin: 0; text-align: center; }
-                                table { width: 100%; border-collapse: collapse; margin-bottom: 20px; font-size: 14px; }
-                                th, td { padding: 8px; text-align: center; border: 1px solid black; }
-                                td { font-size: 12px; }
-                            </style>
-                            <h5>รายงานความสามารถในการดำเนินชีวิตประจำวัน (ADL)</h5>
-                            <table>
-                                <thead>
-                                    <tr>
-                                        <th>วันที่</th>
-                                        <th>ชื่อผู้สูงอายุ</th>
-                                        <th>ชื่อเจ้าหน้าที่</th>
-                                        <th>คะแนน ADL</th>
-                                        <th>กลุ่ม ADL</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    ${filteredData.map(row => `
+                                <style>
+                                    * { font-family: 'Open Sans', Arial, sans-serif !important; color: black !important; background-color: white !important; }
+                                    h5 { font-size: 20px; margin: 0; text-align: center; }
+                                    table { width: 100%; border-collapse: collapse; margin-bottom: 20px; font-size: 14px; }
+                                    th, td { padding: 8px; text-align: center; border: 1px solid black; }
+                                    td { font-size: 12px; }
+                                </style>
+                                <h5>รายงานความสามารถในการดำเนินชีวิตประจำวัน (ADL)</h5>
+                                <table>
+                                    <thead>
                                         <tr>
-                                            <td>${row[0]}</td>
-                                            <td>${row[1]}</td>
-                                            <td>${row[2]}</td>
-                                            <td>${row[3]}</td>
-                                            <td>${row[4]}</td>
+                                            <th>วันที่</th>
+                                            <th>ชื่อผู้สูงอายุ</th>
+                                            <th>ชื่อเจ้าหน้าที่</th>
+                                            <th>คะแนน ADL</th>
+                                            <th>กลุ่ม ADL</th>
                                         </tr>
-                                    `).join('')}
-                                </tbody>
-                            </table>
-                        `;
+                                    </thead>
+                                    <tbody>
+                                        ${filteredData.map(row => `
+                                            <tr>
+                                                <td>${row[0]}</td>
+                                                <td>${row[1]}</td>
+                                                <td>${row[2]}</td>
+                                                <td>${row[3]}</td>
+                                                <td>${row[4]}</td>
+                                            </tr>
+                                        `).join('')}
+                                    </tbody>
+                                </table>
+                            `;
 
             const opt = {
                 margin: 0.5,

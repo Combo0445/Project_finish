@@ -1,224 +1,99 @@
-# ระบบประเมินความสามารถในการดำเนินกิจวัตรประจำวันของผู้สูงอายุ
-## ADL Assessment System
+# 🏥 ระบบประเมินความสามารถในการดำเนินกิจวัตรประจำวันของผู้สูงอายุ (Elderly Care Assessment System)
+[![Laravel](https://img.shields.io/badge/Laravel-10-red?logo=laravel&style=for-the-badge)](https://laravel.com/)
+[![MySQL](https://img.shields.io/badge/MySQL-8.0-blue?logo=mysql&style=for-the-badge)](https://www.mysql.com/)
+[![PHP](https://img.shields.io/badge/PHP-8.1+-purple?logo=php&style=for-the-badge)](https://www.php.net/)
+[![Bootstrap](https://img.shields.io/badge/Bootstrap-4-563D7C?logo=bootstrap&style=for-the-badge)](https://getbootstrap.com/)
 
-![Laravel](https://img.shields.io/badge/Laravel-10-red?logo=laravel)
-![MySQL](https://img.shields.io/badge/MySQL-8.0-blue?logo=mysql)
-![PHP](https://img.shields.io/badge/PHP-8.1+-purple?logo=php)
-![License](https://img.shields.io/badge/License-MIT-green)
+> **Portfolio Project:** Web Application สำหรับจัดการและติดตามผลการประเมินสุขภาพผู้สูงอายุในระดับชุมชน ออกแบบมาเพื่อเพิ่มประสิทธิภาพการทำงานของบุคลากรทางการแพทย์ (หมอ และ เจ้าหน้าที่สาธารณสุข)
 
-## 📋 ภาพรวมโปรเจกต์
-
-ระบบประเมินความสามารถในการดำเนินชีวิตประจำวันของผู้สูงอายุ (ADL Barthel Index) พร้อมการประเมิน Care Giver และ TAI (Thai Able Index) สำหรับสนับสนุนการดูแลผู้สูงอายุในสถานสงเคราะห์และโรงพยาบาล
-
-**เทคโนโลยี:** Laravel 10, MySQL, jQuery, Bootstrap 4, Quill Editor
+## 📋 ภาพรวมระบบ (Project Overview)
+ระบบถูกพัฒนาขึ้นเพื่อเปลี่ยนผ่านการจัดเก็บข้อมูลสุขภาพผู้สูงอายุจากรูปแบบกระดาษสู่ระบบดิจิทัล (Digital Transformation) โดยรองรับแบบประเมินมาตรฐานทางการแพทย์ถึง 3 รูปแบบ ได้แก่ **Barthel ADL Index**, **Care Giver Assessment**, และ **TAI (Thai Able Index)** ระบบมาพร้อมกับกระบวนการทำงานที่ไร้รอยต่อ (Seamless Workflow) ตั้งแต่การประเมินผลโดยเจ้าหน้าที่ ไปจนถึงการสั่งการดูแล (Care Instructions) โดยแพทย์ผู้เชี่ยวชาญ
 
 ---
 
-## ✨ ฟีเจอร์หลัก
+## ✨ ฟีเจอร์เด่น (Highlight Features)
 
-### 👥 ระบบแบ่งบทบาท (Role-Based Access)
-- **Admin** - จัดการระบบ, ผู้ใช้, ข่าวสาร, Sliders
-- **Staff** - บันทึก ADL Assessment, Care Giver, TAI, Activity, Performance Report
-- **Doctor** - จัดการคำสั่งดูแล (Care Instructions)
+### 👥 1. Role-Based Access Control (RBAC)
+ออกแบบระบบจำกัดสิทธิ์การเข้าถึงข้อมูลและการใช้งานฟังก์ชันต่างๆ อย่างเด็ดขาดตามบทบาทของผู้ใช้งาน:
+*   **Admin:** ควบคุมผู้ใช้งานระบบ, อัปเดตข่าวสาร/ประกาศ, จัดการแบนเนอร์
+*   **Staff (เจ้าหน้าที่สาธารณสุข):** ลงพื้นที่ประเมินสุขภาพผู้สูงอายุ, เก็บข้อมูล ADL/CG/TAI, และติดตามผล
+*   **Doctor (แพทย์):** ดูประวัติสุขภาพรายบุคคล และออกคำสั่งการดูแล (Care Instructions) ให้เจ้าหน้าที่นำไปปฏิบัติ
 
-### 📊 ระบบประเมินครอบคลุม
-- **Barthel ADL Index** - ประเมิน 10 ด้าน (Self-care, Mobility, Continence)
-- **Care Giver Assessment** - บันทึก caregiver และสภาพสุขภาพผู้สูงอายุ (37+ ข้อมูลด้าน)
-- **TAI (Thai Able Index)** - ประเมิน Mobility, Confusion, Feeding, Toileting
-- **Performance Report** - รวบรวมและรายงานผลประเมิน
+### 📊 2. Comprehensive Health Assessment System
+รองรับมาตรวัดสุขภาพผู้สูงอายุที่เชื่อมโยงกัน:
+*   **Barthel ADL Index:** ประเมินความสามารถในการดำเนินชีวิต 10 ด้าน พร้อมจำแนกกลุ่ม (ติดสังคม, ติดบ้าน, ติดเตียง) อัตโนมัติ
+*   **Care Giver Assessment:** เก็บข้อมูลผู้ดูแลและสภาพแวดล้อมอย่างละเอียดกว่า 37 มิติ
+*   **TAI (Thai Able Index):** ประเมินประสิทธิภาพการกลืน, การขับถ่าย, และการเคลื่อนไหว
 
-### 📰 ระบบข่าวสาร
-- สร้าง/แก้ไข/ลบข่าว พร้อม Quill Editor
-- อัพโหลดหลายรูป (ตารางแยก news_images)
-- Avatar ตามบทบาท (Admin/Staff/Doctor)
+### 📝 3. Doctor's Care Instruction Workflow
+*   ระบบสั่งการดูแลจากแพทย์ พร้อม Status Tracking (รอยืนยัน -> ยืนยันรับทราบ)
+*   ระบบออกรายงาน PDF แบบ Real-time ครบถ้วนบนหน้าเดียว สำหรับพิมพ์แนบแฟ้มประวัติ
 
-### 📁 การจัดการไฟล์
-- Upload Profile Picture, Caregiver Photos, Sliders
-- Storage symlink สำหรับเก็บไฟล์สาธารณะ
-- ลบไฟล์อัตโนมัติเมื่อลบบันทึก
-
-### 📑 ระบบรายงาน & Export
-- Export Excel (ADL, Care Giver, TAI)
-- PDF Report สำหรับแต่ละประเมิน
-- ค้นหาและกรองข้อมูล
-
-### 🔔 ระบบแจ้งเตือน
-- Notification สำหรับใบสั่ง Care Instruction ที่รอยืนยัน
-- Bell Icon มี shake animation เมื่อมีการแจ้งเตือน
+### 📈 4. Dashboard & Analytics
+*   สรุปข้อมูลสถิติประชากรผู้สูงอายุตามช่วงวัย และกลุ่มสุขภาพ (ADL Groups)
+*   **Performance Report:** สรุปผลประเมินทั้งหมดในรูปแบบตารางและ Export เป็น PDF/Excel ได้
 
 ---
 
-## 🛠️ การติดตั้ง
+## 💻 เทคโนโลยีและสถาปัตยกรรม (Tech Stack & Architecture)
 
-### ข้อกำหนด
-- PHP >= 8.1
-- Composer
-- MySQL / MariaDB 8.0
-- Node.js & npm (ตามต้องการ)
+*   **Backend:** PHP 8.1, Laravel 10 (MVC Architecture)
+*   **Frontend:** Blade Templates, Bootstrap 4, jQuery, DataTables
+*   **Database:** MySQL 8.0 (Relational Database Design)
+*   **Other Libraries:** mPDF (สำหรับสร้าง PDF), Maatwebsite Excel (สำหรับ Export ข้อมูล), Quill Editor (สำหรับจัดการบทความ)
 
-### ขั้นตอนการติดตั้ง
+---
 
-**1. Clone Repository**
+## 🛠 ทักษะทางวิศวกรรมซอฟต์แวร์ที่นำมาใช้ (Engineering Practices)
+
+โปรเจกต์นี้ไม่ได้มีแค่ฟีเจอร์ที่ทำงานได้จริง แต่ยังคำนึงถึงโครงสร้างโค้ดและความปลอดภัย:
+
+1.  **System Refactoring & Clean Architecture:**
+    *   แยกระบบที่ซับซ้อนและไม่ได้ใช้งาน (เช่น คลังยา) ออกจาก Core Logic เพื่อลด Dependency ที่ไม่จำเป็น (Decoupling) ทำให้โค้ดอ่านง่ายและบำรุงรักษาได้ลื่นไหลยิ่งขึ้น
+    *   ใช้ `DB::transaction()` ในการบันทึกข้อมูลแบบหลายตาราง (เช่น บันทึกผู้สูงอายุ + ข้อมูลที่อยู่) ป้องกันปัญหาข้อมูลตกหล่นหากเกิด Error กลางคัน
+2.  **Security & Data Integrity:**
+    *   Implement **Soft Deletes** (`deleted_at`) สำหรับข้อมูลสำคัญ ป้องกันการสูญหายของประวัติทางการแพทย์
+    *   ป้องกันการโจมตีแบบ SQL Injection ด้วย Eloquent ORM อย่างเคร่งครัด
+    *   ป้องกัน Cross-Site Scripting (XSS) ผ่านระบบ Blade Templating ของ Laravel
+3.  **Performance Optimization:**
+    *   ใช้วิธี **Eager Loading** (`with()`) ในการ Query ดึงข้อมูลที่มี Relationship กัน เพื่อแก้ปัญหา **N+1 Query Problem** ทำให้ระบบแสดงผล Report และ Dashboard ได้รวดเร็วขึ้นอย่างมาก
+    *   ลดการเรียกใช้ `Model::all()` เปลี่ยนมาใช้ Query กรองและ Paginate ข้อมูลเสมอ
+4.  **Google Maps Integration:**
+    *   บูรณาการแผนที่เพื่อระบุตำแหน่งพิกัดบ้านผู้สูงอายุ ผ่านพิกัด Latitude/Longitude โดยไม่เกิดค่าใช้จ่าย API เปล่าประโยชน์
+
+---
+
+## 🚀 การติดตั้งสำหรับ Development (Installation)
+
 ```bash
+# 1. Clone repository
 git clone https://github.com/Combo0445/Project_finish.git
 cd Project_finish
-```
 
-**2. ติดตั้ง PHP Dependencies**
-```bash
+# 2. Install dependencies
 composer install
-```
 
-**3. สร้าง .env File**
-```bash
+# 3. Environment setup
 cp .env.example .env
 php artisan key:generate
-```
 
-**4. ตั้งค่า Database ใน .env**
-```env
-DB_CONNECTION=mysql
-DB_HOST=127.0.0.1
-DB_PORT=3306
-DB_DATABASE=project_finish
-DB_USERNAME=root
-DB_PASSWORD=
-```
+# 4. Database Setup (ตั้งค่า DB_DATABASE ใน .env ให้เรียบร้อย)
+php artisan migrate --seed
 
-**5. รัน Migration**
-```bash
-php artisan migrate
-```
-
-**6. สร้าง Storage Symlink**
-```bash
+# 5. Storage Link (สำหรับดึงรูปภาพ)
 php artisan storage:link
-```
 
-**7. สตาร์ท Development Server**
-```bash
+# 6. Run Server
 php artisan serve
 ```
 
-เปิดเบราว์เซอร์ไปที่: `http://localhost:8000`
-
 ---
 
-## 📖 การใช้งาน
+## 👨‍💻 เกี่ยวกับผู้พัฒนา (About Developer)
 
-### สำหรับ Admin
-- ไปที่ `/admin-dashboard`
-- สร้าง/ลบผู้ใช้งาน (Staff/Doctor)
-- จัดการข่าวสาร และ Sliders
+**Combo (Combo0445)**
+*Software Developer / Web Programmer*
 
-### สำหรับ Staff
-- ไปที่ `/staff-dashboard`
-- บันทึก ADL Assessment สำหรับผู้สูงอายุ
-- บันทึก Care Giver และ Activity
-- ประเมิน TAI scores
-- บันทึก Performance Report
+ระบบนี้ถูกพัฒนาขึ้นด้วยความตั้งใจที่จะนำเทคโนโลยีมาประยุกต์ใช้กับระบบสาธารณสุขชุมชน โดยเน้นที่การใช้งานได้จริง โค้ดที่เป็นระเบียบ และพร้อมสำหรับการสเกลในอนาคต หากคุณกำลังมองหานักพัฒนาที่เข้าใจทั้ง Business Logic และ Technical Architecture ยินดีที่ได้รู้จักครับ!
 
-### สำหรับ Doctor
-- ไปที่ `/doctor-dashboard`
-- ออกคำสั่งดูแล (Care Instructions)
-- ดูรายงานประเมิน
-
----
-
-## 📊 โครงสร้าง Database
-
-| ตาราง | รายละเอียด |
-|------|----------|
-| `users` | ผู้ใช้งาน พร้อม Image_User & Type_Personnel |
-| `elderlys` | ข้อมูลผู้สูงอายุ (ชื่อ, วันเกิด, ที่อยู่) |
-| `barthel_adls` | ผลการประเมิน ADL (10 ด้าน) |
-| `care_givers` | ข้อมูล Caregiver และสุขภาพผู้สูงอายุ (37+ ฟิลด์, nullable) |
-| `score_t_a_i_s` | ผลการประเมิน TAI พร้อม timestamps |
-| `care_instructions` | คำสั่งดูแลจากแพทย์ |
-| `activity_caregivers` | กิจกรรมรายวันของ Caregiver |
-| `news` | บทความข่าวสาร (title, content) |
-| `news_images` | รูปภาพข่าวสาร (JSON paths) |
-| `performance_report` | รวมผลการประเมินทั้งหมด |
-| `sliders` | ภาพบนหน้าแรก |
-
----
-
-## 🔐 ความปลอดภัย
-
-- ✅ Laravel Authentication + Session
-- ✅ Middleware Role-based Access Control
-- ✅ CSRF Token Protection
-- ✅ Password Hashing (Bcrypt)
-- ✅ SQL Injection Prevention (Eloquent ORM)
-- ✅ .env ไม่ Commit ลง Git
-
----
-
-## 📝 API Routes
-
-ดูรายละเอียด:
-```bash
-php artisan route:list
-```
-
----
-
-## 🚀 Deployment
-
-### การ Deploy ไปยัง Production
-
-1. ตั้งค่า `.env`:
-   ```env
-   APP_ENV=production
-   APP_DEBUG=false
-   ```
-
-2. ปรับ Composer:
-   ```bash
-   composer install --no-dev
-   ```
-
-3. Cache Configuration:
-   ```bash
-   php artisan config:cache
-   php artisan route:cache
-   ```
-
-4. ตั้งค่า Web Server (Nginx/Apache) ให้ Document Root = `public/`
-
-5. ติดตั้ง SSL Certificate
-
----
-
-## 🤝 ผู้ร่วมสร้าง
-
-- **พัฒนาโดย:** Combo (Combo0445)
-
----
-
-## 📧 ติดต่อ
-
-- **GitHub:** [https://github.com/Combo0445](https://github.com/Combo0445)
-
----
-
-## 📜 เวอร์ชั่นและอัปเดต
-
-**v1.1 (Feb 2026 - Security & Refactoring Audit)**
-- ✅ **Security Hardening**: เพิ่ม Soft Deletes ป้องกันข้อมูลลบถาวร
-- ✅ **Role-Based Access Control (RBAC)**: ควบรวม `Care Instruction` (หมอและสตาฟฟ์) ใช้ Controller ส่วนกลาง
-- ✅ **Performance**: แก้ไข Memory Leaks จากการเรียก `Model::all()` ใน Dashboard และ การปริ้น PDF
-- ✅ **File Upload Security**: เพิ่มระบบคัดกรองขนาดและประเภทไฟล์ (MIME types) แบบเข้มงวดให้ Slider และระบบอื่นๆ
-
-**v1.0 (Feb 2026)**
-- ✅ แก้ไข UrlGenerator error ใน Avatar
-- ✅ เพิ่มระบบข่าวสาร & Quill Editor
-- ✅ ทำให้ care_givers columns nullable
-- ✅ สร้างตาราง performance_report  
-- ✅ แก้ไข JavaScript onclick errors
-- ✅ Role-based Avatar Selection
-
----
-
-**ขอบคุณที่ใช้ระบบนี้ 🙏**
-
+*   🌍 **GitHub:** [https://github.com/Combo0445](https://github.com/Combo0445)

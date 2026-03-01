@@ -3,8 +3,7 @@
     $roleNames = [
         'Admin' => 'ผู้ดูแลระบบ',
         'Staff' => 'เจ้าหน้าที่',
-        'Doctor' => 'นายแพทย์',
-        'Pharmacist' => 'เภสัชกร'
+        'Doctor' => 'นายแพทย์'
     ];
     $currentRoleName = $roleNames[$role] ?? 'ผู้ใช้งาน';
 @endphp
@@ -50,7 +49,6 @@
                         @if($role === 'Admin') จัดการข้อมูลผู้ใช้
                         @elseif($role === 'Staff') จัดการข้อมูลผู้สูงอายุ
                         @elseif($role === 'Doctor') อ่านข้อมูลและให้คำแนะนำ
-                        @elseif($role === 'Pharmacist') จัดการคลังยา
                         @else แดชบอร์ด
                         @endif
                     </span>
@@ -66,6 +64,15 @@
                             <i class="material-icons opacity-10">assignment</i>
                         </div>
                         <span class="nav-link-text ms-1">จัดการข่าวสาร</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link text-white {{ Request::is('audit-logs') ? 'active bg-gradient-primary' : '' }}"
+                        href="{{ route('audit-logs.index') }}">
+                        <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
+                            <i class="material-icons opacity-10">history</i>
+                        </div>
+                        <span class="nav-link-text ms-1">ประวัติการใช้งาน (Audit Logs)</span>
                     </a>
                 </li>
             @endif
@@ -146,27 +153,6 @@
                 </li>
             @endif
 
-            {{-- Pharmacist Specific --}}
-            @if($role === 'Pharmacist' || $role === 'Admin')
-                <li class="nav-item">
-                    <a class="nav-link text-white {{ request('unconfirmed') ? 'active bg-gradient-primary' : '' }}"
-                        href="{{ route('care_instructions.index', ['unconfirmed' => 'true']) }}">
-                        <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
-                            <i class="material-icons opacity-10">announcement</i>
-                        </div>
-                        <span class="nav-link-text ms-1">คำแนะนำ (รอยืนยัน)</span>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link text-white {{ Request::is('medicines*') ? 'active bg-gradient-primary' : '' }}"
-                        href="{{ route('medicines.index') }}">
-                        <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
-                            <i class="material-icons opacity-10">local_pharmacy</i>
-                        </div>
-                        <span class="nav-link-text ms-1">จัดการคลังยา</span>
-                    </a>
-                </li>
-            @endif
 
             {{-- Doctor Specific --}}
             @if($role === 'Doctor')

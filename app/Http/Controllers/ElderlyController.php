@@ -26,11 +26,8 @@ class ElderlyController extends Controller
         DB::transaction(function () use ($request) {
             $elderly = new Elderly();
             $elderly->fill($request->only(['Name_Elderly', 'Gender', 'Birthday', 'Address', 'Phone_Elderly']));
-
-            if ($request->hasFile('Image_Elderly')) {
-                $imagePath = $request->file('Image_Elderly')->store('elderly_images', 'public');
-                $elderly->Image_Elderly = $imagePath;
-            }
+            $imageService = app(\App\Services\ImageUploadService::class);
+            $elderly->Image_Elderly = $imageService->handleSingleUpload($request->file('Image_Elderly'), 'elderly_images');
 
             $elderly->save();
 
@@ -59,14 +56,12 @@ class ElderlyController extends Controller
         DB::transaction(function () use ($request, $id) {
             $elderly = Elderly::findOrFail($id);
             $elderly->fill($request->only(['Name_Elderly', 'Gender', 'Birthday', 'Address', 'Phone_Elderly']));
-
-            if ($request->hasFile('Image_Elderly')) {
-                if ($elderly->Image_Elderly) {
-                    Storage::disk('public')->delete($elderly->Image_Elderly);
-                }
-                $imagePath = $request->file('Image_Elderly')->store('elderly_images', 'public');
-                $elderly->Image_Elderly = $imagePath;
-            }
+            $imageService = app(\App\Services\ImageUploadService::class);
+            $elderly->Image_Elderly = $imageService->handleSingleUpload(
+                $request->file('Image_Elderly'),
+                'elderly_images',
+                $elderly->Image_Elderly
+            );
 
             $elderly->save();
 
@@ -104,7 +99,7 @@ class ElderlyController extends Controller
 
     public function showReport()
     {
-        $elderlies = Elderly::paginate(20);
+        $elderlies = Elderly::with(['barthel_adl', 'care_giver'])->paginate(20);
 
         $ageGroupsData = Elderly::selectRaw('
             SUM(TIMESTAMPDIFF(YEAR, Birthday, CURDATE()) BETWEEN 60 AND 69) as age_60_69,
