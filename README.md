@@ -31,7 +31,7 @@
 
 ### 📈 4. Dashboard & Analytics
 *   สรุปข้อมูลสถิติประชากรผู้สูงอายุตามช่วงวัย และกลุ่มสุขภาพ (ADL Groups)
-*   **Performance Report:** สรุปผลประเมินทั้งหมดในรูปแบบตารางและ Export เป็น PDF/Excel ได้
+*   **Performance Report:** สรุปผลประเมินทั้งหมดในรูปแบบตารางและ Export เป็น PDF ได้
 
 ---
 
@@ -40,26 +40,23 @@
 *   **Backend:** PHP 8.1, Laravel 10 (MVC Architecture)
 *   **Frontend:** Blade Templates, Bootstrap 4, jQuery, DataTables
 *   **Database:** MySQL 8.0 (Relational Database Design)
-*   **Other Libraries:** mPDF (สำหรับสร้าง PDF), Maatwebsite Excel (สำหรับ Export ข้อมูล), Quill Editor (สำหรับจัดการบทความ)
+*   **Other Libraries:** mPDF (สำหรับสร้าง PDF), Quill Editor (สำหรับจัดการบทความ)
 
 ---
 
 ## 🛠 ทักษะทางวิศวกรรมซอฟต์แวร์ที่นำมาใช้ (Engineering Practices)
 
-โปรเจกต์นี้ไม่ได้มีแค่ฟีเจอร์ที่ทำงานได้จริง แต่ยังคำนึงถึงโครงสร้างโค้ดและความปลอดภัย:
-
-1.  **System Refactoring & Clean Architecture:**
-    *   แยกระบบที่ซับซ้อนและไม่ได้ใช้งาน (เช่น คลังยา) ออกจาก Core Logic เพื่อลด Dependency ที่ไม่จำเป็น (Decoupling) ทำให้โค้ดอ่านง่ายและบำรุงรักษาได้ลื่นไหลยิ่งขึ้น
-    *   ใช้ `DB::transaction()` ในการบันทึกข้อมูลแบบหลายตาราง (เช่น บันทึกผู้สูงอายุ + ข้อมูลที่อยู่) ป้องกันปัญหาข้อมูลตกหล่นหากเกิด Error กลางคัน
+1.  **Clean Architecture:**
+    *   ใช้ `DB::transaction()` ในการบันทึกข้อมูลแบบหลายตาราง ป้องกันปัญหาข้อมูลตกหล่นหากเกิด Error กลางคัน
 2.  **Security & Data Integrity:**
     *   Implement **Soft Deletes** (`deleted_at`) สำหรับข้อมูลสำคัญ ป้องกันการสูญหายของประวัติทางการแพทย์
     *   ป้องกันการโจมตีแบบ SQL Injection ด้วย Eloquent ORM อย่างเคร่งครัด
     *   ป้องกัน Cross-Site Scripting (XSS) ผ่านระบบ Blade Templating ของ Laravel
 3.  **Performance Optimization:**
-    *   ใช้วิธี **Eager Loading** (`with()`) ในการ Query ดึงข้อมูลที่มี Relationship กัน เพื่อแก้ปัญหา **N+1 Query Problem** ทำให้ระบบแสดงผล Report และ Dashboard ได้รวดเร็วขึ้นอย่างมาก
+    *   ใช้วิธี **Eager Loading** (`with()`) แก้ปัญหา **N+1 Query Problem** ทำให้ระบบแสดงผลได้รวดเร็วขึ้น
     *   ลดการเรียกใช้ `Model::all()` เปลี่ยนมาใช้ Query กรองและ Paginate ข้อมูลเสมอ
 4.  **Google Maps Integration:**
-    *   บูรณาการแผนที่เพื่อระบุตำแหน่งพิกัดบ้านผู้สูงอายุ ผ่านพิกัด Latitude/Longitude โดยไม่เกิดค่าใช้จ่าย API เปล่าประโยชน์
+    *   บูรณาการแผนที่เพื่อระบุตำแหน่งพิกัดบ้านผู้สูงอายุ ผ่านพิกัด Latitude/Longitude
 
 ---
 
@@ -94,6 +91,6 @@ php artisan serve
 **Combo (Combo0445)**
 *Software Developer / Web Programmer*
 
-ระบบนี้ถูกพัฒนาขึ้นด้วยความตั้งใจที่จะนำเทคโนโลยีมาประยุกต์ใช้กับระบบสาธารณสุขชุมชน โดยเน้นที่การใช้งานได้จริง โค้ดที่เป็นระเบียบ และพร้อมสำหรับการสเกลในอนาคต หากคุณกำลังมองหานักพัฒนาที่เข้าใจทั้ง Business Logic และ Technical Architecture ยินดีที่ได้รู้จักครับ!
+ระบบนี้ถูกพัฒนาขึ้นด้วยความตั้งใจที่จะนำเทคโนโลยีมาประยุกต์ใช้กับระบบสาธารณสุขชุมชน โดยเน้นที่การใช้งานได้จริง โค้ดที่เป็นระเบียบ และพร้อมสำหรับการสเกลในอนาคต
 
 *   🌍 **GitHub:** [https://github.com/Combo0445](https://github.com/Combo0445)
