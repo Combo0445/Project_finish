@@ -202,8 +202,8 @@ Route::middleware(['CheckLogin', 'IsStaff'])->group(function () {
     Route::get('/report/monthly-summary', [ReportController::class, 'MonthlySummary'])->name('report.monthly.summary');
 
     // Reports
-    Route::get('/report-all-adl', [ADLController::class, 'ReportADLAll'])->name('report.all.adl');
-    Route::get('/report-adl/{id}', [ADLController::class, 'ReportADL'])->name('report.adl');
+    Route::get('/report-all-adl', [ReportController::class, 'ReportADLAll'])->name('report.all.adl');
+    Route::get('/report-adl/{id}', [ReportController::class, 'ReportADL'])->name('report.adl');
     Route::get('/report-all-cg', [ReportController::class, 'ReportCGAll'])->name('report.all.cg');
     Route::get('report-cg/{id}', [ReportController::class, 'ReportCG'])->name('report.cg');
     Route::get('report-all-acg', [ReportController::class, 'ReportACGAll'])->name('report.all.acg');

@@ -9,7 +9,6 @@
             <tr>
                 <th style="text-align: center;">วันที่</th>
                 <th style="text-align: center;">ชื่อผู้สูงอายุ</th>
-                <th style="text-align: center;">ชื่อผู้รับผิดชอบ</th>
                 <th style="text-align: center;">คะแนน</th>
                 <th style="text-align: center;">กลุ่ม</th>
             </tr>
@@ -17,11 +16,18 @@
         <tbody>
             @foreach ($adls as $adl)
                 <tr>
-                    <td style="text-align: center;">{{ $adl->created_at ? $adl->created_at->format('Y-m-d') : '-' }}</td>
-                    <td style="text-align: center;">{{ $adl->Name_Elderly }}</td>
-                    <td style="text-align: center;">{{ $adl->Name_User }}</td>
-                    <td style="text-align: center;">{{ $adl->Score_ADL }}</td>
-                    <td style="text-align: center;">{{ $adl->Group_ADL }}</td>
+                    <td style="text-align: center;">
+                        {{ $adl->created_at ? \Carbon\Carbon::parse($adl->created_at)->translatedFormat('d F Y') : '-' }}
+                    </td>
+                    <td style="text-align: center;">
+                        {{ $adl->elderly->Name_Elderly ?? '-' }}
+                    </td>
+                    <td style="text-align: center;">
+                        {{ $adl->Score_ADL ?? '-' }}
+                    </td>
+                    <td style="text-align: center;">
+                        {{ $adl->Group_ADL ?? '-' }}
+                    </td>
                 </tr>
             @endforeach
         </tbody>

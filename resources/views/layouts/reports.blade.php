@@ -6,14 +6,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@yield('title', 'รายงาน')</title>
     <style>
-        font-family: 'sarabun',
-        sans-serif;
-        font-size: 18px;
-        font-weight: bold;
-        line-height: 1.2;
-        color: #000;
-        margin: 0;
-        padding: 5px;
+        /* ✅ แบบถูก — ใส่ใน body {} */
+        body {
+            font-family: 'sarabun', sans-serif;
+            font-size: 18px;
+            font-weight: bold;
+            line-height: 1.2;
+            color: #000;
+            margin: 0;
+            padding: 5px;
+        }
 
         .container {
             max-width: 800px;
@@ -39,7 +41,6 @@
             font-weight: bold;
             color: #000;
             margin: 0;
-            text-transform: uppercase;
             line-height: 1.2;
             text-align: center;
         }
@@ -73,6 +74,7 @@
             padding: 4px;
             text-align: left;
             font-size: 18px;
+            font-family: 'sarabun', sans-serif;
         }
 
         th {
@@ -127,12 +129,12 @@
 <body>
     <div class="container">
         <header class="header">
-            @if(!empty($logo))
+            @if (!empty($logo))
                 <img src="{{ $logo }}" class="logo">
             @endif
             <h1 class="report-title">@yield('report_title')</h1>
             <div class="report-meta">
-                พิมพ์เมื่อวันที่: {{ now()->translatedFormat('d F Y H:i') }} น.
+                พิมพ์เมื่อวันที่: {{ now()->format('d/m/Y H:i') }} น.
             </div>
         </header>
 

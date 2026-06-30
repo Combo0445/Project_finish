@@ -211,8 +211,8 @@ class ADLController extends Controller
             ->limit(200)
             ->get();
 
-        // Use ReportController logic style for consistency
-        $reportController = app(\App\Http\Controllers\ReportController::class);
+        // Use ReportController logic style for consistency//
+        return app(\App\Http\Controllers\ReportController::class)->ReportADLAll(request());
         $mpdf = new \Mpdf\Mpdf([
             'default_font_size' => 18,
             'default_font' => 'sarabun',
