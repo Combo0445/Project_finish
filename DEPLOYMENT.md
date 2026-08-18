@@ -1,10 +1,11 @@
 # คู่มือ Deploy (Deployment Guide)
 
-โปรเจกต์นี้เป็น Laravel 10 (PHP 8.1+, MySQL 8) พร้อม asset build ด้วย Vite รองรับการ deploy ได้ 3 แนวทาง เลือกตามสภาพแวดล้อมที่มี:
+โปรเจกต์นี้เป็น Laravel 10 (PHP 8.1+, MySQL 8) พร้อม asset build ด้วย Vite รองรับการ deploy ได้ 4 แนวทาง เลือกตามสภาพแวดล้อมที่มี:
 
 | แนวทาง | เหมาะกับ | ระดับความยาก |
 |---|---|---|
-| [Docker](#option-a-docker-แนะนำ) | VPS/Cloud ใดก็ได้ที่รัน Docker ได้ (Railway, Render, DigitalOcean, self-hosted) | ง่ายที่สุด, ทำซ้ำได้แน่นอน |
+| [Railway](#option-d-railway-เร็วที่สุด-ฟรี) | ทำ live demo/portfolio แบบไม่มีค่าใช้จ่าย ไม่ต้องมี VPS | ง่ายที่สุด, ~5 นาที |
+| [Docker](#option-a-docker-แนะนำ) | VPS/Cloud ใดก็ได้ที่รัน Docker ได้ (Render, DigitalOcean, self-hosted) | ง่าย, ทำซ้ำได้แน่นอน |
 | [VPS แบบ manual](#option-b-vps-manual-nginx--php-fpm) | VPS ที่มี SSH เต็มรูปแบบ | ปานกลาง |
 | [Shared hosting (cPanel)](#option-c-shared-hosting-cpanel) | โฮสต์ราคาถูก/ฟรีที่ไม่มี SSH หรือ Docker | ยุ่งยากสุด, มีข้อจำกัด |
 
@@ -155,6 +156,40 @@ server {
 7. ถ้า cPanel รองรับ "Setup Node.js/PHP App" ให้ตั้ง PHP version เป็น 8.1+ และ document root เป็นโฟลเดอร์ที่มีไฟล์จาก `public/`
 
 **ข้อจำกัด**: หลาย shared host ไม่มี cron จริง (ต้องใช้ cPanel Cron Jobs แทน `queue:work`/scheduler) และบาง host block `exec()`/`shell_exec()` ที่ mPDF อาจเรียกใช้ภายใน ถ้าเจอปัญหาสร้าง PDF ไม่ได้ ให้ตรวจสอบ PHP disabled functions ในหน้า cPanel ก่อน
+
+---
+
+## Option D: Railway (เร็วที่สุด, ฟรี)
+
+เหมาะที่สุดสำหรับทำ **live demo ใส่พอร์ตโฟลิโอ** — ไม่ต้องมี VPS ไม่ต้องผูกบัตรเครดิต ใช้ `Dockerfile` ตัวเดียวกับ Option A ได้เลยโดยไม่ต้องแก้อะไร (entrypoint รองรับ `$PORT` ที่ Railway inject ให้อัตโนมัติอยู่แล้ว)
+
+1. **Push โค้ดขึ้น GitHub** (ถ้ายังไม่ได้ push) — Railway deploy จาก GitHub repo โดยตรง
+2. สมัคร/ล็อกอิน **[railway.app](https://railway.app)** ด้วยบัญชี GitHub
+3. **New Project → Deploy from GitHub repo** → เลือก repo นี้ Railway จะตรวจเจอ `Dockerfile` และ build ให้อัตโนมัติ
+4. **เพิ่มฐานข้อมูล**: ในโปรเจกต์เดียวกัน กด **+ New → Database → Add MySQL** (มี free tier ในตัว)
+5. **ตั้งค่า Environment Variables** ที่ service ของแอป (แท็บ Variables) — อ้างอิงค่าจาก MySQL service ที่เพิ่งสร้างด้วย syntax `${{ ServiceName.VAR }}`:
+   ```
+   APP_ENV=production
+   APP_DEBUG=false
+   APP_URL=https://<ชื่อโปรเจกต์>.up.railway.app   # แก้เป็น domain จริงที่ Railway ออกให้หลัง deploy ครั้งแรก
+   APP_KEY=                                          # รันคำสั่งด้านล่างเพื่อสร้าง แล้วเอามาใส่
+   DB_CONNECTION=mysql
+   DB_HOST=${{MySQL.MYSQLHOST}}
+   DB_PORT=${{MySQL.MYSQLPORT}}
+   DB_DATABASE=${{MySQL.MYSQLDATABASE}}
+   DB_USERNAME=${{MySQL.MYSQLUSER}}
+   DB_PASSWORD=${{MySQL.MYSQLPASSWORD}}
+   ```
+   สร้างค่า `APP_KEY` จากเครื่องตัวเอง (ไม่ต้องมี DB ต่อก็รันได้): `php artisan key:generate --show`
+6. Railway จะ redeploy อัตโนมัติเมื่อบันทึก environment variables — `docker/entrypoint.sh` จะรัน migrate ให้เองตอน container start
+7. หลัง deploy สำเร็จ เข้า Settings ของ service เพื่อดู public domain (`https://<ชื่อโปรเจกต์>.up.railway.app`) แล้วย้อนกลับไปแก้ `APP_URL` ให้ตรงกับ domain จริงตามข้อ 5
+8. สร้างข้อมูล demo (ปลอดภัย ไม่ใช่ข้อมูลจริง) ผ่าน Railway's web shell หรือ CLI:
+   ```bash
+   railway run php artisan db:seed --class=DemoSeeder --force
+   ```
+   หรือถ้าไม่ได้ติดตั้ง Railway CLI ให้เปิด Terminal ในหน้า service (Railway มี built-in shell ให้ใช้ได้จาก dashboard)
+
+**ค่าใช้จ่าย**: free tier ของ Railway มี usage credit ให้ทุกเดือน เพียงพอสำหรับ demo พอร์ตโฟลิโอที่มีคนเข้าดูไม่เยอะ — ถ้า credit หมดแอปจะ sleep ไม่ได้ถูกลบ เปิดเข้าอีกครั้งจะ wake ขึ้นมาเอง
 
 ---
 
