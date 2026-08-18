@@ -1,11 +1,8 @@
-<!DOCTYPE html>
-<html lang="en">
+@extends('layouts.app')
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>แก้ไขแบบประเมิน TAI</title>
-    <link href="{{ url('assets/css/argon-dashboard.css') }}" rel="stylesheet" />
+@section('title', 'แก้ไขแบบประเมิน TAI')
+
+@push('styles')
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -29,11 +26,9 @@
             font-weight: bold;
         }
     </style>
-</head>
+@endpush
 
-<body>
-    @include('layout.nav')
-
+@section('content')
     <div class="container mt-5">
         <div class="card">
             <div class="card-header">
@@ -43,6 +38,17 @@
                 @if (session('success'))
                     <div class="alert alert-success">
                         {{ session('success') }}
+                    </div>
+                @endif
+
+                @if ($errors->any())
+                    <div class="alert alert-danger">
+                        <strong>กรุณาตรวจสอบข้อมูลที่กรอก:</strong>
+                        <ul class="mb-0">
+                            @foreach ($errors->all() as $error)
+                                <li>{{ $error }}</li>
+                            @endforeach
+                        </ul>
                     </div>
                 @endif
 
@@ -117,7 +123,9 @@
             </div>
         </div>
     </div>
+@endsection
 
+@push('scripts')
     <script>
         function calculateTotalScore() {
             let mobility = document.querySelector('input[name="mobility"]:checked');
@@ -191,8 +199,4 @@
             calculateTotalScore(); // คำนวณค่าครั้งแรกเมื่อโหลดหน้าเว็บ
         });
     </script>
-
-</body>
-
-
-</html>
+@endpush

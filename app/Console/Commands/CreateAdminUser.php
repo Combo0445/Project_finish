@@ -47,6 +47,7 @@ class CreateAdminUser extends Command
             'Phone' => '-',
             'Image_User' => 'images-user/Admin.jpg',
             'line_token' => null,
+            'is_admin_permanent' => true,
         ]);
 
         $this->info("สร้างแอดมิน {$username} เรียบร้อยแล้ว!");

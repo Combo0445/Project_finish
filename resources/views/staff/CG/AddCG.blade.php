@@ -1,13 +1,8 @@
-<!DOCTYPE html>
-<html lang="en">
+@extends('layouts.app')
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Add Care Giver</title>
-    <link href="{{ url('assets/css/argon-dashboard.css') }}" rel="stylesheet" />
-    <link href="{{ url('assets/css/nucleo-icons.css') }}" rel="stylesheet" />
-    <link href="{{ url('assets/css/nucleo-svg.css') }}" rel="stylesheet" />
+@section('title', 'Add Care Giver')
+
+@push('styles')
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -132,11 +127,9 @@
             }
         }
     </script>
-</head>
+@endpush
 
-<body>
-    @include('layout.nav')
-
+@section('content')
     <div class="assessment-container px-3">
         <div class="card">
             <div class="card-header">
@@ -155,6 +148,12 @@
                     @if (session('success'))
                         <div class="alert alert-success text-white">
                             {{ session('success') }}
+                        </div>
+                    @endif
+
+                    @if (session('error'))
+                        <div class="alert alert-danger text-white">
+                            {{ session('error') }}
                         </div>
                     @endif
 
@@ -178,12 +177,12 @@
                                 <div class="col-md-6 form-group">
                                     <label for="Name_CG">ชื่อผู้ดูแลผู้สูงอายุ</label>
                                     <input type="text" id="Name_CG" name="Name_CG" class="form-control form-control-lg"
-                                        required>
+                                        required value="{{ old('Name_CG') }}">
                                 </div>
                                 <div class="col-md-6 form-group">
                                     <label for="Related">เกี่ยวข้องเป็น</label>
                                     <input type="text" id="Related" name="Related" class="form-control form-control-lg"
-                                        required>
+                                        required value="{{ old('Related') }}">
                                 </div>
                             </div>
 
@@ -191,7 +190,7 @@
                                 <div class="col-md-6 form-group">
                                     <label for="Phone_CG">เบอร์ติดต่อ</label>
                                     <input type="number" id="Phone_CG" name="Phone_CG"
-                                        class="form-control form-control-lg" required>
+                                        class="form-control form-control-lg" required value="{{ old('Phone_CG') }}">
                                 </div>
                                 <div class="col-md-6 form-group">
                                     <label for="ID_Elderly">ชื่อ-สกุลผู้สูงอายุ</label>
@@ -199,13 +198,13 @@
                                         onchange="fetchElderlyDetails()" required>
                                         <option value="">เลือกผู้สูงอายุ</option>
                                         @foreach ($elderlys as $elderly)
-                                            <option value="{{ $elderly->ID_ADL }}" 
-                                                {{ (isset($selected_elderly_id) && $selected_elderly_id == $elderly->ID_ADL) ? 'selected' : '' }}>
+                                            <option value="{{ $elderly->ID_ADL }}"
+                                                {{ old('ID_Elderly', $selected_elderly_id ?? null) == $elderly->ID_ADL ? 'selected' : '' }}>
                                                 {{ $elderly->elderly->Name_Elderly }}
                                             </option>
                                         @endforeach
                                     </select>
-                                    @if(isset($selected_elderly_id))
+                                    @if(old('ID_Elderly', $selected_elderly_id ?? null))
                                         <script>
                                             window.onload = function() {
                                                 fetchElderlyDetails();
@@ -232,17 +231,17 @@
                                 <div class="col-md-4 form-group">
                                     <label for="Weight">น้ำหนักตัว (กก.)</label>
                                     <input type="number" id="Weight" name="Weight" class="form-control form-control-lg"
-                                        step="0.1" required>
+                                        step="0.1" required value="{{ old('Weight') }}">
                                 </div>
                                 <div class="col-md-4 form-group">
                                     <label for="Height">ส่วนสูง (ซม.)</label>
                                     <input type="number" id="Height" name="Height" class="form-control form-control-lg"
-                                        step="0.1" required>
+                                        step="0.1" required value="{{ old('Height') }}">
                                 </div>
                                 <div class="col-md-4 form-group">
                                     <label for="Waist">รอบเอว (ซม.)</label>
                                     <input type="number" id="Waist" name="Waist" class="form-control form-control-lg"
-                                        step="0.1" required>
+                                        step="0.1" required value="{{ old('Waist') }}">
                                 </div>
                             </div>
 
@@ -269,12 +268,12 @@
                             <div class="row">
                                 <div class="col-md-6 form-group">
                                     <label for="Disease">โรคประจำตัว</label>
-                                    <input type="text" id="Disease" name="Disease" class="form-control form-control-lg">
+                                    <input type="text" id="Disease" name="Disease" class="form-control form-control-lg" value="{{ old('Disease') }}">
                                 </div>
                                 <div class="col-md-6 form-group">
                                     <label for="Disability">ความพิการ</label>
                                     <input type="text" id="Disability" name="Disability"
-                                        class="form-control form-control-lg">
+                                        class="form-control form-control-lg" value="{{ old('Disability') }}">
                                 </div>
                             </div>
 
@@ -291,7 +290,7 @@
                                     <div class="col-md-6 form-group">
                                         <label for="Date">ลงเวลารายงานผลการปฏิบัติงาน</label>
                                         <input type="date" id="Date" name="Date" class="form-control form-control-lg"
-                                            required>
+                                            required value="{{ old('Date') }}">
                                     </div>
                                     <div class="col-md-6 form-group">
                                         <label for="Consciousness">ความรู้สึกตัว</label>
@@ -503,12 +502,12 @@
                                 <div class="col-md-6 form-group">
                                     <label for="Other_problems">ปัญหาอื่น ๆ</label>
                                     <input type="text" id="Other_problems" name="Other_problems"
-                                        class="form-control form-control-lg">
+                                        class="form-control form-control-lg" value="{{ old('Other_problems') }}">
                                 </div>
                                 <div class="col-md-6 form-group">
                                     <label for="Assistance">การช่วยเหลือ</label>
                                     <input type="text" id="Assistance" name="Assistance"
-                                        class="form-control form-control-lg">
+                                        class="form-control form-control-lg" value="{{ old('Assistance') }}">
                                 </div>
                             </div>
 
@@ -552,6 +551,83 @@
             </div>
         </div>
     </div>
+@endsection
+
+@push('scripts')
+    <script>
+        // Wizard step navigation (previously missing entirely — the form had no way
+        // to reach step 2/3 or reveal the submit button, so it could not be saved at all)
+        document.addEventListener('DOMContentLoaded', function () {
+            let currentStep = 1;
+            const totalSteps = 3;
+
+            const updateUI = () => {
+                document.querySelectorAll('.wizard-step').forEach(el => el.classList.remove('active'));
+                document.getElementById(`step-${currentStep}`).classList.add('active');
+
+                document.querySelectorAll('.step-dot').forEach((el, index) => {
+                    if (index + 1 < currentStep) {
+                        el.classList.add('completed');
+                        el.classList.remove('active');
+                    } else if (index + 1 === currentStep) {
+                        el.classList.add('active');
+                        el.classList.remove('completed');
+                    } else {
+                        el.classList.remove('active', 'completed');
+                    }
+                });
+
+                document.getElementById('btn-prev').style.display = currentStep > 1 ? 'block' : 'none';
+
+                if (currentStep === totalSteps) {
+                    document.getElementById('btn-next').style.display = 'none';
+                    document.getElementById('btn-submit').style.display = 'block';
+                } else {
+                    document.getElementById('btn-next').style.display = 'block';
+                    document.getElementById('btn-submit').style.display = 'none';
+                }
+            };
+
+            const validateStep = (step) => {
+                const stepEl = document.getElementById(`step-${step}`);
+                const invalid = stepEl.querySelector(':invalid');
+                if (invalid) {
+                    invalid.reportValidity();
+                    return false;
+                }
+                return true;
+            };
+
+            document.getElementById('btn-next').addEventListener('click', () => {
+                if (validateStep(currentStep) && currentStep < totalSteps) {
+                    currentStep++;
+                    updateUI();
+                    window.scrollTo(0, 0);
+                }
+            });
+
+            document.getElementById('btn-prev').addEventListener('click', () => {
+                if (currentStep > 1) {
+                    currentStep--;
+                    updateUI();
+                    window.scrollTo(0, 0);
+                }
+            });
+
+            @if ($errors->any())
+                // Redisplayed after a validation error: jump to the first step that has one
+                for (let s = 1; s <= totalSteps; s++) {
+                    if (document.getElementById(`step-${s}`).querySelector(':invalid')) {
+                        currentStep = s;
+                        break;
+                    }
+                }
+            @endif
+
+            updateUI();
+        });
+    </script>
+
     <script>
         function validateAndPreviewImages(input) {
             const preview = document.getElementById('imagePreview');
@@ -647,8 +723,9 @@
 
         document.getElementById('assessment-form').addEventListener('submit', function (event) {
             concatenateVitalSigns();
+            const submitBtn = document.getElementById('btn-submit');
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status"></span> กำลังบันทึก...';
         });
     </script>
-</body>
-
-</html>
+@endpush

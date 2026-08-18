@@ -38,11 +38,51 @@ class AuthController extends Controller
         if (Hash::check($request->password, $user->Password)) {
             Auth::login($user);
 
+            // Admin accounts can act as any role — let them pick which one to use this session
+            if ($user->is_admin_permanent) {
+                return redirect()->route('select-role');
+            }
+
             return redirect()->intended('dashboard');
         }
 
         // If password is incorrect, return with error
         return back()->with('fail', 'รหัสผ่านไม่ถูกต้อง');
+    }
+
+    public function selectRole()
+    {
+        $user = Auth::user();
+
+        // Only admin accounts have more than one role to choose from
+        if (!$user->is_admin_permanent) {
+            return redirect()->route('dashboard');
+        }
+
+        $roles = [
+            'Admin' => 'ผู้ดูแลระบบ',
+            'Staff' => 'เจ้าหน้าที่',
+            'Doctor' => 'แพทย์',
+        ];
+
+        return view('login.select-role', compact('roles'));
+    }
+
+    public function chooseRole(Request $request)
+    {
+        $user = Auth::user();
+
+        if (!$user->is_admin_permanent) {
+            return redirect()->route('dashboard');
+        }
+
+        $request->validate([
+            'role' => 'required|in:Admin,Staff,Doctor',
+        ]);
+
+        $user->update(['Type_Personnel' => $request->role]);
+
+        return redirect()->route('dashboard');
     }
 
 

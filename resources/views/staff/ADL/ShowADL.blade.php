@@ -204,7 +204,7 @@
         }
 
         // PDF Generation Logic
-        document.getElementById('generate-pdf').addEventListener('click', function () {
+        document.getElementById('generate-pdf')?.addEventListener('click', function () {
             var filteredData = $('#adlTable').DataTable().rows({ filter: 'applied' }).data().toArray();
             if (filteredData.length === 0) {
                 Swal.fire('ไม่พบข้อมูลที่ตรงกับการค้นหา', '', 'error');

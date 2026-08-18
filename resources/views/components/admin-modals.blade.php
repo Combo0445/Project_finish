@@ -84,8 +84,8 @@
 </div>
 
 <!-- Modal for Create Slider -->
-<div class="modal fade" id="createSliderModal" tabindex="-1" role="dialog" aria-labelledby="createSliderModalLabel"
-    aria-hidden="true">
+<div class="modal fade" id="createSliderModal" tabindex="-1" role="dialog"
+    aria-labelledby="createSliderModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered" role="document">
         <div class="modal-content">
             <div class="modal-header">
@@ -113,37 +113,56 @@
     </div>
 </div>
 
-<!-- Modal for Edit Slider -->
-<div class="modal fade" id="editSliderModal" tabindex="-1" role="dialog" aria-labelledby="editSliderModalLabel"
-    aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered" role="document">
+<!-- Modal เลือกรูป Slider -->
+<div class="modal fade" id="selectSliderModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
         <div class="modal-content">
+
             <div class="modal-header">
-                <h5 class="modal-title" id="editSliderModalLabel">แก้ไขรูปเลื่อนสไลด์</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
+                <h5 class="modal-title">เลือกรูปที่ต้องการแก้ไข</h5>
+
+                <button type="button" class="close" data-dismiss="modal">
+                    <span>&times;</span>
                 </button>
             </div>
+
             <div class="modal-body">
-                <form id="editSliderForm" method="POST" enctype="multipart/form-data">
-                    @csrf
-                    @method('PUT')
-                    <div class="form-group">
-                        <label for="currentImage">รูปภาพปัจจุบัน:</label>
-                        <img id="currentImage" src="" alt="Slider Image" width="100">
-                    </div>
-                    <div class="form-group">
-                        <input type="file" id="editSliderImageFile" name="image" class="form-control-file"
-                            style="display: none;">
-                        <button type="button" class="btn btn-login"
-                            onclick="document.getElementById('editSliderImageFile').click()">เลือกไฟล์รูป</button>
-                    </div>
-                    <div class="form-group">
-                        <div id="editSliderImagePreview" style="display: flex; flex-wrap: wrap; gap: 10px;"></div>
-                    </div>
-                    <button type="submit" class="btn btn-success">บันทึก</button>
-                </form>
+
+                <div class="row">
+
+                    @foreach ($sliders as $slider)
+                        <div class="col-md-4 text-center mb-3">
+
+                            <img src="{{ asset('storage/' . $slider->image) }}" class="img-fluid rounded mb-2"
+                                style="height:150px;object-fit:cover;">
+
+                            <button class="btn btn-warning btn-sm"
+                                onclick="openEditSlider('{{ $slider->id }}','{{ $slider->image }}')">
+
+                                เลือกรูปนี้
+
+                            </button>
+
+                            <button type="button" class="btn btn-danger btn-sm"
+                                onclick="confirmDeleteSlider('{{ $slider->id }}')">
+
+                                ลบ
+
+                            </button>
+                            <form id="delete-slider-form-{{ $slider->id }}"
+                                action="{{ route('admin.sliders.destroy', $slider->id) }}" method="POST"
+                                style="display:none;">
+                                @csrf
+                                @method('DELETE')
+                            </form>
+
+                        </div>
+                    @endforeach
+
+                </div>
+
             </div>
+
         </div>
     </div>
 </div>

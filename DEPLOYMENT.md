@@ -2,7 +2,7 @@
 
 โปรเจกต์นี้เป็น Laravel 10 (PHP 8.1+, MySQL 8) พร้อม asset build ด้วย Vite รองรับการ deploy ได้ 4 แนวทาง เลือกตามสภาพแวดล้อมที่มี:
 
-| แนวทาง | เหมาะกับ | ระดับความยาก |`
+| แนวทาง | เหมาะกับ | ระดับความยาก |
 |---|---|---|
 | [Railway](#option-d-railway-เร็วที่สุด-ฟรี) | ทำ live demo/portfolio แบบไม่มีค่าใช้จ่าย ไม่ต้องมี VPS | ง่ายที่สุด, ~5 นาที |
 | [Docker](#option-a-docker-แนะนำ) | VPS/Cloud ใดก็ได้ที่รัน Docker ได้ (Render, DigitalOcean, self-hosted) | ง่าย, ทำซ้ำได้แน่นอน |

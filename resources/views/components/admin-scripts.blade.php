@@ -5,7 +5,7 @@
         for (let i = 0; i < event.target.files.length; i++) {
             let file = event.target.files[i];
             let reader = new FileReader();
-            reader.onload = function (e) {
+            reader.onload = function(e) {
                 let img = document.createElement('img');
                 img.src = e.target.result;
                 img.style.width = '100px';
@@ -18,13 +18,13 @@
         }
     }
 
-    document.getElementById('edit-images')?.addEventListener('change', function (event) {
+    document.getElementById('edit-images')?.addEventListener('change', function(event) {
         let editImagePreview = document.getElementById('editImagePreview');
         editImagePreview.innerHTML = '';
         for (let i = 0; i < event.target.files.length; i++) {
             let file = event.target.files[i];
             let reader = new FileReader();
-            reader.onload = function (e) {
+            reader.onload = function(e) {
                 let img = document.createElement('img');
                 img.src = e.target.result;
                 img.style.width = '100px';
@@ -37,13 +37,13 @@
         }
     });
 
-    document.getElementById('sliderImageFile')?.addEventListener('change', function (event) {
+    document.getElementById('sliderImageFile')?.addEventListener('change', function(event) {
         let imagePreview = document.getElementById('sliderImagePreview');
         imagePreview.innerHTML = '';
         for (let i = 0; i < event.target.files.length; i++) {
             let file = event.target.files[i];
             let reader = new FileReader();
-            reader.onload = function (e) {
+            reader.onload = function(e) {
                 let img = document.createElement('img');
                 img.src = e.target.result;
                 img.style.width = '100px';
@@ -56,13 +56,13 @@
         }
     });
 
-    document.getElementById('editSliderImageFile')?.addEventListener('change', function (event) {
+    document.getElementById('editSliderImageFile')?.addEventListener('change', function(event) {
         let imagePreview = document.getElementById('editSliderImagePreview');
         imagePreview.innerHTML = '';
         for (let i = 0; i < event.target.files.length; i++) {
             let file = event.target.files[i];
             let reader = new FileReader();
-            reader.onload = function (e) {
+            reader.onload = function(e) {
                 let img = document.createElement('img');
                 img.src = e.target.result;
                 img.style.width = '100px';
@@ -103,14 +103,36 @@
             theme: 'snow',
             modules: {
                 toolbar: [
-                    [{ header: [1, 2, 3, 4, 5, 6, false] }],
+                    [{
+                        header: [1, 2, 3, 4, 5, 6, false]
+                    }],
                     ['bold', 'italic', 'underline'],
-                    [{ list: 'ordered' }, { list: 'bullet' }],
-                    [{ script: 'sub' }, { script: 'super' }],
-                    [{ indent: '-1' }, { indent: '+1' }],
-                    [{ color: [] }, { background: [] }],
-                    [{ font: [] }],
-                    [{ align: [] }],
+                    [{
+                        list: 'ordered'
+                    }, {
+                        list: 'bullet'
+                    }],
+                    [{
+                        script: 'sub'
+                    }, {
+                        script: 'super'
+                    }],
+                    [{
+                        indent: '-1'
+                    }, {
+                        indent: '+1'
+                    }],
+                    [{
+                        color: []
+                    }, {
+                        background: []
+                    }],
+                    [{
+                        font: []
+                    }],
+                    [{
+                        align: []
+                    }],
                     ['clean']
                 ]
             }
@@ -122,38 +144,60 @@
             theme: 'snow',
             modules: {
                 toolbar: [
-                    [{ header: [1, 2, 3, 4, 5, 6, false] }],
+                    [{
+                        header: [1, 2, 3, 4, 5, 6, false]
+                    }],
                     ['bold', 'italic', 'underline'],
-                    [{ list: 'ordered' }, { list: 'bullet' }],
-                    [{ script: 'sub' }, { script: 'super' }],
-                    [{ indent: '-1' }, { indent: '+1' }],
-                    [{ color: [] }, { background: [] }],
-                    [{ font: [] }],
-                    [{ align: [] }],
+                    [{
+                        list: 'ordered'
+                    }, {
+                        list: 'bullet'
+                    }],
+                    [{
+                        script: 'sub'
+                    }, {
+                        script: 'super'
+                    }],
+                    [{
+                        indent: '-1'
+                    }, {
+                        indent: '+1'
+                    }],
+                    [{
+                        color: []
+                    }, {
+                        background: []
+                    }],
+                    [{
+                        font: []
+                    }],
+                    [{
+                        align: []
+                    }],
                     ['clean']
                 ]
             }
         });
     }
 
-    document.querySelector('#createNewsModal form')?.addEventListener('submit', function () {
+    document.querySelector('#createNewsModal form')?.addEventListener('submit', function() {
         if (quillContent) document.getElementById('content').value = quillContent.root.innerHTML;
     });
 
-    document.querySelector('#editNewsForm')?.addEventListener('submit', function () {
+    document.querySelector('#editNewsForm')?.addEventListener('submit', function() {
         if (quillEditContent) document.getElementById('edit-content').value = quillEditContent.root.innerHTML;
     });
 
     function showEditModal(id, title, content, images) {
         const form = document.getElementById('editNewsForm');
         if (!form) return;
-        form.action = '{{ route("admin.news.update", ":id") }}'.replace(':id', id);
+        form.action = '{{ route('admin.news.update', ':id') }}'.replace(':id', id);
         document.getElementById('edit-title').value = title;
         if (quillEditContent) quillEditContent.root.innerHTML = content;
 
         let imageContainer = document.getElementById('currentNewsImages');
         imageContainer.innerHTML = '';
-        images.forEach(function (imagePath) {
+        images.forEach(function(imagePath) {
             let img = document.createElement('img');
             img.src = `${imagePath}`;
             img.alt = 'Current News Image';
@@ -165,9 +209,9 @@
         $('#editNewsModal').modal('show');
     }
 
-    document.addEventListener('DOMContentLoaded', function () {
-        document.querySelectorAll('.edit-news-btn').forEach(function (btn) {
-            btn.addEventListener('click', function () {
+    document.addEventListener('DOMContentLoaded', function() {
+        document.querySelectorAll('.edit-news-btn').forEach(function(btn) {
+            btn.addEventListener('click', function() {
                 const id = this.getAttribute('data-id');
                 const title = JSON.parse(this.getAttribute('data-title') || '""');
                 const content = JSON.parse(this.getAttribute('data-content') || '""');
@@ -180,8 +224,18 @@
     function setSliderData(id, image) {
         const form = document.getElementById('editSliderForm');
         if (!form) return;
-        form.action = '{{ route("admin.sliders.update", ":id") }}'.replace(':id', id);
+        form.action = '{{ route('admin.sliders.update', ':id') }}'.replace(':id', id);
         document.getElementById('currentImage').src = `{{ url('storage') }}/${image}`;
+    }
+
+    function openEditSlider(id, image) {
+
+        setSliderData(id, image);
+
+        $('#selectSliderModal').modal('hide');
+
+        $('#editSliderModal').modal('show');
+
     }
 
     function confirmDeleteNews(newsId) {
