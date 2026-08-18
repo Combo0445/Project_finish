@@ -10,9 +10,12 @@ class TrustProxies extends Middleware
     /**
      * The trusted proxies for this application.
      *
+     * Trusting all proxies so HTTPS/host detection works correctly behind a
+     * reverse proxy (Docker/Nginx, load balancers, most managed hosts).
+     *
      * @var array<int, string>|string|null
      */
-    protected $proxies;
+    protected $proxies = '*';
 
     /**
      * The headers that should be used to detect proxies.

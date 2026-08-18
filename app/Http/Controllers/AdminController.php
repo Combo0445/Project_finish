@@ -327,6 +327,11 @@ class AdminController extends Controller
         ]);
     }
 
+    public function reportUserPdfContent()
+    {
+        return view('admin.report-admin');
+    }
+
     public function switchRole($role)
     {
         $allowedRoles = ['Staff', 'Doctor'];

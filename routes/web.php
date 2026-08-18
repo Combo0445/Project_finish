@@ -8,37 +8,21 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\PersonnelController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\CGController;
-use App\Models\BarthelAdl;
-use App\Models\CareGiver;
 use App\Http\Controllers\ADLExportController;
 use App\Http\Controllers\CGExportController;
 use App\Http\Controllers\TAIController;
 use App\Http\Controllers\PerformanceReportController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\PageController;
 
 /* |-------------------------------------------------------------------------- | Web Routes |-------------------------------------------------------------------------- | | Here is where you can register web routes for your application. These | routes are loaded by the RouteServiceProvider and all of them will | be assigned to the "web" middleware group. Make something great! | */
 
-Route::get('/', function () {
-    $sliders = App\Models\Slider::orderBy('id', 'desc')->get();
-    $news = App\Models\News::orderBy('id', 'desc')->get();
+Route::get('/up', [PageController::class, 'up'])->name('health');
 
-    $adlAssessmentCount = BarthelAdl::count();
-    $cgAssessmentCount = CareGiver::count();
+Route::get('/', [PageController::class, 'home'])->name('welcome');
 
-    $adlGroupCounts = [
-        'กลุ่มติดสังคม' => BarthelAdl::where('Group_ADL', 'กลุ่มติดสังคม')->count(),
-        'กลุ่มติดบ้าน' => BarthelAdl::where('Group_ADL', 'กลุ่มติดบ้าน')->count(),
-        'กลุ่มติดเตียง' => BarthelAdl::where('Group_ADL', 'กลุ่มติดเตียง')->count(),
-    ];
-
-    return view('welcome', compact('sliders', 'news', 'adlAssessmentCount', 'cgAssessmentCount', 'adlGroupCounts'));
-})->name('welcome');
-
-Route::get('/news/{id}', function ($id) {
-    $newsItem = App\Models\News::findOrFail($id);
-    return view('layout.newshow', compact('newsItem'));
-})->name('news.show');
+Route::get('/news/{id}', [PageController::class, 'newsShow'])->name('news.show');
 
 
 
@@ -67,26 +51,16 @@ Route::controller(AuthController::class)->group(function () {
 
 
 
-Route::get('/contact', function () {
-    return view('layout.contact');
-})->name('contact');
-Route::get('/about', function () {
-    return view('layout.about');
-})->name('about');
-Route::get('/about/history', function () {
-    return view('layout.history');
-})->name('history');
-Route::get('/about/vision', function () {
-    return view('layout.vision');
-})->name('vision');
+Route::get('/contact', [PageController::class, 'contact'])->name('contact');
+Route::get('/about', [PageController::class, 'about'])->name('about');
+Route::get('/about/history', [PageController::class, 'history'])->name('history');
+Route::get('/about/vision', [PageController::class, 'vision'])->name('vision');
 
 Route::get('/about/personnel', [PersonnelController::class, 'showPersonnel'])->name('personnel');
 
 
 
-Route::get('error', function () {
-    return view('error.error');
-});
+Route::get('error', [PageController::class, 'error']);
 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////Middleware
@@ -112,12 +86,7 @@ Route::middleware(['CheckLogin', 'IsAdmin'])->group(function () {
 
     // Reports
     Route::get('/admin/report-user-pdf', [AdminController::class, 'ReportUser'])->name('admin.report-user');
-    Route::get(
-        '/admin/report-user-pdf-content',
-        function () {
-            return view('admin.report-admin');
-        }
-    );
+    Route::get('/admin/report-user-pdf-content', [AdminController::class, 'reportUserPdfContent']);
 
     // Layout & Settings
     Route::get('layout-admin', [AdminController::class, 'ShowlayoutAdmin'])->name('admin.layout-admin');

@@ -86,6 +86,16 @@ php artisan serve
 
 ---
 
+## 🚀 การ Deploy ขึ้น Production
+
+รองรับการ deploy 3 แนวทาง (Docker, VPS แบบ manual, Shared hosting cPanel) พร้อม `Dockerfile`/`docker-compose.yml` สำเร็จรูป — ดูรายละเอียดทั้งหมดที่ [DEPLOYMENT.md](DEPLOYMENT.md)
+
+```bash
+docker compose up -d --build
+```
+
+---
+
 ## 👨‍💻 เกี่ยวกับผู้พัฒนา (About Developer)
 
 **Combo (Combo0445)**
