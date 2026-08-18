@@ -8,6 +8,8 @@
 .env
 .env.backup
 .env.production
+.env.docker
+.env.*.local
 Homestead.json
 Homestead.yaml
 auth.json

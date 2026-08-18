@@ -38,8 +38,10 @@
 5. รัน `php artisan storage:link` (สำหรับไฟล์ที่ผ่าน Storage disk เช่น export/report)
 6. cache ให้ครบเพื่อ performance: `php artisan config:cache && php artisan route:cache && php artisan view:cache`
    (โปรเจกต์นี้แก้ route closures ทั้งหมดเป็น controller แล้ว ทำให้ `route:cache` ใช้งานได้)
-7. สร้างผู้ดูแลระบบคนแรก: `php artisan make:admin <username> <password>`
-8. ตรวจสอบสิทธิ์ไฟล์: `storage/` และ `bootstrap/cache/` ต้องเขียนได้โดย web server user (`chmod -R 775` + owner ที่ถูกต้อง)
+7. **ต้อง seed ข้อมูล personnel ก่อนสร้าง admin เสมอ**: `php artisan db:seed --class=PersonnelSeeder --force` — `make:admin` อ้างอิง `ID_Personnel=1` ที่มาจาก seeder นี้ ถ้าข้ามขั้นตอนนี้จะเจอ foreign key constraint error
+8. สร้างผู้ดูแลระบบคนแรก: `php artisan make:admin <username> <password>`
+9. ตรวจสอบสิทธิ์ไฟล์: `storage/` และ `bootstrap/cache/` ต้องเขียนได้โดย web server user (`chmod -R 775` + owner ที่ถูกต้อง)
+10. ถ้าอยู่หลัง TLS-terminating proxy ที่ **ไม่** forward header `X-Forwarded-Proto` (ปกติ Nginx/PaaS ส่วนใหญ่ forward ให้อยู่แล้วและไม่ต้องทำอะไรเพิ่ม) ให้ตั้ง `FORCE_HTTPS_SCHEME=true` ใน `.env` — **อย่าตั้งค่านี้ถ้ายังไม่มี TLS จริงอยู่หน้าแอป** (เช่น `docker compose up` แบบ plain HTTP โดยไม่มี reverse proxy) เพราะจะทำให้ redirect ไปเป็น `https://` ที่แอปไม่มีทางเสิร์ฟได้ ผู้ใช้จะเข้าเว็บไม่ได้เลย
 
 ---
 
@@ -55,7 +57,8 @@ php artisan key:generate --show   # เอาค่ามาใส่ APP_KEY �
 # 2. Build และรัน
 docker compose --env-file .env.docker up -d --build
 
-# 3. รอ container พร้อม แล้วสร้าง admin คนแรก
+# 3. รอ container พร้อม แล้ว seed personnel ก่อน (make:admin ต้องการ ID_Personnel=1 จาก seeder นี้)
+docker compose exec app php artisan db:seed --class=PersonnelSeeder --force
 docker compose exec app php artisan make:admin admin "รหัสผ่านที่ปลอดภัย"
 ```
 
@@ -87,6 +90,7 @@ php artisan key:generate --force
 php artisan migrate --force
 php artisan storage:link
 php artisan config:cache && php artisan route:cache && php artisan view:cache
+php artisan db:seed --class=PersonnelSeeder --force
 php artisan make:admin admin "รหัสผ่านที่ปลอดภัย"
 
 # 4. สิทธิ์ไฟล์ (ปรับ www-data ตาม user ที่ Nginx/PHP-FPM รันอยู่)
