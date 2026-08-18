@@ -41,7 +41,9 @@
     <div class="admin-buttons">
         <button class="btn btn-primary" data-toggle="modal"
             data-target="#createSliderModal">เพิ่มรูปเลื่อนสไลด์</button>
-        <button class="btn btn-primary" data-toggle="modal" data-target="#viewSliderModal">แก้ไขรูปเลื่อนสไลด์</button>
+        <button class="btn btn-primary" data-toggle="modal" data-target="#selectSliderModal">
+            แก้ไขรูปเลื่อนสไลด์
+        </button>
     </div>
 
     <div class="container-fluid">
@@ -65,9 +67,11 @@
                                 </div>
                                 <div class="card-footer d-flex justify-content-end">
                                     @php
-                                        $imageUrls = $newsItem->images->map(function ($img) {
-                                            return url('storage/' . $img->image_path);
-                                        })->toArray();
+                                        $imageUrls = $newsItem->images
+                                            ->map(function ($img) {
+                                                return url('storage/' . $img->image_path);
+                                            })
+                                            ->toArray();
                                     @endphp
                                     <button class="btn btn-warning btn-sm edit-news-btn" style="margin-right: 10px;"
                                         data-id="{{ $newsItem->id }}" data-title='@json($newsItem->title)'
