@@ -50,6 +50,7 @@ class AdminController extends Controller
         $user->Address = $request->Address ?? '';
         $user->Phone = $request->Phone ?? '';
         $user->line_token = $request->line_token;
+        $user->is_admin_permanent = $user->Type_Personnel === 'Admin';
 
         // Set default profile image based on user type
         switch ($user->Type_Personnel) {

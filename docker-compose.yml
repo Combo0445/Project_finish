@@ -23,6 +23,7 @@ services:
       LOG_LEVEL: error
     volumes:
       - storage-data:/var/www/html/storage/app
+      - storage-framework:/var/www/html/storage/framework
       - uploads-images:/var/www/html/public/images
       - uploads-images-user:/var/www/html/public/images-user
     depends_on:
@@ -49,5 +50,6 @@ services:
 volumes:
   db-data:
   storage-data:
+  storage-framework:
   uploads-images:
   uploads-images-user:

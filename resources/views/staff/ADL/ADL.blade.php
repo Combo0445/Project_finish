@@ -126,6 +126,23 @@
                 </div>
             @endif
 
+            @if(session('error'))
+                <div class="alert alert-danger">
+                    {{ session('error') }}
+                </div>
+            @endif
+
+            @if ($errors->any())
+                <div class="alert alert-danger">
+                    <strong>กรุณาตรวจสอบข้อมูลที่กรอก:</strong>
+                    <ul class="mb-0">
+                        @foreach ($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+            @endif
+
             <!-- Wizard Step Indicators -->
             <div class="step-indicator">
                 <div class="step-dot active" id="dot-1">1</div>
@@ -146,7 +163,7 @@
                                 <select name="elderly_id" id="elderly_id" class="form-control form-control-lg" required>
                                     <option value="" disabled selected>-- กรุณาเลือก --</option>
                                     @foreach($elderlies as $elderly)
-                                        <option value="{{ $elderly->ID_Elderly }}" {{ (isset($selected_elderly_id) && $selected_elderly_id == $elderly->ID_Elderly) ? 'selected' : '' }}>
+                                        <option value="{{ $elderly->ID_Elderly }}" {{ old('elderly_id', $selected_elderly_id ?? null) == $elderly->ID_Elderly ? 'selected' : '' }}>
                                             {{ $elderly->Name_Elderly }}
                                         </option>
                                     @endforeach
@@ -170,11 +187,11 @@
                     <div class="question-block">
                         <h5>1. การรับประทานอาหาร:</h5>
                         <div class="form-check">
-                            <label class="d-block mb-3"><input type="radio" name="feeding" value="0" required>
+                            <label class="d-block mb-3"><input type="radio" name="feeding" value="0" {{ old("feeding") == "0" ? "checked" : "" }} required>
                                 ไม่สามารถตักอาหารเข้าปากได้ต้องมีคนป้อนให้</label>
-                            <label class="d-block mb-3"><input type="radio" name="feeding" value="1">
+                            <label class="d-block mb-3"><input type="radio" name="feeding" value="1" {{ old("feeding") == "1" ? "checked" : "" }}>
                                 ตักอาหารเองได้แต่ต้องมีคนช่วย</label>
-                            <label class="d-block mb-3"><input type="radio" name="feeding" value="2">
+                            <label class="d-block mb-3"><input type="radio" name="feeding" value="2" {{ old("feeding") == "2" ? "checked" : "" }}>
                                 ตักอาหารและช่วยตัวเองได้เป็นปกติ</label>
                         </div>
                     </div>
@@ -183,9 +200,9 @@
                     <div class="question-block">
                         <h5>2. การดูแลร่างกาย:</h5>
                         <div class="form-check">
-                            <label class="d-block mb-3"><input type="radio" name="grooming" value="0" required>
+                            <label class="d-block mb-3"><input type="radio" name="grooming" value="0" {{ old("grooming") == "0" ? "checked" : "" }} required>
                                 ต้องการความช่วยเหลือ</label>
-                            <label class="d-block mb-3"><input type="radio" name="grooming" value="1"> ทำเองได้
+                            <label class="d-block mb-3"><input type="radio" name="grooming" value="1" {{ old("grooming") == "1" ? "checked" : "" }}> ทำเองได้
                                 (รวมทั้งที่ทำได้เองถ้าเตรียมอุปกรณ์ไว้ให้)</label>
                         </div>
                     </div>
@@ -194,13 +211,13 @@
                     <div class="question-block">
                         <h5>3. การย้ายตัว (เช่น จากเตียงไปเก้าอี้):</h5>
                         <div class="form-check">
-                            <label class="d-block mb-3"><input type="radio" name="transfer" value="0" required> นั่งไม่ได้
+                            <label class="d-block mb-3"><input type="radio" name="transfer" value="0" {{ old("transfer") == "0" ? "checked" : "" }} required> นั่งไม่ได้
                                 หรือต้องใช้คนสองคนช่วยกันยก</label>
-                            <label class="d-block mb-3"><input type="radio" name="transfer" value="1"> ต้องใช้คนแข็งแรง 1
+                            <label class="d-block mb-3"><input type="radio" name="transfer" value="1" {{ old("transfer") == "1" ? "checked" : "" }}> ต้องใช้คนแข็งแรง 1
                                 คนหรือคนทั่วไป 2 คนช่วยพยุง</label>
-                            <label class="d-block mb-3"><input type="radio" name="transfer" value="2">
+                            <label class="d-block mb-3"><input type="radio" name="transfer" value="2" {{ old("transfer") == "2" ? "checked" : "" }}>
                                 ต้องการคนช่วยพยุงเล็กน้อย หรือดูแลความปลอดภัย</label>
-                            <label class="d-block mb-3"><input type="radio" name="transfer" value="3"> ทำได้เอง</label>
+                            <label class="d-block mb-3"><input type="radio" name="transfer" value="3" {{ old("transfer") == "3" ? "checked" : "" }}> ทำได้เอง</label>
                         </div>
                     </div>
 
@@ -208,11 +225,11 @@
                     <div class="question-block">
                         <h5>4. การใช้ห้องน้ำ (ขับถ่าย):</h5>
                         <div class="form-check">
-                            <label class="d-block mb-3"><input type="radio" name="toilet_use" value="0" required>
+                            <label class="d-block mb-3"><input type="radio" name="toilet_use" value="0" {{ old("toilet_use") == "0" ? "checked" : "" }} required>
                                 ช่วยตัวเองไม่ได้</label>
-                            <label class="d-block mb-3"><input type="radio" name="toilet_use" value="1"> ทำเองได้บ้าง
+                            <label class="d-block mb-3"><input type="radio" name="toilet_use" value="1" {{ old("toilet_use") == "1" ? "checked" : "" }}> ทำเองได้บ้าง
                                 แต่ต้องการความช่วยเหลือบางส่วน</label>
-                            <label class="d-block mb-3"><input type="radio" name="toilet_use" value="2">
+                            <label class="d-block mb-3"><input type="radio" name="toilet_use" value="2" {{ old("toilet_use") == "2" ? "checked" : "" }}>
                                 ทำเองได้ดีเรียบร้อย</label>
                         </div>
                     </div>
@@ -221,13 +238,13 @@
                     <div class="question-block">
                         <h5>5. การเคลื่อนที่ภายในบ้าน:</h5>
                         <div class="form-check">
-                            <label class="d-block mb-3"><input type="radio" name="mobility" value="0" required>
+                            <label class="d-block mb-3"><input type="radio" name="mobility" value="0" {{ old("mobility") == "0" ? "checked" : "" }} required>
                                 เคลื่อนที่ไปไหนไม่ได้</label>
-                            <label class="d-block mb-3"><input type="radio" name="mobility" value="1">
+                            <label class="d-block mb-3"><input type="radio" name="mobility" value="1" {{ old("mobility") == "1" ? "checked" : "" }}>
                                 เคลื่อนที่ได้เองโดยใช้รถเข็น</label>
-                            <label class="d-block mb-3"><input type="radio" name="mobility" value="2">
+                            <label class="d-block mb-3"><input type="radio" name="mobility" value="2" {{ old("mobility") == "2" ? "checked" : "" }}>
                                 เดินได้แต่ต้องมีคนเดินช่วยพยุงดูแล</label>
-                            <label class="d-block mb-3"><input type="radio" name="mobility" value="3">
+                            <label class="d-block mb-3"><input type="radio" name="mobility" value="3" {{ old("mobility") == "3" ? "checked" : "" }}>
                                 เดินหรือเคลื่อนที่ได้เอง</label>
                         </div>
                     </div>
@@ -240,11 +257,11 @@
                     <div class="question-block">
                         <h5>6. การสวมใส่เสื้อผ้า:</h5>
                         <div class="form-check">
-                            <label class="d-block mb-3"><input type="radio" name="dressing" value="0" required>
+                            <label class="d-block mb-3"><input type="radio" name="dressing" value="0" {{ old("dressing") == "0" ? "checked" : "" }} required>
                                 ต้องมีคนช่วยสวมให้ทั้งหมด</label>
-                            <label class="d-block mb-3"><input type="radio" name="dressing" value="1">
+                            <label class="d-block mb-3"><input type="radio" name="dressing" value="1" {{ old("dressing") == "1" ? "checked" : "" }}>
                                 ช่วยตัวเองได้ครึ่งหนึ่ง ที่เหลือต้องมีคนช่วย</label>
-                            <label class="d-block mb-3"><input type="radio" name="dressing" value="2">
+                            <label class="d-block mb-3"><input type="radio" name="dressing" value="2" {{ old("dressing") == "2" ? "checked" : "" }}>
                                 ใส่เองได้ดีทั้งหมด</label>
                         </div>
                     </div>
@@ -253,10 +270,10 @@
                     <div class="question-block">
                         <h5>7. การขึ้นลงบันได (1 ชั้น):</h5>
                         <div class="form-check">
-                            <label class="d-block mb-3"><input type="radio" name="stairs" value="0" required>
+                            <label class="d-block mb-3"><input type="radio" name="stairs" value="0" {{ old("stairs") == "0" ? "checked" : "" }} required>
                                 ไม่สามารถทำได้</label>
-                            <label class="d-block mb-3"><input type="radio" name="stairs" value="1"> ต้องการคนช่วย</label>
-                            <label class="d-block mb-3"><input type="radio" name="stairs" value="2"> ขึ้นลงได้เอง</label>
+                            <label class="d-block mb-3"><input type="radio" name="stairs" value="1" {{ old("stairs") == "1" ? "checked" : "" }}> ต้องการคนช่วย</label>
+                            <label class="d-block mb-3"><input type="radio" name="stairs" value="2" {{ old("stairs") == "2" ? "checked" : "" }}> ขึ้นลงได้เอง</label>
                         </div>
                     </div>
 
@@ -264,9 +281,9 @@
                     <div class="question-block">
                         <h5>8. การอาบน้ำ:</h5>
                         <div class="form-check">
-                            <label class="d-block mb-3"><input type="radio" name="bathing" value="0" required>
+                            <label class="d-block mb-3"><input type="radio" name="bathing" value="0" {{ old("bathing") == "0" ? "checked" : "" }} required>
                                 ต้องมีคนช่วยหรือทำให้</label>
-                            <label class="d-block mb-3"><input type="radio" name="bathing" value="1"> อาบน้ำเองได้</label>
+                            <label class="d-block mb-3"><input type="radio" name="bathing" value="1" {{ old("bathing") == "1" ? "checked" : "" }}> อาบน้ำเองได้</label>
                         </div>
                     </div>
 
@@ -274,11 +291,11 @@
                     <div class="question-block">
                         <h5>9. การกลั้นอุจจาระ:</h5>
                         <div class="form-check">
-                            <label class="d-block mb-3"><input type="radio" name="bowels" value="0" required> กลั้นไม่ได้
+                            <label class="d-block mb-3"><input type="radio" name="bowels" value="0" {{ old("bowels") == "0" ? "checked" : "" }} required> กลั้นไม่ได้
                                 หรือต้องสวน</label>
-                            <label class="d-block mb-3"><input type="radio" name="bowels" value="1">
+                            <label class="d-block mb-3"><input type="radio" name="bowels" value="1" {{ old("bowels") == "1" ? "checked" : "" }}>
                                 กลั้นไม่ได้บางครั้ง</label>
-                            <label class="d-block mb-3"><input type="radio" name="bowels" value="2">
+                            <label class="d-block mb-3"><input type="radio" name="bowels" value="2" {{ old("bowels") == "2" ? "checked" : "" }}>
                                 กลั้นได้เป็นปกติ</label>
                         </div>
                     </div>
@@ -287,11 +304,11 @@
                     <div class="question-block">
                         <h5>10. การกลั้นปัสสาวะ:</h5>
                         <div class="form-check">
-                            <label class="d-block mb-3"><input type="radio" name="bladder" value="0" required>
+                            <label class="d-block mb-3"><input type="radio" name="bladder" value="0" {{ old("bladder") == "0" ? "checked" : "" }} required>
                                 กลั้นไม่ได้เลย</label>
-                            <label class="d-block mb-3"><input type="radio" name="bladder" value="1">
+                            <label class="d-block mb-3"><input type="radio" name="bladder" value="1" {{ old("bladder") == "1" ? "checked" : "" }}>
                                 กลั้นไม่ได้บางครั้ง</label>
-                            <label class="d-block mb-3"><input type="radio" name="bladder" value="2">
+                            <label class="d-block mb-3"><input type="radio" name="bladder" value="2" {{ old("bladder") == "2" ? "checked" : "" }}>
                                 กลั้นได้เป็นปกติ</label>
                         </div>
                     </div>
@@ -386,6 +403,17 @@
                 return true;
             };
 
+            @if ($errors->any())
+                // Redisplayed after a validation error: jump to the first step that has one
+                for (let s = 1; s <= totalSteps; s++) {
+                    if (document.getElementById(`step-${s}`).querySelector(':invalid')) {
+                        currentStep = s;
+                        updateUI();
+                        break;
+                    }
+                }
+            @endif
+
             document.getElementById('btn-next').addEventListener('click', () => {
                 if (validateStep(currentStep) && currentStep < totalSteps) {
                     currentStep++;
@@ -434,6 +462,13 @@
                 radio.addEventListener('change', calculateTotalScore);
             });
             calculateTotalScore();
+
+            // Prevent double-submit on the final POST
+            document.getElementById('adlForm').addEventListener('submit', function () {
+                const submitBtn = document.getElementById('btn-submit');
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status"></span> กำลังบันทึก...';
+            });
         });
     </script>
 @endpush

@@ -1,15 +1,8 @@
-<!DOCTYPE html>
-<html lang="en">
+@extends('layouts.app')
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Edit Activity</title>
-    <link href="{{ url('assets/css/argon-dashboard.css') }}" rel="stylesheet" />
-    <link href="{{ url('assets/css/nucleo-icons.css') }}" rel="stylesheet" />
-    <link href="{{ url('assets/css/nucleo-svg.css') }}" rel="stylesheet" />
-    <!-- Bootstrap for nav-tabs -->
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+@section('title', 'Edit Activity')
+
+@push('styles')
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -96,11 +89,9 @@
             margin-left: 10px;
         }
     </style>
-</head>
+@endpush
 
-<body>
-    @include('layout.nav')
-
+@section('content')
     <div class="container mt-5">
         <div class="card">
             <div class="card-header">
@@ -110,6 +101,16 @@
                 @if (session('success'))
                     <div class="alert alert-success">
                         {{ session('success') }}
+                    </div>
+                @endif
+
+                @if ($errors->any())
+                    <div class="alert alert-danger">
+                        <ul class="mb-0">
+                            @foreach ($errors->all() as $error)
+                                <li>{{ $error }}</li>
+                            @endforeach
+                        </ul>
                     </div>
                 @endif
 
@@ -277,12 +278,9 @@
             </div>
         </div>
     </div>
+@endsection
 
-    <!-- Include Bootstrap JS and dependencies -->
-    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-
+@push('scripts')
     <script>
         function handleCheckboxValues(event) {
             event.preventDefault(); // Prevent the form from submitting immediately
@@ -313,6 +311,4 @@
             }
         });
     </script>
-</body>
-
-</html>
+@endpush

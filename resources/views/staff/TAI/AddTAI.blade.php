@@ -1,13 +1,8 @@
-<!DOCTYPE html>
-<html lang="en">
+@extends('layouts.app')
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>เพิ่มแบบประเมิน TAI</title>
-    <link href="{{ url('assets/css/argon-dashboard.css') }}" rel="stylesheet" />
-    <link href="{{ url('assets/css/nucleo-icons.css') }}" rel="stylesheet" />
-    <link href="{{ url('assets/css/nucleo-svg.css') }}" rel="stylesheet" />
+@section('title', 'เพิ่มแบบประเมิน TAI')
+
+@push('styles')
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -124,11 +119,9 @@
             color: white;
         }
     </style>
-</head>
+@endpush
 
-<body>
-    @include('layout.nav')
-
+@section('content')
     <div class="assessment-container px-3">
         <div class="card">
             <div class="card-header">
@@ -138,6 +131,17 @@
                 @if(session('success'))
                     <div class="alert alert-success text-white">
                         {{ session('success') }}
+                    </div>
+                @endif
+
+                @if ($errors->any())
+                    <div class="alert alert-danger">
+                        <strong>กรุณาตรวจสอบข้อมูลที่กรอก:</strong>
+                        <ul class="mb-0">
+                            @foreach ($errors->all() as $error)
+                                <li>{{ $error }}</li>
+                            @endforeach
+                        </ul>
                     </div>
                 @endif
 
@@ -180,7 +184,7 @@
                             <div class="form-group d-flex flex-wrap gap-3">
                                 @for ($i = 0; $i <= 5; $i++)
                                     <label class="me-3 mb-2 px-2 py-1 border rounded" style="cursor: pointer;">
-                                        <input type="radio" name="mobility" value="{{ $i }}" {{ $tai->mobility == $i ? 'checked' : '' }} required> {{ $i }} คะแนน
+                                        <input type="radio" name="mobility" value="{{ $i }}" {{ old('mobility', $tai->mobility) == $i ? 'checked' : '' }} required> {{ $i }} คะแนน
                                     </label>
                                 @endfor
                             </div>
@@ -191,7 +195,7 @@
                             <div class="form-group d-flex flex-wrap gap-3">
                                 @for ($i = 0; $i <= 5; $i++)
                                     <label class="me-3 mb-2 px-2 py-1 border rounded" style="cursor: pointer;">
-                                        <input type="radio" name="confuse" value="{{ $i }}" {{ $tai->confuse == $i ? 'checked' : '' }} required> {{ $i }} คะแนน
+                                        <input type="radio" name="confuse" value="{{ $i }}" {{ old('confuse', $tai->confuse) == $i ? 'checked' : '' }} required> {{ $i }} คะแนน
                                     </label>
                                 @endfor
                             </div>
@@ -202,7 +206,7 @@
                             <div class="form-group d-flex flex-wrap gap-3">
                                 @for ($i = 0; $i <= 5; $i++)
                                     <label class="me-3 mb-2 px-2 py-1 border rounded" style="cursor: pointer;">
-                                        <input type="radio" name="feed" value="{{ $i }}" {{ $tai->feed == $i ? 'checked' : '' }} required> {{ $i }} คะแนน
+                                        <input type="radio" name="feed" value="{{ $i }}" {{ old('feed', $tai->feed) == $i ? 'checked' : '' }} required> {{ $i }} คะแนน
                                     </label>
                                 @endfor
                             </div>
@@ -213,7 +217,7 @@
                             <div class="form-group d-flex flex-wrap gap-3">
                                 @for ($i = 0; $i <= 5; $i++)
                                     <label class="me-3 mb-2 px-2 py-1 border rounded" style="cursor: pointer;">
-                                        <input type="radio" name="toilet" value="{{ $i }}" {{ $tai->toilet == $i ? 'checked' : '' }} required> {{ $i }} คะแนน
+                                        <input type="radio" name="toilet" value="{{ $i }}" {{ old('toilet', $tai->toilet) == $i ? 'checked' : '' }} required> {{ $i }} คะแนน
                                     </label>
                                 @endfor
                             </div>
@@ -266,7 +270,9 @@
             </div>
         </div>
     </div>
+@endsection
 
+@push('scripts')
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             let currentStep = 1;
@@ -304,11 +310,6 @@
 
             // Basic Validation before next step
             const validateStep = (step) => {
-                if(step === 1) {
-                    if(!document.getElementById('elderly_id') || !document.getElementById('elderly_id').value) {
-                        return false;
-                    }
-                }
                 if(step === 2) {
                     const requiredNames = ['mobility', 'confuse', 'feed', 'toilet'];
                     for(let name of requiredNames) {
@@ -320,6 +321,17 @@
                 }
                 return true;
             };
+
+            @if ($errors->any())
+                // Redisplayed after a validation error: jump to the first step that has one
+                for (let s = 1; s <= totalSteps; s++) {
+                    if (document.getElementById(`step-${s}`).querySelector(':invalid')) {
+                        currentStep = s;
+                        updateUI();
+                        break;
+                    }
+                }
+            @endif
 
             document.getElementById('btn-next').addEventListener('click', () => {
                 if (validateStep(currentStep) && currentStep < totalSteps) {
@@ -423,8 +435,13 @@
             });
 
             calculateTotalScore();
+
+            // Prevent double-submit on the final POST
+            document.getElementById('taiForm').addEventListener('submit', function () {
+                const submitBtn = document.getElementById('btn-submit');
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status"></span> กำลังบันทึก...';
+            });
         });
     </script>
-</body>
-
-</html>
+@endpush

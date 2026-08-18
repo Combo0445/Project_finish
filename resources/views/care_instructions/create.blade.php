@@ -33,16 +33,16 @@
                                     value="{{ Auth::user()->Name_User }}" readonly>
                             </div>
                             <div class="col-md-6 form-group">
-                                <label for="Name_Staff">เลือกเจ้าหน้าที่ผู้รับผิดชอบ <span class="text-danger">*</span></label>
-                                <select id="Name_Staff" name="Name_Staff" class="form-control" required>
-                                    <option value="" disabled {{ !$reporter ? 'selected' : '' }}>-- เลือกเจ้าหน้าที่ --</option>
+                                <label for="Name_Staff">เลือกเจ้าหน้าที่ผู้รับผิดชอบ</label>
+                                <select id="Name_Staff" name="Name_Staff" class="form-control">
+                                    <option value="" {{ !$reporter ? 'selected' : '' }}>-- ไม่ระบุ (ให้เจ้าหน้าที่เลือกเองภายหลัง) --</option>
                                     @foreach($staffMembers as $staff)
                                         <option value="{{ $staff->Name_User }}" {{ $reporter === $staff->Name_User ? 'selected' : '' }}>
                                             {{ $staff->Name_User }}
                                         </option>
                                     @endforeach
                                 </select>
-                                <small class="text-muted">เลือกเจ้าหน้าที่เพื่อส่งการแจ้งเตือน</small>
+                                <small class="text-muted">เลือกเจ้าหน้าที่เพื่อส่งการแจ้งเตือน หรือเว้นว่างไว้เพื่อให้เจ้าหน้าที่ท่านใดก็ได้เลือกดูแลผู้สูงอายุรายนี้เอง</small>
                             </div>
                         </div>
 

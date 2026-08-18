@@ -1,15 +1,8 @@
-<!DOCTYPE html>
-<html lang="en">
+@extends('layouts.app')
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Add Activity</title>
-    <link href="{{ url('assets/css/argon-dashboard.css') }}" rel="stylesheet" />
-    <link href="{{ url('assets/css/nucleo-icons.css') }}" rel="stylesheet" />
-    <link href="{{ url('assets/css/nucleo-svg.css') }}" rel="stylesheet" />
-    <!-- Bootstrap for nav-tabs -->
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+@section('title', 'Add Activity')
+
+@push('styles')
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -98,11 +91,9 @@
             /* ย้ายปุ่มไปทางขวา */
         }
     </style>
-</head>
+@endpush
 
-<body>
-    @include('layout.nav')
-
+@section('content')
     <div class="container mt-5">
         <div class="card">
             <div class="card-header">
@@ -112,6 +103,22 @@
                 @if (session('success'))
                     <div class="alert alert-success">
                         {{ session('success') }}
+                    </div>
+                @endif
+
+                @if (session('error'))
+                    <div class="alert alert-danger">
+                        {{ session('error') }}
+                    </div>
+                @endif
+
+                @if ($errors->any())
+                    <div class="alert alert-danger">
+                        <ul class="mb-0">
+                            @foreach ($errors->all() as $error)
+                                <li>{{ $error }}</li>
+                            @endforeach
+                        </ul>
                     </div>
                 @endif
 
@@ -145,25 +152,25 @@
                             <div class="form-group">
                                 <label for="ID_Elderly">ชื่อ-สกุลผู้สูงอายุ</label>
                                 <select id="ID_Elderly" name="ID_Elderly" class="form-control" style="height: 45px;"
-                                    onchange="fetchElderlyDetails()" required>
+                                    required>
                                     <option value="">เลือกผู้สูงอายุ</option>
                                     @foreach ($elderlys as $elderly)
-                                        <option value="{{ $elderly->ID_Elderly }}">{{ $elderly->Name_Elderly }}</option>
+                                        <option value="{{ $elderly->ID_Elderly }}" {{ old('ID_Elderly') == $elderly->ID_Elderly ? 'selected' : '' }}>{{ $elderly->Name_Elderly }}</option>
                                     @endforeach
                                 </select>
                             </div>
                             <div class="form-group">
                                 <label for="activity_date">ลงเวลากิจกรรมการดูแลผู้สูงอายุ</label>
                                 <input type="date" id="activity_date" name="activity_date" class="form-control"
-                                    required>
+                                    value="{{ old('activity_date') }}" required>
                             </div>
                             <div class="form-group">
                                 <label for="evaluate">ประเมิน/ติดตามอาการ</label>
                                 <select id="evaluate" name="evaluate" class="form-control" style="height: 45px;"
                                     required>
                                     <option value="">-- กรุณาเลือก --</option>
-                                    <option value="ประเมิน">ประเมิน</option>
-                                    <option value="ติดตามอาการ">ติดตามอาการ</option>
+                                    <option value="ประเมิน" {{ old('evaluate') == 'ประเมิน' ? 'selected' : '' }}>ประเมิน</option>
+                                    <option value="ติดตามอาการ" {{ old('evaluate') == 'ติดตามอาการ' ? 'selected' : '' }}>ติดตามอาการ</option>
                                 </select>
                             </div>
 
@@ -233,7 +240,7 @@
                         <div class="form-group">
                             <label for="other_specified">อื่น ๆ ระบุ</label>
                             <input type="text" id="other_specified" name="other_specified" class="form-control"
-                                required>
+                                required value="{{ old('other_specified') }}">
                         </div>
                         <br>
                     </div>
@@ -274,7 +281,7 @@
                         <div class="form-group">
                             <label for="other_social_specified">อื่น ๆ ระบุ</label>
                             <input type="text" id="other_social_specified" name="other_social_specified"
-                                class="form-control" required>
+                                class="form-control" required value="{{ old('other_social_specified') }}">
                         </div>
                         <br>
                     </div>
@@ -282,11 +289,11 @@
                     <div class="tab-pane fade" id="problem" role="tabpanel" aria-labelledby="problem-tab">
                         <div class="form-group mt-3">
                             <label for="problem">ปัญหาที่พบ</label>
-                            <input type="text" id="problem" name="problem" class="form-control" required>
+                            <input type="text" id="problem" name="problem" class="form-control" required value="{{ old('problem') }}">
                         </div>
                         <div class="form-group">
                             <label for="solution">แนวทางการแก้ไข</label>
-                            <input type="text" id="solution" name="solution" class="form-control" required>
+                            <input type="text" id="solution" name="solution" class="form-control" required value="{{ old('solution') }}">
                         </div>
                     </div>
 
@@ -299,12 +306,9 @@
             </div>
         </div>
     </div>
+@endsection
 
-    <!-- Include Bootstrap JS and dependencies -->
-    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-
+@push('scripts')
     <script>
         function handleCheckboxValues(event) {
             event.preventDefault(); // Prevent the form from submitting immediately
@@ -322,6 +326,10 @@
             // Hide all checkboxes momentarily while form is being submitted
             checkboxes.forEach(checkbox => checkbox.style.visibility = "hidden");
 
+            const submitBtn = form.querySelector('button[type="submit"]');
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status"></span> กำลังบันทึก...';
+
             form.submit();
         }
 
@@ -338,6 +346,4 @@
             }
         });
     </script>
-</body>
-
-</html>
+@endpush

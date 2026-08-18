@@ -1,10 +1,8 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1.0">
-  <title>เพิ่ม Performance Report</title>
-  <link href="{{ url('assets/css/argon-dashboard.css') }}" rel="stylesheet"/>
+@extends('layouts.app')
+
+@section('title', 'เพิ่ม Performance Report')
+
+@push('styles')
   <style>
      body {
          font-family: Arial, sans-serif;
@@ -53,15 +51,18 @@
      .btn-danger { background: #dc3545; }
      .btn-danger:hover { background: #c82333; }
  </style>
-</head>
-<body>
-  @include('layout.nav')
+@endpush
 
+@section('content')
   <div class="container mt-5">
     <div class="card">
       <div class="card-header"><h4>แบบรายงานผลการปฏิบัติงาน <br>
           ตามแผนการดูแลรายบุคคลสำหรับผู้สูงอายุที่มีภาวะพึ่งพิง</h4></div>
       <div class="card-body">
+        @if(session('success'))
+          <div class="alert alert-success">{{ session('success') }}</div>
+        @endif
+
         @if($errors->any())
           <div class="alert alert-danger"><ul class="mb-0">
             @foreach($errors->all() as $e) <li>{{ $e }}</li> @endforeach
@@ -158,9 +159,10 @@
         </form>
       </div>
       {{-- /container --}}
-    
+@endsection
+
+@push('scripts')
       {{-- AJAX โหลดข้อมูล ADL, TAI, CG ล่าสุด --}}
-      <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
       <script>
           $('#ID_Elderly').on('change', function(){
             let id = $(this).val();
@@ -197,6 +199,5 @@
                 );
             });
           });
-        </script>        
-    </body>
-    </html>
+        </script>
+@endpush

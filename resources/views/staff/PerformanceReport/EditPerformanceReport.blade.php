@@ -1,11 +1,9 @@
 {{-- resources/views/staff/PerformanceReport/EditPerformanceReport.blade.php --}}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1.0">
-  <title>แก้ไข Performance Report</title>
-  <link href="{{ url('assets/css/argon-dashboard.css') }}" rel="stylesheet"/>
+@extends('layouts.app')
+
+@section('title', 'แก้ไข Performance Report')
+
+@push('styles')
   <style>
     body { font-family: Arial; background: #f4f4f4; padding:20px; }
     .container { max-width:800px; margin:0 auto; background:#fff; padding:20px; border-radius:8px; box-shadow:0 0 10px rgba(0,0,0,0.1); }
@@ -16,12 +14,15 @@
     .btn-success { background:#28a745; }
     .btn-danger  { background:#dc3545; }
   </style>
-</head>
-<body>
-  @include('layout.nav')
+@endpush
 
+@section('content')
   <div class="container mt-5">
     <h4 class="text-center mb-4">แก้ไข Performance Report</h4>
+
+    @if(session('success'))
+      <div class="alert alert-success">{{ session('success') }}</div>
+    @endif
 
     @if($errors->any())
       <div class="alert alert-danger"><ul class="mb-0">
@@ -50,7 +51,7 @@
       <div class="form-group">
         <label>ADL (ล่าสุด)</label>
         <select id="ID_Adl" name="ID_Adl" class="form-control" required>
-          <option value="{{ $performanceReport->ID_Adl }}" selected>
+          <option value="{{ $performanceReport->ID_ADL }}" selected>
             {{ optional($performanceReport->adl)->Score_ADL ?? '-' }}
           </option>
         </select>
@@ -60,7 +61,7 @@
       <div class="form-group">
         <label>TAI (ล่าสุด)</label>
         <select id="ID_Tai" name="ID_Tai" class="form-control" required>
-          <option value="{{ $performanceReport->ID_Tai }}" selected>
+          <option value="{{ $performanceReport->ID_TAI }}" selected>
             TAI #{{ optional($performanceReport->tai)->id ?? '-' }}
           </option>
         </select>
@@ -128,9 +129,10 @@
       </div>
     </form>
   </div>
+@endsection
 
+@push('scripts')
   {{-- AJAX โหลดข้อมูล ADL, TAI, CG ล่าสุด ได้เหมือน Add --}}
-  <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
   <script>
     $('#ID_Elderly').on('change', function(){
       let id = $(this).val();
@@ -157,5 +159,4 @@
       });
     });
   </script>
-</body>
-</html>
+@endpush

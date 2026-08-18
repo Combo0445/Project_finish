@@ -1,21 +1,8 @@
-<!DOCTYPE html>
-<html lang="en">
+@extends('layouts.app')
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Register User</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="{{ url('assets/css/nucleo-icons.css') }}" rel="stylesheet" />
-    <link href="{{ url('assets/css/nucleo-svg.css') }}" rel="stylesheet" />
-    <link href="{{ url('assets/css/argon-dashboard.css') }}" rel="stylesheet" />
-</head>
+@section('title', 'Register User')
 
-<body>
-    @include('layout.nav')
-
+@section('content')
     <div class="container mt-5">
         <div class="card">
             <div class="card-header d-flex justify-content-between align-items-center">
@@ -101,9 +88,8 @@
             </div>
         </div>
     </div>
+@endsection
 
-    <x-scripts />
+@push('scripts')
     <x-register-user-scripts />
-</body>
-
-</html>
+@endpush

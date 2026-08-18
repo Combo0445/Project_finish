@@ -143,6 +143,19 @@
 
                             </button>
 
+                            <button type="button" class="btn btn-danger btn-sm"
+                                onclick="confirmDeleteSlider('{{ $slider->id }}')">
+
+                                ลบ
+
+                            </button>
+                            <form id="delete-slider-form-{{ $slider->id }}"
+                                action="{{ route('admin.sliders.destroy', $slider->id) }}" method="POST"
+                                style="display:none;">
+                                @csrf
+                                @method('DELETE')
+                            </form>
+
                         </div>
                     @endforeach
 

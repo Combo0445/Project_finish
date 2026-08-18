@@ -31,7 +31,7 @@ Route::get('/news/{id}', [PageController::class, 'newsShow'])->name('news.show')
 Route::controller(AuthController::class)->group(function () {
 
     Route::get('homepage', 'Homepage');
-    Route::get('login', 'login');
+    Route::get('login', 'login')->name('login');
     Route::post('/login', 'loginUser')->name('login.submit')->middleware('throttle:5,1');
     Route::post('/logout', 'logout')->name('logout');
     Route::get('dashboard-Doctor', 'Dashboard_Dcotor');
@@ -65,6 +65,9 @@ Route::get('error', [PageController::class, 'error']);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////Middleware
 Route::middleware(['auth'])->group(function () {
+    Route::get('select-role', [AuthController::class, 'selectRole'])->name('select-role');
+    Route::post('select-role', [AuthController::class, 'chooseRole'])->name('select-role.submit');
+
     Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
     Route::get('profile-user', [ProfileController::class, 'showProfile'])->name('profile-user');
     Route::get('edit-profile', [ProfileController::class, 'editProfile'])->name('edit-profile');

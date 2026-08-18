@@ -77,8 +77,10 @@ class CareInstructionController extends Controller
         $careGiver = CareGiver::where('ID_Elderly', $elderly->ID_Elderly)->first();
         $reporter = $careGiver ? $careGiver->Reporter : 'Unknown';
 
-        // Fetch all staff members for the dropdown
-        $staffMembers = User::where('Type_Personnel', 'Staff')->get();
+        // Fetch all staff members for the dropdown (admins can assign instructions to themselves too)
+        $staffMembers = User::where('Type_Personnel', 'Staff')
+            ->orWhere('is_admin_permanent', true)
+            ->get();
 
         // Fetch historical care instructions for this patient
         $history = CareInstruction::where('ID_Elderly', $elderly->ID_Elderly)
@@ -101,7 +103,7 @@ class CareInstructionController extends Controller
             'Date_CI' => 'required|date',
             'Name_Elderly' => 'required|string',
             'Name_Doctor' => 'required|string',
-            'Name_Staff' => 'required|string',
+            'Name_Staff' => 'nullable|string',
             'Care_instructions' => 'required|string',
         ]);
 
@@ -140,8 +142,10 @@ class CareInstructionController extends Controller
         $careGiver = CareGiver::where('ID_Elderly', $elderly->ID_Elderly)->first();
         $reporter = $careGiver ? $careGiver->Reporter : 'Unknown';
 
-        // Fetch all staff members for the dropdown
-        $staffMembers = User::where('Type_Personnel', 'Staff')->get();
+        // Fetch all staff members for the dropdown (admins can assign instructions to themselves too)
+        $staffMembers = User::where('Type_Personnel', 'Staff')
+            ->orWhere('is_admin_permanent', true)
+            ->get();
 
         // Fetch historical care instructions for this patient (excluding current one)
         $history = CareInstruction::where('ID_Elderly', $elderly->ID_Elderly)
@@ -165,7 +169,7 @@ class CareInstructionController extends Controller
             'Date_CI' => 'required|date',
             'Name_Elderly' => 'required|string',
             'Name_Doctor' => 'required|string',
-            'Name_Staff' => 'required|string',
+            'Name_Staff' => 'nullable|string',
             'Care_instructions' => 'required|string',
         ]);
 
