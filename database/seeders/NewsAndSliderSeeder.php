@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Schema;
 use App\Models\News;
 use App\Models\NewsImage;
 use App\Models\Slider;
@@ -11,6 +12,13 @@ class NewsAndSliderSeeder extends Seeder
 {
     public function run(): void
     {
+        // Re-running this seeder must not duplicate rows/images, so start clean every time.
+        Schema::disableForeignKeyConstraints();
+        NewsImage::truncate();
+        News::truncate();
+        Slider::truncate();
+        Schema::enableForeignKeyConstraints();
+
         // 1. Create Sliders - 3 sliders
         $sliderImages = [
             'https://picsum.photos/seed/elderly-slider1/1200/500',
