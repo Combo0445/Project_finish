@@ -1,12 +1,8 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-Compatible" content="ie=edge">
-    <title>Contact Us</title>
-    <!-- Link to Bootstrap CSS -->
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+@extends('layouts.app')
+
+@section('title', 'Contact Us')
+
+@push('styles')
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -53,12 +49,9 @@
             text-align: center;
         }
     </style>
-</head>
-<body>
+@endpush
 
-    <!-- Include Navigation -->
-    @include('layout.nav')
-
+@section('content')
     <!-- Contact Section -->
     <section class="contact-section">
         <div class="container">
@@ -97,18 +90,10 @@
                 </div>
                 <div class="col-md-6">
                     <h3>ตำแหน่งที่ตั้งของเรา</h3>
-                    <!-- Embed Google Map -->
-                    <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d240.8995393443442!2d103.19263725505863!3d14.97089444599563!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3119eb20e8008e73%3A0x1bd0c25a9c4865c8!2z4Liq4Liz4LiZ4Lix4LiB4LiH4Liy4LiZ4Liq4Liy4LiY4Liy4Lij4LiT4Liq4Li44LiC4Lit4Liz4LmA4Lig4Lit4Lir4LmJ4Lin4Lii4Lij4Liy4LiK!5e0!3m2!1sth!2sth!4v1725688867880!5m2!1sth!2sth" width="800" height="600" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+                    <!-- Embed Google Map (generic placeholder — no real office location) -->
+                    <iframe src="https://www.google.com/maps?q=Thailand&z=6&output=embed" width="800" height="600" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
                 </div>
             </div>
         </div>
     </section>
-
-    <!-- Bootstrap JS and dependencies -->
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-
-    @include('layout.footer')
-</body>
-</html>
+@endsection

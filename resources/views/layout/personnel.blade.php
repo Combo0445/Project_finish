@@ -1,10 +1,8 @@
-<!DOCTYPE html>
-<html lang="th">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>คณะบุคลากร</title>
+@extends('layouts.app')
+
+@section('title', 'คณะบุคลากร')
+
+@push('styles')
     <style>
         body {
             font-family: 'Arial', sans-serif;
@@ -54,11 +52,9 @@
             color: #355e3b;
         }
     </style>
-</head>
-<body>
+@endpush
 
-    @include('layout.nav')
-
+@section('content')
     <div class="container">
         <h3>คณะบุคลากร</h3>
 
@@ -89,6 +85,4 @@
             <p>จำนวนบุคลากรรวม: {{ $adminCount + $doctorCount + $staffCount }} คน</p>
         </div>
     </div>
-    @include('layout.footer')
-</body>
-</html>
+@endsection

@@ -1,10 +1,8 @@
-<!DOCTYPE html>
-<html lang="th">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>วิสัยทัศน์/พันธกิจ</title>
+@extends('layouts.app')
+
+@section('title', 'วิสัยทัศน์/พันธกิจ')
+
+@push('styles')
     <style>
         body {
             font-family: 'Arial', sans-serif;
@@ -35,11 +33,9 @@
             padding-left: 100px; /* ขยับเนื้อหาไปทางขวา */
         }
     </style>
-</head>
-<body>
+@endpush
 
-    @include('layout.nav')
-
+@section('content')
     <div class="container">
         <h3>วิสัยทัศน์ / พันธกิจ</h3>
 
@@ -57,6 +53,4 @@
             <li>พัฒนาระบบการบริหารจัดการที่มีประสิทธิภาพและทันสมัยเพื่อรองรับการให้บริการที่ครอบคลุมและยั่งยืน</li>
         </ul>
     </div>
-    @include('layout.footer')
-</body>
-</html>
+@endsection

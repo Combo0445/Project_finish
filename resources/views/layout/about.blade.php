@@ -1,12 +1,8 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>เกี่ยวกับเรา</title>
-    <!-- Link to Bootstrap CSS -->
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+@extends('layouts.app')
+
+@section('title', 'เกี่ยวกับเรา')
+
+@push('styles')
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -35,12 +31,9 @@
             color: #f8f9fa !important;
         }
     </style>
-</head>
-<body>
+@endpush
 
-    <!-- Include Navigation -->
-    @include('layout.nav')
-
+@section('content')
     <!-- About Section -->
     <section class="about-section">
         <div class="container">
@@ -54,10 +47,4 @@
             </div>
         </div>
     </section>
-    @include('layout.footer')
-    <!-- Bootstrap JS and dependencies -->
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-</body>
-</html>
+@endsection
