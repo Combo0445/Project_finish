@@ -16,7 +16,7 @@ services:
       DB_DATABASE: ${DB_DATABASE:-project_finish}
       DB_USERNAME: ${DB_USERNAME:-laravel}
       DB_PASSWORD: ${DB_PASSWORD:-secret}
-      SESSION_DRIVER: file
+      SESSION_DRIVER: database
       CACHE_DRIVER: file
       QUEUE_CONNECTION: sync
       LOG_CHANNEL: stack
