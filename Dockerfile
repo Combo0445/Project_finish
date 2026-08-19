@@ -56,10 +56,6 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
         gd \
         zip \
     && a2enmod rewrite \
-    && rm -f /etc/apache2/mods-enabled/mpm_event.load /etc/apache2/mods-enabled/mpm_event.conf \
-             /etc/apache2/mods-enabled/mpm_worker.load /etc/apache2/mods-enabled/mpm_worker.conf \
-    && ln -sf /etc/apache2/mods-available/mpm_prefork.load /etc/apache2/mods-enabled/mpm_prefork.load \
-    && ln -sf /etc/apache2/mods-available/mpm_prefork.conf /etc/apache2/mods-enabled/mpm_prefork.conf \
     && rm -rf /var/lib/apt/lists/*
 
 # Point Apache's document root at Laravel's public/ directory
@@ -77,6 +73,16 @@ RUN chown -R www-data:www-data /var/www/html \
 
 COPY docker/entrypoint.sh /usr/local/bin/entrypoint.sh
 RUN chmod +x /usr/local/bin/entrypoint.sh
+
+# Force mpm_prefork as the only enabled MPM. This must be the LAST filesystem
+# change in the image: a dpkg trigger fired by an earlier apt-get install
+# re-enables mpm_event after any fix placed inside that same RUN step, which
+# caused "AH00534: More than one MPM loaded" even though this was already
+# fixed once in that earlier layer.
+RUN rm -f /etc/apache2/mods-enabled/mpm_event.load /etc/apache2/mods-enabled/mpm_event.conf \
+          /etc/apache2/mods-enabled/mpm_worker.load /etc/apache2/mods-enabled/mpm_worker.conf \
+    && ln -sf /etc/apache2/mods-available/mpm_prefork.load /etc/apache2/mods-enabled/mpm_prefork.load \
+    && ln -sf /etc/apache2/mods-available/mpm_prefork.conf /etc/apache2/mods-enabled/mpm_prefork.conf
 
 EXPOSE 80
 
