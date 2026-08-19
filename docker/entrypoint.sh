@@ -24,4 +24,12 @@ php artisan view:cache
 
 php artisan migrate --force
 
+echo "=== DEBUG: /etc/apache2/mods-enabled (mpm) ==="
+ls -la /etc/apache2/mods-enabled/ 2>&1 | grep -i mpm
+echo "=== DEBUG: /etc/apache2/mods-available (mpm) ==="
+ls -la /etc/apache2/mods-available/ 2>&1 | grep -i mpm
+echo "=== DEBUG: apache2ctl -M ==="
+apache2ctl -M 2>&1
+echo "=== END DEBUG ==="
+
 exec "$@"
