@@ -74,15 +74,18 @@ RUN chown -R www-data:www-data /var/www/html \
 COPY docker/entrypoint.sh /usr/local/bin/entrypoint.sh
 RUN chmod +x /usr/local/bin/entrypoint.sh
 
-# Force mpm_prefork as the only enabled MPM. This must be the LAST filesystem
-# change in the image: a dpkg trigger fired by an earlier apt-get install
-# re-enables mpm_event after any fix placed inside that same RUN step, which
-# caused "AH00534: More than one MPM loaded" even though this was already
-# fixed once in that earlier layer.
-RUN rm -f /etc/apache2/mods-enabled/mpm_event.load /etc/apache2/mods-enabled/mpm_event.conf \
+# Force mpm_prefork as the only possible MPM. Deleting just the mods-enabled
+# symlinks wasn't enough — something (a dpkg trigger) kept re-creating them
+# later, causing "AH00534: More than one MPM loaded" on Railway even though
+# the same fix passed locally. Deleting the source files in mods-available
+# too means there is nothing left for anything to re-enable.
+RUN rm -f /etc/apache2/mods-available/mpm_event.load /etc/apache2/mods-available/mpm_event.conf \
+          /etc/apache2/mods-available/mpm_worker.load /etc/apache2/mods-available/mpm_worker.conf \
+          /etc/apache2/mods-enabled/mpm_event.load /etc/apache2/mods-enabled/mpm_event.conf \
           /etc/apache2/mods-enabled/mpm_worker.load /etc/apache2/mods-enabled/mpm_worker.conf \
     && ln -sf /etc/apache2/mods-available/mpm_prefork.load /etc/apache2/mods-enabled/mpm_prefork.load \
-    && ln -sf /etc/apache2/mods-available/mpm_prefork.conf /etc/apache2/mods-enabled/mpm_prefork.conf
+    && ln -sf /etc/apache2/mods-available/mpm_prefork.conf /etc/apache2/mods-enabled/mpm_prefork.conf \
+    && apache2ctl -M 2>&1 | grep -c mpm_ | grep -qx 1
 
 EXPOSE 80
 
