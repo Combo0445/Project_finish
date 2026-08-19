@@ -56,6 +56,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
         gd \
         zip \
     && a2enmod rewrite \
+    && (a2dismod mpm_event mpm_worker || true) \
+    && a2enmod mpm_prefork \
     && rm -rf /var/lib/apt/lists/*
 
 # Point Apache's document root at Laravel's public/ directory
