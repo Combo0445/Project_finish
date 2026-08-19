@@ -121,7 +121,7 @@
         </div>
     </div>
     <footer>
-        <p>&copy; 2024 สำนักงานสาธารณสุข อำเภอห้วยราช จังหวัดบุรีรัมย์</p>
+        <p>&copy; 2026 สำนักงานสาธารณสุขตัวอย่าง (Demo)</p>
     </footer>
     <script src="{{ url('assets/js/core/popper.min.js') }}"></script>
     <script src="{{ url('assets/js/core/bootstrap.min.js') }}"></script>

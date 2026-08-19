@@ -69,9 +69,9 @@
                     <div class="contact-info">
                         <h5>ที่อยู่</h5>
                         <div class="phone-numbers">
-                            <p>สำนักงานสาธารณสุขอำเภอห้วยราช หมู่ที่ 3 ถนนสุขาภิบาล ตำบลห้วยราช</p>
-                            <p>อำเภอห้วยราช จังหวัดบุรีรัมย์ 31000</p>
-                            <p>โทร 044 606 033 - 43</p>
+                            <p>สำนักงานสาธารณสุขตัวอย่าง (Demo) ตำบลตัวอย่าง</p>
+                            <p>อำเภอตัวอย่าง จังหวัดตัวอย่าง 10000</p>
+                            <p>โทร 080-000-0000 (ตัวอย่าง)</p>
                             <hr>
                         </div>
 
@@ -79,25 +79,16 @@
                         <div class="contact-details">
                             <div class="phone-numbers">
                                 <h5>เบอร์โทรศัพท์</h5>
-                                <p class="bbbb">044 606 033</p>
-                                <p class="bbbb">044 606 034</p>
-                                <p class="bbbb">044 606 035</p>
-                                <p class="bbbb">044 606 036</p>
-                                <p class="bbbb">044 606 037</p>
-                                <p class="bbbb">044 606 038</p>
-                                <p class="bbbb">044 606 039</p>
-                                <p class="bbbb">044 606 040</p>
-                                <p class="bbbb">044 606 041</p>
-                                <p class="bbbb">044 606 042</p>
-                                <p class="bbbb">044 606 043</p>
+                                <p class="bbbb">080-000-0001 (ตัวอย่าง)</p>
+                                <p class="bbbb">080-000-0002 (ตัวอย่าง)</p>
                             </div>
                             <div class="email">
                                 <h5>อีเมล (Email)</h5>
-                                <p class="bbbb">huairat.health@hospital.com</p>
+                                <p class="bbbb">demo@example.com</p>
                                 <br>
                                 <h5>เฟซบุ๊ก (Facebook)</h5>
                                 <p class="bbbb">
-                                    <a href="https://www.facebook.com/people/%E0%B8%AA%E0%B8%B3%E0%B8%99%E0%B8%B1%E0%B8%81%E0%B8%87%E0%B8%B2%E0%B8%99%E0%B8%AA%E0%B8%B2%E0%B8%98%E0%B8%B2%E0%B8%A3%E0%B8%93%E0%B8%AA%E0%B8%B8%E0%B8%82-%E0%B8%AD%E0%B8%B3%E0%B9%80%E0%B8%A0%E0%B8%AD%E0%B8%AB%E0%B9%89%E0%B8%A7%E0%B8%A2%E0%B8%A3%E0%B8%B2%E0%B8%8A/100003197671366" target="_blank" class="bbbb">สำนักงานสาธารณสุข อำเภอห้วยราช</a>
+                                    <span class="bbbb">สำนักงานสาธารณสุขตัวอย่าง (Demo)</span>
                                 </p>
 
                             </div>

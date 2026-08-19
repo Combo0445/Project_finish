@@ -101,7 +101,7 @@
         @endif
         <div class="text-bold" style="font-size: 22px;">ระบบประเมินผู้สูงอายุที่มีภาวะพึ่งพิง (ADL)
         </div>
-        <div style="font-size: 18px; font-weight: normal;">เทศบาลตำบลห้วยราช จังหวัดบุรีรัมย์</div>
+        <div style="font-size: 18px; font-weight: normal;">เทศบาลตำบลตัวอย่าง (Demo)</div>
         <div class="report-title" style="margin-top: 10px; text-align: center;">{{ $title ?? 'รายงานคำแนะนำการดูแล' }}
         </div>
         <div style="font-size: 16px; font-weight: normal; margin-top: 5px;">พิมพ์เมื่อ:
