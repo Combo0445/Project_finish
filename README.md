@@ -1,4 +1,4 @@
-# 🏥 ระบบประเมินความสามารถในการดำเนินกิจวัตรประจำวันของผู้สูงอายุ (Elderly Care Assessment System)
+# 🏥 ระบบประเมินผู้สูงอายุที่มีภาวะพึ่งพิง (ADL)
 [![Laravel](https://img.shields.io/badge/Laravel-10-red?logo=laravel&style=for-the-badge)](https://laravel.com/)
 [![MySQL](https://img.shields.io/badge/MySQL-8.0-blue?logo=mysql&style=for-the-badge)](https://www.mysql.com/)
 [![PHP](https://img.shields.io/badge/PHP-8.1+-purple?logo=php&style=for-the-badge)](https://www.php.net/)

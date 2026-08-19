@@ -3,7 +3,7 @@
         <img src="{{ url('images/Logo.png') }}" alt="Logo" style="height: 60px; width: auto; margin-right: 15px;">
         <div class="logo-text">
             <span
-                style="font-size: 16px; font-weight: 600; color: #fff; display: block; line-height: 1.2;">ระบบประเมินความสามารถในการดำเนินกิจวัตรประจำวันของผู้สูงอายุ</span>
+                style="font-size: 16px; font-weight: 600; color: #fff; display: block; line-height: 1.2;">ระบบประเมินผู้สูงอายุที่มีภาวะพึ่งพิง (ADL)</span>
             <span style="font-size: 13px; font-weight: 400; color: #e6fffc; opacity: 0.9;">Barthel Activities of Daily
                 Living</span>
         </div>

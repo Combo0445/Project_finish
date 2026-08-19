@@ -99,7 +99,7 @@
         @if(!empty($logo))
             <img src="{{ $logo }}" class="logo" style="margin: 0 auto 10px auto; display: block;">
         @endif
-        <div class="text-bold" style="font-size: 22px;">ระบบประเมินความสามารถในการดำเนินกิจวัตรประจำวันของผู้สูงอายุ
+        <div class="text-bold" style="font-size: 22px;">ระบบประเมินผู้สูงอายุที่มีภาวะพึ่งพิง (ADL)
         </div>
         <div style="font-size: 18px; font-weight: normal;">เทศบาลตำบลห้วยราช จังหวัดบุรีรัมย์</div>
         <div class="report-title" style="margin-top: 10px; text-align: center;">{{ $title ?? 'รายงานคำแนะนำการดูแล' }}
