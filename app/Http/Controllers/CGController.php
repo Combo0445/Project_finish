@@ -97,7 +97,7 @@ class CGController extends Controller
                 ->exists();
 
             if ($alreadyToday) {
-                return redirect()->back()->with('error', 'ผู้สูงอายุคนนี้ได้รับการประเมิน CG ในวันนี้แล้ว ไม่สามารถประเมินซ้ำได้');
+                return redirect()->back()->withInput()->with('error', 'ผู้สูงอายุคนนี้ได้รับการประเมิน CG ในวันนี้แล้ว ไม่สามารถประเมินซ้ำได้');
             }
 
             $careGiverData['Bedsores'] = $request->Bedsores . ($request->Bedsores_details ? '-' . $request->Bedsores_details : '');
@@ -117,7 +117,7 @@ class CGController extends Controller
             if ($adl) {
                 $careGiverData['ID_ADL'] = $adl->ID_ADL;
             } else {
-                return redirect()->back()->withErrors(['ID_ADL' => 'ไม่พบข้อมูล ADL สำหรับผู้สูงอายุที่เลือก']);
+                return redirect()->back()->withInput()->withErrors(['ID_ADL' => 'ไม่พบข้อมูล ADL สำหรับผู้สูงอายุที่เลือก']);
             }
 
             if ($request->hasFile('Picture')) {
@@ -134,7 +134,7 @@ class CGController extends Controller
             return redirect()->route('cg.create')->with('success', 'เพิ่ม Care Giver สำเร็จแล้ว!');
         } catch (\Exception $e) {
             \Log::error('CG Store Error: ' . $e->getMessage());
-            return redirect()->back()->with('error', 'เกิดข้อผิดพลาดในการบันทึกข้อมูล กรุณาลองใหม่อีกครั้ง');
+            return redirect()->back()->withInput()->with('error', 'เกิดข้อผิดพลาดในการบันทึกข้อมูล กรุณาลองใหม่อีกครั้ง');
         }
     }
 
@@ -377,7 +377,7 @@ class CGController extends Controller
         return $latestCareGiver ? $latestCareGiver->ID_CG : null;
     }
 
-    public function getElderlyDetails($elderlyId)
+    public function getElderlyDetails($elderlyId, Request $request)
     {
         $adl = BarthelAdl::find($elderlyId);
         if ($adl) {
@@ -385,7 +385,10 @@ class CGController extends Controller
             if ($elderly) {
                 $age = Carbon::parse($elderly->Birthday)->age;
 
+                // เวลาแก้ไขรายงานที่มีอยู่แล้ว ไม่ควรดึงค่าของตัวมันเองมาเป็น "ล่าสุด" จึงมี
+                // exclude ไว้ตัดรายงานที่กำลังแก้ไขออกจากการค้นหา
                 $latestCG = CareGiver::where('ID_Elderly', $elderly->ID_Elderly)
+                    ->when($request->query('exclude'), fn($q, $excludeId) => $q->where('ID_CG', '!=', $excludeId))
                     ->orderByDesc('Date_CG')
                     ->first();
 

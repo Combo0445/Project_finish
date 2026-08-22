@@ -107,6 +107,25 @@
             document.getElementById('caregiver-form').classList.remove('hidden');
         }
 
+        // ดึงน้ำหนัก/ส่วนสูง/รอบเอว/ความดัน จากรายงาน CG ครั้งก่อนหน้าของผู้สูงอายุคนนี้
+        // (ไม่นับรายงานที่กำลังแก้ไขอยู่นี้เอง) มาใส่แทนค่าปัจจุบันในฟอร์ม
+        function fillLatestVitals() {
+            const url = `{{ route('get-elderly-details', $caregiver->ID_ADL) }}?exclude={{ $caregiver->ID_CG }}`;
+            fetch(url)
+                .then(response => response.json())
+                .then(data => {
+                    if (!data.Latest) {
+                        alert('ไม่พบข้อมูลการประเมินครั้งก่อนหน้าของผู้สูงอายุคนนี้');
+                        return;
+                    }
+                    if (data.Latest.Weight) document.getElementById('Weight').value = data.Latest.Weight;
+                    if (data.Latest.Height) document.getElementById('Height').value = data.Latest.Height;
+                    if (data.Latest.Waist) document.getElementById('Waist').value = data.Latest.Waist;
+                    if (data.Latest.Vital_signs) populateVitalSignsFromText(data.Latest.Vital_signs);
+                })
+                .catch(error => console.error('Error:', error));
+        }
+
         function transferValues() {
             document.getElementById('Name_CG_hidden').value = document.getElementById('Name_CG').value;
             document.getElementById('Related_hidden').value = document.getElementById('Related').value;
@@ -184,6 +203,11 @@
                             <label for="Address">ที่อยู่</label>
                             <input type="text" id="Address" name="Address" class="form-control"
                                 value="{{ $caregiver->Address }}" required readonly>
+                        </div>
+                        <div class="mb-2">
+                            <button type="button" class="btn btn-outline-secondary btn-sm" onclick="fillLatestVitals()">
+                                ดึงข้อมูลครั้งก่อนหน้า (น้ำหนัก/ส่วนสูง/รอบเอว/ความดัน)
+                            </button>
                         </div>
                         <div class="form-group">
                             <label for="Weight">น้ำหนักตัว</label>

@@ -204,6 +204,27 @@
                         <div class="step-dot" id="dot-3">3</div>
                     </div>
 
+                    @php
+                        // ก่อน submit ฝั่ง JS จะรวมค่า select ("มี"/"ไม่มี") กับรายละเอียดเป็นสตริงเดียว
+                        // เช่น "มี (แผลที่ส้นเท้า)" แล้วส่งเป็นค่าของ select นั้นเอง เมื่อ redisplay
+                        // เพราะ validate ไม่ผ่านที่ช่องอื่น จึงต้องแยกกลับมาเป็น select + รายละเอียด
+                        // เพื่อคืนค่าที่กรอกไว้แล้ว ไม่ให้ต้องกรอกใหม่ทั้งหมด
+                        $toggleFields = [
+                            'Bedsores', 'Pain', 'Swelling', 'Itchy_rash',
+                            'Stiff_joints', 'Malnutrition',
+                            'Economic_problems', 'Social_problems', 'Doctor_FU',
+                        ];
+                        $oldToggle = [];
+                        foreach ($toggleFields as $tf) {
+                            $raw = old($tf);
+                            $detail = '';
+                            if ($raw && preg_match('/^มี \((.*)\)$/u', $raw, $m)) {
+                                $detail = $m[1];
+                            }
+                            $oldToggle[$tf] = ['hasValue' => $raw !== null, 'isYes' => $raw && $raw !== 'ไม่มี', 'detail' => $detail];
+                        }
+                    @endphp
+
                     <!-- SINGLE FORM FOR EVERYTHING -->
                     <form id="assessment-form" action="{{ route('cg.store') }}" method="POST"
                         enctype="multipart/form-data">
@@ -299,13 +320,13 @@
                                 <div class="col-md-6 form-group">
                                     <label for="Rights">สิทธิการรักษา</label>
                                     <select id="Rights" name="Rights" class="form-control form-control-lg" required>
-                                        <option value="" disabled selected>-- เลือกสิทธิการรักษา --</option>
-                                        <option value="สิทธิข้าราชการ">สิทธิข้าราชการ</option>
-                                        <option value="บัตรผู้พิการ">บัตรผู้พิการ</option>
-                                        <option value="บัตรทอง">บัตรทอง</option>
-                                        <option value="ประกันสุขภาพ">ประกันสุขภาพ</option>
-                                        <option value="อปท.">อปท.</option>
-                                        <option value="ผู้สูงอายุ">ผู้สูงอายุ</option>
+                                        <option value="" disabled {{ old('Rights') ? '' : 'selected' }}>-- เลือกสิทธิการรักษา --</option>
+                                        <option value="สิทธิข้าราชการ" {{ old('Rights') == 'สิทธิข้าราชการ' ? 'selected' : '' }}>สิทธิข้าราชการ</option>
+                                        <option value="บัตรผู้พิการ" {{ old('Rights') == 'บัตรผู้พิการ' ? 'selected' : '' }}>บัตรผู้พิการ</option>
+                                        <option value="บัตรทอง" {{ old('Rights') == 'บัตรทอง' ? 'selected' : '' }}>บัตรทอง</option>
+                                        <option value="ประกันสุขภาพ" {{ old('Rights') == 'ประกันสุขภาพ' ? 'selected' : '' }}>ประกันสุขภาพ</option>
+                                        <option value="อปท." {{ old('Rights') == 'อปท.' ? 'selected' : '' }}>อปท.</option>
+                                        <option value="ผู้สูงอายุ" {{ old('Rights') == 'ผู้สูงอายุ' ? 'selected' : '' }}>ผู้สูงอายุ</option>
                                     </select>
                                 </div>
                             </div>
@@ -341,8 +362,8 @@
                                         <label for="Consciousness">ความรู้สึกตัว</label>
                                         <select id="Consciousness" name="Consciousness"
                                             class="form-control form-control-lg" required>
-                                            <option value="รู้สึกดี">รู้สึกดี</option>
-                                            <option value="ไม่รู้สึกตัว">ไม่รู้สึกตัว</option>
+                                            <option value="รู้สึกดี" {{ old('Consciousness', 'รู้สึกดี') == 'รู้สึกดี' ? 'selected' : '' }}>รู้สึกดี</option>
+                                            <option value="ไม่รู้สึกตัว" {{ old('Consciousness') == 'ไม่รู้สึกตัว' ? 'selected' : '' }}>ไม่รู้สึกตัว</option>
                                         </select>
                                     </div>
                                 </div>
@@ -390,29 +411,29 @@
                                 <div class="col-md-4 form-group">
                                     <label for="Bedsores">แผลกดทับ</label>
                                     <select id="Bedsores" name="Bedsores" class="form-control form-control-lg" required>
-                                        <option value="ไม่มี">ไม่มี</option>
-                                        <option value="มี">มี</option>
+                                        <option value="ไม่มี" {{ !$oldToggle['Bedsores']['isYes'] ? 'selected' : '' }}>ไม่มี</option>
+                                        <option value="มี" {{ $oldToggle['Bedsores']['isYes'] ? 'selected' : '' }}>มี</option>
                                     </select>
                                     <input style="display:none;" type="text" id="Bedsores_details"
-                                        class="form-control mt-2" placeholder="รายละเอียดถ้ามี">
+                                        class="form-control mt-2" placeholder="รายละเอียดถ้ามี" value="{{ $oldToggle['Bedsores']['detail'] }}">
                                 </div>
                                 <div class="col-md-4 form-group">
                                     <label for="Pain">อาการปวด</label>
                                     <select id="Pain" name="Pain" class="form-control form-control-lg" required>
-                                        <option value="ไม่มี">ไม่มี</option>
-                                        <option value="มี">มี</option>
+                                        <option value="ไม่มี" {{ !$oldToggle['Pain']['isYes'] ? 'selected' : '' }}>ไม่มี</option>
+                                        <option value="มี" {{ $oldToggle['Pain']['isYes'] ? 'selected' : '' }}>มี</option>
                                     </select>
                                     <input style="display:none;" type="text" id="Pain_details" class="form-control mt-2"
-                                        placeholder="รายละเอียดถ้ามี">
+                                        placeholder="รายละเอียดถ้ามี" value="{{ $oldToggle['Pain']['detail'] }}">
                                 </div>
                                 <div class="col-md-4 form-group">
                                     <label for="Swelling">อาการบวม</label>
                                     <select id="Swelling" name="Swelling" class="form-control form-control-lg" required>
-                                        <option value="ไม่มี">ไม่มี</option>
-                                        <option value="มี">มี</option>
+                                        <option value="ไม่มี" {{ !$oldToggle['Swelling']['isYes'] ? 'selected' : '' }}>ไม่มี</option>
+                                        <option value="มี" {{ $oldToggle['Swelling']['isYes'] ? 'selected' : '' }}>มี</option>
                                     </select>
                                     <input style="display:none;" type="text" id="Swelling_details"
-                                        class="form-control mt-2" placeholder="รายละเอียดถ้ามี">
+                                        class="form-control mt-2" placeholder="รายละเอียดถ้ามี" value="{{ $oldToggle['Swelling']['detail'] }}">
                                 </div>
                             </div>
 
@@ -421,31 +442,31 @@
                                     <label for="Itchy_rash">ผื่นคัน</label>
                                     <select id="Itchy_rash" name="Itchy_rash" class="form-control form-control-lg"
                                         required>
-                                        <option value="ไม่มี">ไม่มี</option>
-                                        <option value="มี">มี</option>
+                                        <option value="ไม่มี" {{ !$oldToggle['Itchy_rash']['isYes'] ? 'selected' : '' }}>ไม่มี</option>
+                                        <option value="มี" {{ $oldToggle['Itchy_rash']['isYes'] ? 'selected' : '' }}>มี</option>
                                     </select>
                                     <input style="display:none;" type="text" id="Itchy_rash_details"
-                                        class="form-control mt-2" placeholder="รายละเอียดถ้ามี">
+                                        class="form-control mt-2" placeholder="รายละเอียดถ้ามี" value="{{ $oldToggle['Itchy_rash']['detail'] }}">
                                 </div>
                                 <div class="col-md-4 form-group">
                                     <label for="Stiff_joints">ข้อติดแข็ง</label>
                                     <select id="Stiff_joints" name="Stiff_joints" class="form-control form-control-lg"
                                         required>
-                                        <option value="ไม่มี">ไม่มี</option>
-                                        <option value="มี">มี</option>
+                                        <option value="ไม่มี" {{ !$oldToggle['Stiff_joints']['isYes'] ? 'selected' : '' }}>ไม่มี</option>
+                                        <option value="มี" {{ $oldToggle['Stiff_joints']['isYes'] ? 'selected' : '' }}>มี</option>
                                     </select>
                                     <input style="display:none;" type="text" id="Stiff_joints_details"
-                                        class="form-control mt-2" placeholder="รายละเอียดถ้ามี">
+                                        class="form-control mt-2" placeholder="รายละเอียดถ้ามี" value="{{ $oldToggle['Stiff_joints']['detail'] }}">
                                 </div>
                                 <div class="col-md-4 form-group">
                                     <label for="Malnutrition">ทุพโภชนาการ</label>
                                     <select id="Malnutrition" name="Malnutrition" class="form-control form-control-lg"
                                         required>
-                                        <option value="ไม่มี">ไม่มี</option>
-                                        <option value="มี">มี</option>
+                                        <option value="ไม่มี" {{ !$oldToggle['Malnutrition']['isYes'] ? 'selected' : '' }}>ไม่มี</option>
+                                        <option value="มี" {{ $oldToggle['Malnutrition']['isYes'] ? 'selected' : '' }}>มี</option>
                                     </select>
                                     <input style="display:none;" type="text" id="Malnutrition_details"
-                                        class="form-control mt-2" placeholder="รายละเอียดถ้ามี">
+                                        class="form-control mt-2" placeholder="รายละเอียดถ้ามี" value="{{ $oldToggle['Malnutrition']['detail'] }}">
                                 </div>
                             </div>
                         </div>
@@ -458,16 +479,16 @@
                                 <div class="col-md-6 form-group">
                                     <label for="Eating">การรับประทานอาหาร</label>
                                     <select id="Eating" name="Eating" class="form-control form-control-lg" required>
-                                        <option value="ตักกินเองได้">ตักกินเองได้</option>
-                                        <option value="กินเองไม่ได้">กินเองไม่ได้</option>
+                                        <option value="ตักกินเองได้" {{ old('Eating', 'ตักกินเองได้') == 'ตักกินเองได้' ? 'selected' : '' }}>ตักกินเองได้</option>
+                                        <option value="กินเองไม่ได้" {{ old('Eating') == 'กินเองไม่ได้' ? 'selected' : '' }}>กินเองไม่ได้</option>
                                     </select>
                                 </div>
                                 <div class="col-md-6 form-group">
                                     <label for="Swallowing">การกลืน</label>
                                     <select id="Swallowing" name="Swallowing" class="form-control form-control-lg"
                                         required>
-                                        <option value="กลืนได้ปกติ">กลืนได้ปกติ</option>
-                                        <option value="สำลัก">สำลัก</option>
+                                        <option value="กลืนได้ปกติ" {{ old('Swallowing', 'กลืนได้ปกติ') == 'กลืนได้ปกติ' ? 'selected' : '' }}>กลืนได้ปกติ</option>
+                                        <option value="สำลัก" {{ old('Swallowing') == 'สำลัก' ? 'selected' : '' }}>สำลัก</option>
                                     </select>
                                 </div>
                             </div>
@@ -477,16 +498,16 @@
                                     <label for="Defecation">การขับถ่ายอุจจาระ</label>
                                     <select id="Defecation" name="Defecation" class="form-control form-control-lg"
                                         required>
-                                        <option value="กลั้นได้">กลั้นได้</option>
-                                        <option value="กลั้นไม่ได้">กลั้นไม่ได้</option>
+                                        <option value="กลั้นได้" {{ old('Defecation', 'กลั้นได้') == 'กลั้นได้' ? 'selected' : '' }}>กลั้นได้</option>
+                                        <option value="กลั้นไม่ได้" {{ old('Defecation') == 'กลั้นไม่ได้' ? 'selected' : '' }}>กลั้นไม่ได้</option>
                                     </select>
                                 </div>
                                 <div class="col-md-6 form-group">
                                     <label for="Urinary_excretion">การขับถ่ายปัสสาวะ</label>
                                     <select id="Urinary_excretion" name="Urinary_excretion"
                                         class="form-control form-control-lg" required>
-                                        <option value="กลั้นได้">กลั้นได้</option>
-                                        <option value="กลั้นไม่ได้">กลั้นไม่ได้</option>
+                                        <option value="กลั้นได้" {{ old('Urinary_excretion', 'กลั้นได้') == 'กลั้นได้' ? 'selected' : '' }}>กลั้นได้</option>
+                                        <option value="กลั้นไม่ได้" {{ old('Urinary_excretion') == 'กลั้นไม่ได้' ? 'selected' : '' }}>กลั้นไม่ได้</option>
                                     </select>
                                 </div>
                             </div>
@@ -496,16 +517,16 @@
                                     <label for="Taking_medicine">การรับประทานยา</label>
                                     <select id="Taking_medicine" name="Taking_medicine"
                                         class="form-control form-control-lg" required>
-                                        <option value="กินสม่ำเสมอ">กินสม่ำเสมอ</option>
-                                        <option value="ขาดยา">ขาดยา</option>
+                                        <option value="กินสม่ำเสมอ" {{ old('Taking_medicine', 'กินสม่ำเสมอ') == 'กินสม่ำเสมอ' ? 'selected' : '' }}>กินสม่ำเสมอ</option>
+                                        <option value="ขาดยา" {{ old('Taking_medicine') == 'ขาดยา' ? 'selected' : '' }}>ขาดยา</option>
                                     </select>
                                 </div>
                                 <div class="col-md-6 form-group">
                                     <label for="Emotional_state">สภาพอารมณ์</label>
                                     <select id="Emotional_state" name="Emotional_state"
                                         class="form-control form-control-lg" required>
-                                        <option value="ปกติ">ปกติ</option>
-                                        <option value="ผิดปกติ">ผิดปกติ</option>
+                                        <option value="ปกติ" {{ old('Emotional_state', 'ปกติ') == 'ปกติ' ? 'selected' : '' }}>ปกติ</option>
+                                        <option value="ผิดปกติ" {{ old('Emotional_state') == 'ผิดปกติ' ? 'selected' : '' }}>ผิดปกติ</option>
                                     </select>
                                 </div>
                             </div>
@@ -515,31 +536,31 @@
                                     <label for="Economic_problems">ปัญหาเศรษฐกิจ</label>
                                     <select id="Economic_problems" name="Economic_problems"
                                         class="form-control form-control-lg" required>
-                                        <option value="ไม่มี">ไม่มี</option>
-                                        <option value="มี">มี</option>
+                                        <option value="ไม่มี" {{ !$oldToggle['Economic_problems']['isYes'] ? 'selected' : '' }}>ไม่มี</option>
+                                        <option value="มี" {{ $oldToggle['Economic_problems']['isYes'] ? 'selected' : '' }}>มี</option>
                                     </select>
                                     <input style="display:none;" type="text" id="Economic_problems_details"
-                                        class="form-control mt-2" placeholder="รายละเอียดถ้ามี">
+                                        class="form-control mt-2" placeholder="รายละเอียดถ้ามี" value="{{ $oldToggle['Economic_problems']['detail'] }}">
                                 </div>
                                 <div class="col-md-4 form-group">
                                     <label for="Social_problems">ปัญหาสังคม</label>
                                     <select id="Social_problems" name="Social_problems"
                                         class="form-control form-control-lg" required>
-                                        <option value="ไม่มี">ไม่มี</option>
-                                        <option value="มี">มี</option>
+                                        <option value="ไม่มี" {{ !$oldToggle['Social_problems']['isYes'] ? 'selected' : '' }}>ไม่มี</option>
+                                        <option value="มี" {{ $oldToggle['Social_problems']['isYes'] ? 'selected' : '' }}>มี</option>
                                     </select>
                                     <input style="display:none;" type="text" id="Social_problems_details"
-                                        class="form-control mt-2" placeholder="รายละเอียดถ้ามี">
+                                        class="form-control mt-2" placeholder="รายละเอียดถ้ามี" value="{{ $oldToggle['Social_problems']['detail'] }}">
                                 </div>
                                 <div class="col-md-4 form-group">
                                     <label for="Doctor_FU">แพทย์นัด F/U</label>
                                     <select id="Doctor_FU" name="Doctor_FU" class="form-control form-control-lg"
                                         required>
-                                        <option value="ไม่มี">ไม่มี</option>
-                                        <option value="มี">มี</option>
+                                        <option value="ไม่มี" {{ !$oldToggle['Doctor_FU']['isYes'] ? 'selected' : '' }}>ไม่มี</option>
+                                        <option value="มี" {{ $oldToggle['Doctor_FU']['isYes'] ? 'selected' : '' }}>มี</option>
                                     </select>
                                     <input style="display:none;" type="text" id="Doctor_FU_details"
-                                        class="form-control mt-2" placeholder="รายละเอียดถ้ามี">
+                                        class="form-control mt-2" placeholder="รายละเอียดถ้ามี" value="{{ $oldToggle['Doctor_FU']['detail'] }}">
                                 </div>
                             </div>
 
@@ -677,8 +698,13 @@
             });
 
             @if ($errors->any())
-                // Redisplayed after a server-side validation error: jump to the first
-                // step/field that still needs data, same as a blocked client-side submit
+                // Redisplayed after a server-side validation error: restore the vital-signs
+                // fields too (they're plain JS-only inputs, not bound via old() like the rest),
+                // then jump to the first step/field that still needs data, same as a blocked
+                // client-side submit
+                @if (old('Vital_signs'))
+                    populateVitalSignsFromText(@json(old('Vital_signs')));
+                @endif
                 jumpToFirstInvalid();
             @endif
 
