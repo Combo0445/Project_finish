@@ -39,7 +39,7 @@ class ElderlyController extends Controller
             $addressElderly->save();
         });
 
-        return redirect()->back()->with('success', 'เพิ่มข้อมูลผู้สูงอายุเรียบร้อยแล้ว');
+        return redirect()->route('dashboard')->with('success', 'เพิ่มข้อมูลผู้สูงอายุเรียบร้อยแล้ว');
     }
 
 
