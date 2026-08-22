@@ -110,6 +110,22 @@
         }
     </style>
     <script>
+        // แยกค่าสัญญาณชีพจากข้อความเดิม (เช่น "BP 120/80 - PR 80 - RR 20 - BT 36.5") มาใส่ในช่อง input
+        function populateVitalSignsFromText(vitalSignsText) {
+            const bpMatch = vitalSignsText.match(/BP (\d+)\/(\d+)/);
+            const prMatch = vitalSignsText.match(/PR (\d+)/);
+            const rrMatch = vitalSignsText.match(/RR (\d+)/);
+            const btMatch = vitalSignsText.match(/BT ([\d.]+)/);
+
+            if (bpMatch) {
+                document.getElementById('BP_systolic').value = bpMatch[1];
+                document.getElementById('BP_diastolic').value = bpMatch[2];
+            }
+            if (prMatch) document.getElementById('PR').value = prMatch[1];
+            if (rrMatch) document.getElementById('RR').value = rrMatch[1];
+            if (btMatch) document.getElementById('BT').value = btMatch[1];
+        }
+
         function fetchElderlyDetails() {
             var elderlyId = document.getElementById('ID_Elderly').value;
             if (elderlyId) {
@@ -122,6 +138,14 @@
                         document.getElementById('ID_ADL').value = elderlyId;
                         document.getElementById('Name_Elderly').value = document.getElementById('ID_Elderly').options[
                             document.getElementById('ID_Elderly').selectedIndex].text;
+
+                        // ดึงส่วนสูง/น้ำหนัก/รอบเอว/สัญญาณชีพล่าสุดของผู้สูงอายุคนนี้มาใส่ให้อัตโนมัติ
+                        if (data.Latest) {
+                            if (data.Latest.Weight) document.getElementById('Weight').value = data.Latest.Weight;
+                            if (data.Latest.Height) document.getElementById('Height').value = data.Latest.Height;
+                            if (data.Latest.Waist) document.getElementById('Waist').value = data.Latest.Waist;
+                            if (data.Latest.Vital_signs) populateVitalSignsFromText(data.Latest.Vital_signs);
+                        }
                     })
                     .catch(error => console.error('Error:', error));
             }
@@ -598,6 +622,23 @@
                 return true;
             };
 
+            // จุดข้ามระหว่างช่วง: ตรวจทุกขั้นตอน (ไม่ใช่แค่ขั้นที่กำลังแสดงอยู่) แล้วเด้ง
+            // ไปยังช่องแรกที่ยังไม่ได้กรอก — ฟิลด์ required ที่ถูกซ่อนด้วย display:none จะไม่ถูก
+            // ตรวจสอบโดยเบราว์เซอร์ตอน submit ตามปกติ จึงต้องเช็คเองก่อนปล่อยให้ฟอร์ม submit จริง
+            const jumpToFirstInvalid = () => {
+                for (let s = 1; s <= totalSteps; s++) {
+                    const invalid = document.getElementById(`step-${s}`).querySelector(':invalid');
+                    if (invalid) {
+                        currentStep = s;
+                        updateUI();
+                        window.scrollTo(0, 0);
+                        invalid.reportValidity();
+                        return true;
+                    }
+                }
+                return false;
+            };
+
             document.getElementById('btn-next').addEventListener('click', () => {
                 if (validateStep(currentStep) && currentStep < totalSteps) {
                     currentStep++;
@@ -615,16 +656,22 @@
             });
 
             @if ($errors->any())
-                // Redisplayed after a validation error: jump to the first step that has one
-                for (let s = 1; s <= totalSteps; s++) {
-                    if (document.getElementById(`step-${s}`).querySelector(':invalid')) {
-                        currentStep = s;
-                        break;
-                    }
-                }
+                // Redisplayed after a server-side validation error: jump to the first
+                // step/field that still needs data, same as a blocked client-side submit
+                jumpToFirstInvalid();
             @endif
 
             updateUI();
+
+            // ตัวกันสุดท้ายก่อน submit จริง: ต้องลงทะเบียนก่อน listener อื่น ๆ ของฟอร์มนี้
+            // (ที่จะ disable ปุ่มและรวมค่าสัญญาณชีพ) จึง stopImmediatePropagation เพื่อกันไม่ให้
+            // listener เหล่านั้นทำงานเมื่อข้อมูลยังไม่ครบ
+            document.getElementById('assessment-form').addEventListener('submit', function (event) {
+                if (jumpToFirstInvalid()) {
+                    event.preventDefault();
+                    event.stopImmediatePropagation();
+                }
+            });
         });
     </script>
 
@@ -721,11 +768,16 @@
             document.getElementById('Vital_signs').value = vitalSigns;
         }
 
-        document.getElementById('assessment-form').addEventListener('submit', function (event) {
-            concatenateVitalSigns();
-            const submitBtn = document.getElementById('btn-submit');
-            submitBtn.disabled = true;
-            submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status"></span> กำลังบันทึก...';
+        // ต้องลงทะเบียนหลัง DOMContentLoaded เช่นเดียวกับ listener อื่น ๆ ของฟอร์มนี้ เพื่อให้
+        // ตัวกันข้อมูลไม่ครบ (registered ก่อนหน้า) มีโอกาส stopImmediatePropagation ได้ทัน
+        // ก่อนที่ปุ่มจะถูก disable โดยไม่ได้บันทึกจริง
+        document.addEventListener('DOMContentLoaded', function () {
+            document.getElementById('assessment-form').addEventListener('submit', function (event) {
+                concatenateVitalSigns();
+                const submitBtn = document.getElementById('btn-submit');
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status"></span> กำลังบันทึก...';
+            });
         });
     </script>
 @endpush

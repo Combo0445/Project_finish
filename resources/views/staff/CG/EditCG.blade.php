@@ -89,6 +89,19 @@
             document.getElementById('assessment-form').classList.remove('hidden');
         }
 
+        // ก่อนสลับไปหน้าถัดไป ต้องเช็คว่ากรอกครบ (เช่น น้ำหนัก/ส่วนสูง/รอบเอว) ก่อน — เดิมปุ่ม
+        // "ถัดไป" เป็น type="button" จึงไม่เคยทริกเกอร์ HTML5 validation เลย ทำให้ข้ามช่องที่ยังไม่ได้
+        // กรอกไปได้โดยไม่มีการเตือน
+        function goToAssessmentForm() {
+            const form = document.getElementById('caregiver-form');
+            if (!form.checkValidity()) {
+                form.reportValidity();
+                return;
+            }
+            transferValues();
+            showAssessmentForm();
+        }
+
         function showCareGiverForm() {
             document.getElementById('assessment-form').classList.add('hidden');
             document.getElementById('caregiver-form').classList.remove('hidden');
@@ -223,14 +236,14 @@
                         </div>
                         <div class="form-group">
                             <label for="Rights">สิทธิการรักษา</label>
-                            <select id="Rights" name="Rights" class="form-control">
-                                <option value="" disabled selected>-- เลือกสิทธิการรักษา --</option>
-                                <option value="สิทธิข้าราชการ">สิทธิข้าราชการ</option>
-                                <option value="บัตรผู้พิการ">บัตรผู้พิการ</option>
-                                <option value="บัตรทอง">บัตรทอง</option>
-                                <option value="ประกันสุขภาพ">ประกันสุขภาพ</option>
-                                <option value="อปท.">อปท.</option>
-                                <option value="ผู้สูงอายุ">ผู้สูงอายุ</option>
+                            <select id="Rights" name="Rights" class="form-control" required>
+                                <option value="" disabled {{ $caregiver->Rights ? '' : 'selected' }}>-- เลือกสิทธิการรักษา --</option>
+                                <option value="สิทธิข้าราชการ" {{ $caregiver->Rights == 'สิทธิข้าราชการ' ? 'selected' : '' }}>สิทธิข้าราชการ</option>
+                                <option value="บัตรผู้พิการ" {{ $caregiver->Rights == 'บัตรผู้พิการ' ? 'selected' : '' }}>บัตรผู้พิการ</option>
+                                <option value="บัตรทอง" {{ $caregiver->Rights == 'บัตรทอง' ? 'selected' : '' }}>บัตรทอง</option>
+                                <option value="ประกันสุขภาพ" {{ $caregiver->Rights == 'ประกันสุขภาพ' ? 'selected' : '' }}>ประกันสุขภาพ</option>
+                                <option value="อปท." {{ $caregiver->Rights == 'อปท.' ? 'selected' : '' }}>อปท.</option>
+                                <option value="ผู้สูงอายุ" {{ $caregiver->Rights == 'ผู้สูงอายุ' ? 'selected' : '' }}>ผู้สูงอายุ</option>
                             </select>
                         </div>  
                         </div>
@@ -239,7 +252,7 @@
                             value="{{ $caregiver->Name_Elderly }}">
 
                         <button class="btn btn-success" type="button"
-                            onclick="transferValues(); showAssessmentForm();">ถัดไป</button>
+                            onclick="goToAssessmentForm();">ถัดไป</button>
                         <a href="{{ route('cg.index') }}" class="btn btn-danger">ยกเลิก</a>
                     </form>
 

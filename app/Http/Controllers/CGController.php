@@ -384,11 +384,22 @@ class CGController extends Controller
             $elderly = Elderly::find($adl->ID_Elderly);
             if ($elderly) {
                 $age = Carbon::parse($elderly->Birthday)->age;
+
+                $latestCG = CareGiver::where('ID_Elderly', $elderly->ID_Elderly)
+                    ->orderByDesc('Date_CG')
+                    ->first();
+
                 return response()->json([
                     'Age' => $age,
                     'Address' => $elderly->Address,
                     'Group_ADL' => $adl->Group_ADL,
                     'ID_Elderly' => $elderly->ID_Elderly,
+                    'Latest' => $latestCG ? [
+                        'Weight' => $latestCG->Weight,
+                        'Height' => $latestCG->Height,
+                        'Waist' => $latestCG->Waist,
+                        'Vital_signs' => $latestCG->Vital_signs,
+                    ] : null,
                 ]);
             }
         }
