@@ -126,29 +126,45 @@
             if (btMatch) document.getElementById('BT').value = btMatch[1];
         }
 
+        // เก็บผลลัพธ์ล่าสุดที่ดึงมาไว้ ให้ปุ่ม "ดึงข้อมูลครั้งล่าสุด" ใช้ได้โดยไม่ต้องยิง
+        // request ซ้ำ — ไม่เติมใส่ในช่องน้ำหนัก/ส่วนสูง/ความดันให้อัตโนมัติ เพราะบางวัน
+        // เจ้าหน้าที่อาจวัดค่าจริงมาแล้วและต้องการกรอกเองบางช่อง
+        let latestElderlyDetails = null;
+
         function fetchElderlyDetails() {
             var elderlyId = document.getElementById('ID_Elderly').value;
             if (elderlyId) {
                 fetch(`{{ route('get-elderly-details', ':elderlyId') }}`.replace(':elderlyId', elderlyId))
                     .then(response => response.json())
                     .then(data => {
+                        latestElderlyDetails = data;
                         document.getElementById('Age').value = data.Age;
                         document.getElementById('Address').value = data.Address;
                         document.getElementById('Group_ADL').value = data.Group_ADL;
                         document.getElementById('ID_ADL').value = elderlyId;
                         document.getElementById('Name_Elderly').value = document.getElementById('ID_Elderly').options[
                             document.getElementById('ID_Elderly').selectedIndex].text;
-
-                        // ดึงส่วนสูง/น้ำหนัก/รอบเอว/สัญญาณชีพล่าสุดของผู้สูงอายุคนนี้มาใส่ให้อัตโนมัติ
-                        if (data.Latest) {
-                            if (data.Latest.Weight) document.getElementById('Weight').value = data.Latest.Weight;
-                            if (data.Latest.Height) document.getElementById('Height').value = data.Latest.Height;
-                            if (data.Latest.Waist) document.getElementById('Waist').value = data.Latest.Waist;
-                            if (data.Latest.Vital_signs) populateVitalSignsFromText(data.Latest.Vital_signs);
-                        }
                     })
                     .catch(error => console.error('Error:', error));
             }
+        }
+
+        // เรียกเมื่อกดปุ่ม "ดึงข้อมูลครั้งล่าสุด" เท่านั้น เติมน้ำหนัก/ส่วนสูง/รอบเอว/ความดัน
+        // จากการประเมินครั้งก่อนหน้าของผู้สูงอายุคนนี้
+        function fillLatestVitals() {
+            if (!document.getElementById('ID_Elderly').value) {
+                alert('กรุณาเลือกผู้สูงอายุก่อน');
+                return;
+            }
+            if (!latestElderlyDetails || !latestElderlyDetails.Latest) {
+                alert('ไม่พบข้อมูลการประเมินครั้งก่อนหน้าของผู้สูงอายุคนนี้');
+                return;
+            }
+            const latest = latestElderlyDetails.Latest;
+            if (latest.Weight) document.getElementById('Weight').value = latest.Weight;
+            if (latest.Height) document.getElementById('Height').value = latest.Height;
+            if (latest.Waist) document.getElementById('Waist').value = latest.Waist;
+            if (latest.Vital_signs) populateVitalSignsFromText(latest.Vital_signs);
         }
     </script>
 @endpush
@@ -251,6 +267,11 @@
                                 </div>
                             </div>
 
+                            <div class="d-flex justify-content-end mb-2">
+                                <button type="button" class="btn btn-outline-secondary btn-sm" onclick="fillLatestVitals()">
+                                    <i class="fas fa-history me-1"></i> ดึงข้อมูลครั้งล่าสุด (น้ำหนัก/ส่วนสูง/รอบเอว/ความดัน)
+                                </button>
+                            </div>
                             <div class="row">
                                 <div class="col-md-4 form-group">
                                     <label for="Weight">น้ำหนักตัว (กก.)</label>
