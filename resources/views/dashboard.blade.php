@@ -124,15 +124,15 @@
                                 <option value="90+" {{ request('age_range') == '90+' ? 'selected' : '' }}>90 ปีขึ้นไป</option>
                             </select>
                         </div>
-                        <div class="col-md-2">
-                            <label class="text-xs text-secondary mb-1">เพิ่มข้อมูลตั้งแต่วันที่</label>
-                            <input type="date" name="created_date_from" class="form-control form-control-sm"
-                                value="{{ request('created_date_from') }}">
-                        </div>
-                        <div class="col-md-2">
-                            <label class="text-xs text-secondary mb-1">ถึงวันที่</label>
-                            <input type="date" name="created_date_to" class="form-control form-control-sm"
-                                value="{{ request('created_date_to') }}">
+                        <div class="col-md-4">
+                            <label class="text-xs text-secondary mb-1">วันที่เพิ่มข้อมูล (ช่วงวัน)</label>
+                            <div class="input-group input-group-sm">
+                                <input type="date" name="created_date_from" class="form-control form-control-sm"
+                                    value="{{ request('created_date_from') }}">
+                                <span class="input-group-text">ถึง</span>
+                                <input type="date" name="created_date_to" class="form-control form-control-sm"
+                                    value="{{ request('created_date_to') }}">
+                            </div>
                         </div>
                         <div class="col-md-12 d-flex gap-2">
                             <button type="submit" class="btn btn-sm btn-dark mb-0">กรอง</button>
