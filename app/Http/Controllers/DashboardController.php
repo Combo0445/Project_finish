@@ -42,6 +42,7 @@ class DashboardController extends Controller
         $groupFilter = $request->input('adl_group');
         $gender = $request->input('gender');
         $ageRange = $request->input('age_range');
+        $createdDate = $request->input('created_date');
 
         $query = Elderly::with(['addressElderly', 'barthel_adl', 'care_giver', 'score_tai', 'care_instructions']);
 
@@ -56,6 +57,9 @@ class DashboardController extends Controller
         }
         if ($ageRange) {
             $this->applyAgeFilter($query, $ageRange);
+        }
+        if ($createdDate) {
+            $query->whereDate('created_at', $createdDate);
         }
 
         $elderlies = $query->paginate(20);

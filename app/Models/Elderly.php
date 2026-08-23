@@ -23,8 +23,6 @@ class Elderly extends Model
         'Image_Elderly'
     ];
 
-    public $timestamps = false;
-
     /**
      * Boot the model to handle cascading soft deletes.
      */

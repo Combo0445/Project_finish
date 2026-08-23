@@ -124,9 +124,14 @@
                                 <option value="90+" {{ request('age_range') == '90+' ? 'selected' : '' }}>90 ปีขึ้นไป</option>
                             </select>
                         </div>
-                        <div class="col-md-2 d-flex gap-2">
+                        <div class="col-md-2">
+                            <label class="text-xs text-secondary mb-1">วันที่เพิ่มข้อมูล</label>
+                            <input type="date" name="created_date" class="form-control form-control-sm"
+                                value="{{ request('created_date') }}">
+                        </div>
+                        <div class="col-md-12 d-flex gap-2">
                             <button type="submit" class="btn btn-sm btn-dark mb-0">กรอง</button>
-                            @if(request()->hasAny(['search', 'adl_group', 'gender', 'age_range']))
+                            @if(request()->hasAny(['search', 'adl_group', 'gender', 'age_range', 'created_date']))
                                 <a href="{{ route('dashboard') }}" class="btn btn-sm btn-outline-secondary mb-0">ล้าง</a>
                             @endif
                         </div>
@@ -137,6 +142,7 @@
                     ['label' => 'ชื่อ-นามสกุล', 'class' => 'text-center'],
                     ['label' => 'อายุ', 'class' => 'text-center'],
                     ['label' => 'เบอร์โทร', 'class' => 'text-center'],
+                    ['label' => 'วันที่เพิ่มข้อมูล', 'class' => 'text-center'],
                     ['label' => 'ADL', 'class' => 'text-center'],
                     ['label' => 'CG', 'class' => 'text-center'],
                     ['label' => 'Actions', 'class' => 'text-center']
@@ -150,6 +156,7 @@
                                 <td class="text-center">{{ $elderly->Name_Elderly }}</td>
                                 <td class="text-center">{{ \Carbon\Carbon::parse($elderly->Birthday)->age }} ปี</td>
                                 <td class="text-center">{{ $elderly->Phone_Elderly }}</td>
+                                <td class="text-center">{{ $elderly->created_at ? $elderly->created_at->format('d/m/Y') : '-' }}</td>
                                 <td class="text-center">
                                     <a
                                         href="{{ $elderly->barthel_adl ? route('adl.index') : route('adl.create', ['elderly_id' => $elderly->ID_Elderly]) }}">
@@ -191,7 +198,7 @@
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="7" class="text-center text-muted py-4">ไม่พบผู้สูงอายุที่ตรงกับเงื่อนไขที่กรอง</td>
+                                <td colspan="8" class="text-center text-muted py-4">ไม่พบผู้สูงอายุที่ตรงกับเงื่อนไขที่กรอง</td>
                             </tr>
                         @endforelse
                     </x-data-table>
