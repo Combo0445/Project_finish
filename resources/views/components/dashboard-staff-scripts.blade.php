@@ -144,14 +144,19 @@
                 });
             });
 
+            // จุดเริ่มต้นที่ 14.971, 103.185 (บุรีรัมย์) เป็นแค่ fallback เผื่อไม่มีหมุดเลย --
+            // ผู้สูงอายุอาจอยู่จังหวัดใดก็ได้ ถ้า setView ไว้ตายตัวแบบเดิม หมุดที่อยู่ไกล
+            // (เช่น ฉะเชิงเทรา) จะถูกเพิ่มลงแผนที่จริง แต่อยู่นอกขอบเขตที่มองเห็น ทำให้ดูเหมือน
+            // ไม่มีหมุดเลยทั้งที่จริงมีอยู่ -- ใช้ fitBounds ปรับมุมมองให้ครอบคลุมหมุดทั้งหมดแทน
             const map = L.map('map').setView([14.971, 103.185], 13);
             L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
                 attribution: '&copy; OpenStreetMap contributors'
             }).addTo(map);
 
+            const markers = [];
             elderlyLocations.forEach(loc => {
                 const adl = loc.adlGroup in icons ? loc.adlGroup : 'ยังไม่ได้ประเมิน';
-                L.marker([loc.latitude, loc.longitude], { icon: icons[adl] })
+                const marker = L.marker([loc.latitude, loc.longitude], { icon: icons[adl] })
                     .addTo(map)
                     .bindPopup(
                         `<div style="font-family: 'Sarabun', sans-serif;">` +
@@ -160,7 +165,13 @@
                         `<span class="badge bg-light text-dark">\${loc.adlGroup}</span>` +
                         `</div>`
                     );
+                markers.push(marker);
             });
+
+            if (markers.length > 0) {
+                // maxZoom กันไม่ให้ซูมเข้าใกล้เกินไปตอนมีหมุดเดียวหรือหมุดอยู่ใกล้กันมาก
+                map.fitBounds(L.featureGroup(markers).getBounds(), { padding: [30, 30], maxZoom: 15 });
+            }
         }
     });
 </script>
