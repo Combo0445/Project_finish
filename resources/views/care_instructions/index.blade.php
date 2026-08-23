@@ -230,6 +230,26 @@
                     confirmButtonText: 'ตกลง'
                 });
             @endif
+
+            @if(session('warning'))
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'โปรดทราบ',
+                    text: '{!! session('warning') !!}',
+                    confirmButtonColor: '#3085d6',
+                    confirmButtonText: 'ตกลง'
+                });
+            @endif
+
+            @if(session('info'))
+                Swal.fire({
+                    icon: 'info',
+                    title: 'แจ้งให้ทราบ',
+                    text: '{!! session('info') !!}',
+                    confirmButtonColor: '#3085d6',
+                    confirmButtonText: 'ตกลง'
+                });
+            @endif
             $('#ciTable').DataTable({
                 "language": {
                     "paginate": { "previous": "ก่อนหน้า", "next": "ถัดไป" },
