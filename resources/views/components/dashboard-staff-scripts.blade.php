@@ -112,6 +112,18 @@
     document.addEventListener('DOMContentLoaded', function () {
         const elderlyLocations = @json($elderlyLocations ?? []);
         const mapDiv = document.getElementById('map');
+
+        // ผู้สูงอายุที่ยังไม่ได้ปักหมุดตำแหน่ง (หรือไม่มีใครตรงกับตัวกรองปัจจุบัน) จะไม่มีพิกัด
+        // ให้แสดง เดิมถ้าไม่มีข้อมูลเลยแผนที่จะไม่ถูกสร้างขึ้นและว่างเปล่าโดยไม่มีคำอธิบาย
+        if (mapDiv && elderlyLocations.length === 0) {
+            mapDiv.innerHTML = `
+                <div class="d-flex flex-column align-items-center justify-content-center h-100 text-muted">
+                    <i class="fas fa-map-marker-alt fa-2x mb-2"></i>
+                    <span>ไม่พบข้อมูลตำแหน่งของผู้สูงอายุที่ตรงกับเงื่อนไขที่กรอง</span>
+                </div>
+            `;
+        }
+
         if (mapDiv && elderlyLocations.length > 0) {
             const iconUrls = {
                 'กลุ่มติดสังคม': 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-blue.png',
