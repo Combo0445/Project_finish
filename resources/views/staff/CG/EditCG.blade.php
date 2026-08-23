@@ -176,17 +176,17 @@
                         <div class="form-group">
                             <label for="Name_CG">ชื่อ - สกุลผู้ดูแลผู้สูงอายุ</label>
                             <input type="text" id="Name_CG" name="Name_CG" class="form-control"
-                                value="{{ $caregiver->Name_CG }}" required>
+                                value="{{ old('Name_CG', $caregiver->Name_CG) }}" required>
                         </div>
                         <div class="form-group">
                             <label for="Related">เกี่ยวข้องเป็น</label>
                             <input type="text" id="Related" name="Related" class="form-control"
-                                value="{{ $caregiver->Related }}" required>
+                                value="{{ old('Related', $caregiver->Related) }}" required>
                         </div>
                         <div class="form-group">
                             <label for="Phone_CG">เบอร์ติดต่อ</label>
                             <input type="number" id="Phone_CG" name="Phone_CG" class="form-control"
-                                value="{{ $caregiver->Phone_CG }}" required>
+                                value="{{ old('Phone_CG', $caregiver->Phone_CG) }}" required>
                         <div class="form-group">
                             <label for="Name_Elderly">ชื่อ-สกุลผู้สูงอายุ</label>
                             <input type="text" id="Name_Elderly" name="Name_Elderly" class="form-control"
@@ -212,17 +212,17 @@
                         <div class="form-group">
                             <label for="Weight">น้ำหนักตัว</label>
                             <input type="number" id="Weight" name="Weight" class="form-control" step="0.1"
-                                value="{{ $caregiver->Weight }}" required>
+                                value="{{ old('Weight', $caregiver->Weight) }}" required>
                         </div>
                         <div class="form-group">
                             <label for="Height">ส่วนสูง</label>
                             <input type="number" id="Height" name="Height" class="form-control" step="0.1"
-                                value="{{ $caregiver->Height }}" required>
+                                value="{{ old('Height', $caregiver->Height) }}" required>
                         </div>
                         <div class="form-group">
                             <label for="Waist">รอบเอว</label>
                             <input type="number" id="Waist" name="Waist" class="form-control" step="0.1"
-                                value="{{ $caregiver->Waist }}" required>
+                                value="{{ old('Waist', $caregiver->Waist) }}" required>
                         </div>
                         @php
                             $group = $caregiver->Group_ADL;
@@ -251,25 +251,26 @@
                         <div class="form-group">
                             <label for="Disease">โรคประจำตัว</label>
                             <input type="text" id="Disease" name="Disease" class="form-control"
-                                value="{{ $caregiver->Disease }}">
+                                value="{{ old('Disease', $caregiver->Disease) }}">
                         </div>
                         <div class="form-group">
                             <label for="Disability">ความพิการ</label>
                             <input type="text" id="Disability" name="Disability" class="form-control"
-                                value="{{ $caregiver->Disability }}">
+                                value="{{ old('Disability', $caregiver->Disability) }}">
                         </div>
+                        @php $oldRights = old('Rights', $caregiver->Rights) @endphp
                         <div class="form-group">
                             <label for="Rights">สิทธิการรักษา</label>
                             <select id="Rights" name="Rights" class="form-control" required>
-                                <option value="" disabled {{ $caregiver->Rights ? '' : 'selected' }}>-- เลือกสิทธิการรักษา --</option>
-                                <option value="สิทธิข้าราชการ" {{ $caregiver->Rights == 'สิทธิข้าราชการ' ? 'selected' : '' }}>สิทธิข้าราชการ</option>
-                                <option value="บัตรผู้พิการ" {{ $caregiver->Rights == 'บัตรผู้พิการ' ? 'selected' : '' }}>บัตรผู้พิการ</option>
-                                <option value="บัตรทอง" {{ $caregiver->Rights == 'บัตรทอง' ? 'selected' : '' }}>บัตรทอง</option>
-                                <option value="ประกันสุขภาพ" {{ $caregiver->Rights == 'ประกันสุขภาพ' ? 'selected' : '' }}>ประกันสุขภาพ</option>
-                                <option value="อปท." {{ $caregiver->Rights == 'อปท.' ? 'selected' : '' }}>อปท.</option>
-                                <option value="ผู้สูงอายุ" {{ $caregiver->Rights == 'ผู้สูงอายุ' ? 'selected' : '' }}>ผู้สูงอายุ</option>
+                                <option value="" disabled {{ $oldRights ? '' : 'selected' }}>-- เลือกสิทธิการรักษา --</option>
+                                <option value="สิทธิข้าราชการ" {{ $oldRights == 'สิทธิข้าราชการ' ? 'selected' : '' }}>สิทธิข้าราชการ</option>
+                                <option value="บัตรผู้พิการ" {{ $oldRights == 'บัตรผู้พิการ' ? 'selected' : '' }}>บัตรผู้พิการ</option>
+                                <option value="บัตรทอง" {{ $oldRights == 'บัตรทอง' ? 'selected' : '' }}>บัตรทอง</option>
+                                <option value="ประกันสุขภาพ" {{ $oldRights == 'ประกันสุขภาพ' ? 'selected' : '' }}>ประกันสุขภาพ</option>
+                                <option value="อปท." {{ $oldRights == 'อปท.' ? 'selected' : '' }}>อปท.</option>
+                                <option value="ผู้สูงอายุ" {{ $oldRights == 'ผู้สูงอายุ' ? 'selected' : '' }}>ผู้สูงอายุ</option>
                             </select>
-                        </div>  
+                        </div>
                         </div>
                         <input type="hidden" id="ID_ADL" name="ID_ADL" value="{{ $caregiver->ID_ADL }}">
                         <input type="hidden" id="Name_Elderly_hidden" name="Name_Elderly"
@@ -280,28 +281,43 @@
                         <a href="{{ route('cg.index') }}" class="btn btn-danger">ยกเลิก</a>
                     </form>
 
+                    @php
+                        // ฟิลด์เหล่านี้ submit ค่าเป็น "ไม่มี" หรือข้อความรายละเอียดดิบๆ โดยตรง (ไม่ใช่ "มี")
+                        // เพราะ JS เปลี่ยนชื่อ input ตอน submit ให้ input รายละเอียดใช้ name เดียวกับ select
+                        // เมื่อเลือก "มี" ดังนั้น old() ของฟิลด์เหล่านี้จะเป็นข้อความรายละเอียดโดยตรงอยู่แล้ว
+                        $toggleFields = [
+                            'Bedsores', 'Pain', 'Swelling', 'Itchy_rash',
+                            'Stiff_joints', 'Malnutrition',
+                            'Economic_problems', 'Social_problems', 'Doctor_FU',
+                        ];
+                        $oldToggle = [];
+                        foreach ($toggleFields as $tf) {
+                            $oldToggle[$tf] = old($tf, $caregiver->$tf);
+                        }
+                    @endphp
+
                     <!-- Assessment Form -->
                     <form id="assessment-form" class="hidden" action="{{ route('cg.update', $caregiver->ID_CG) }}" method="POST" enctype="multipart/form-data">
                         @csrf
                         @method('PUT')
                         <!-- Hidden fields to pass caregiver form data -->
-                        <input type="hidden" id="Name_CG_hidden" name="Name_CG" value="{{ $caregiver->Name_CG }}">
-                        <input type="hidden" id="Related_hidden" name="Related" value="{{ $caregiver->Related }}">
+                        <input type="hidden" id="Name_CG_hidden" name="Name_CG" value="{{ old('Name_CG', $caregiver->Name_CG) }}">
+                        <input type="hidden" id="Related_hidden" name="Related" value="{{ old('Related', $caregiver->Related) }}">
                         <input type="hidden" id="Phone_CG_hidden" name="Phone_CG"
-                            value="{{ $caregiver->Phone_CG }}">
+                            value="{{ old('Phone_CG', $caregiver->Phone_CG) }}">
                         <input type="hidden" id="ID_Elderly_hidden" name="ID_Elderly"
                             value="{{ $caregiver->ID_Elderly }}">
                         <input type="hidden" id="Age_hidden" name="Age" value="{{ $caregiver->Age }}">
                         <input type="hidden" id="Address_hidden" name="Address" value="{{ $caregiver->Address }}">
-                        <input type="hidden" id="Weight_hidden" name="Weight" value="{{ $caregiver->Weight }}">
-                        <input type="hidden" id="Height_hidden" name="Height" value="{{ $caregiver->Height }}">
-                        <input type="hidden" id="Waist_hidden" name="Waist" value="{{ $caregiver->Waist }}">
+                        <input type="hidden" id="Weight_hidden" name="Weight" value="{{ old('Weight', $caregiver->Weight) }}">
+                        <input type="hidden" id="Height_hidden" name="Height" value="{{ old('Height', $caregiver->Height) }}">
+                        <input type="hidden" id="Waist_hidden" name="Waist" value="{{ old('Waist', $caregiver->Waist) }}">
                         <input type="hidden" id="Group_ADL_hidden" name="Group_ADL"
                             value="{{ $caregiver->Group_ADL }}">
-                        <input type="hidden" id="Disease_hidden" name="Disease" value="{{ $caregiver->Disease }}">
+                        <input type="hidden" id="Disease_hidden" name="Disease" value="{{ old('Disease', $caregiver->Disease) }}">
                         <input type="hidden" id="Disability_hidden" name="Disability"
-                            value="{{ $caregiver->Disability }}">
-                        <input type="hidden" id="Rights_hidden" name="Rights" value="{{ $caregiver->Rights }}">
+                            value="{{ old('Disability', $caregiver->Disability) }}">
+                        <input type="hidden" id="Rights_hidden" name="Rights" value="{{ $oldRights }}">
                         <input type="hidden" id="Name_Elderly_hidden" name="Name_Elderly"
                             value="{{ $caregiver->Name_Elderly }}">
                         <!-- End hidden fields -->
@@ -311,11 +327,12 @@
                         </div>
                         <div class="form-group">
                             <label for="Consciousness">ความรู้สึกตัว</label>
+                            @php $oldConsciousness = old('Consciousness', $caregiver->Consciousness) @endphp
                             <select id="Consciousness" name="Consciousness" class="form-control" required>
                                 <option value="รู้สึกดี"
-                                    {{ $caregiver->Consciousness == 'รู้สึกดี' ? 'selected' : '' }}>รู้สึกดี</option>
+                                    {{ $oldConsciousness == 'รู้สึกดี' ? 'selected' : '' }}>รู้สึกดี</option>
                                 <option value="ไม่รู้สึกตัว"
-                                    {{ $caregiver->Consciousness == 'ไม่รู้สึกตัว' ? 'selected' : '' }}>ไม่รู้สึกตัว
+                                    {{ $oldConsciousness == 'ไม่รู้สึกตัว' ? 'selected' : '' }}>ไม่รู้สึกตัว
                                 </option>
                             </select>
                         </div>
@@ -348,102 +365,102 @@
                                 </div>
                             </div>
                         
-                            <input type="hidden" id="Vital_signs" name="Vital_signs" value="{{ $caregiver->Vital_signs }}">
-                        </div>                        
+                            <input type="hidden" id="Vital_signs" name="Vital_signs" value="{{ old('Vital_signs', $caregiver->Vital_signs) }}">
+                        </div>
                         <div class="form-group">
                             <label for="Bedsores">แผลกดทับ</label>
                             <select id="Bedsores" name="Bedsores" class="form-control" required>
-                                <option value="ไม่มี" {{ $caregiver->Bedsores == 'ไม่มี' ? 'selected' : '' }}>ไม่มี
+                                <option value="ไม่มี" {{ $oldToggle['Bedsores'] == 'ไม่มี' ? 'selected' : '' }}>ไม่มี
                                 </option>
-                                <option value="มี" {{ $caregiver->Bedsores != 'ไม่มี' && $caregiver->Bedsores != null ? 'selected' : '' }}>มี
+                                <option value="มี" {{ $oldToggle['Bedsores'] != 'ไม่มี' && $oldToggle['Bedsores'] != null ? 'selected' : '' }}>มี
                                 </option>
                             </select>
                             <input style="display:none;" type="text" id="Bedsores_details" name="Bedsores_details" class="form-control"
-                                value="{{ $caregiver->Bedsores }}" placeholder="รายละเอียดถ้ามี">
+                                value="{{ $oldToggle['Bedsores'] }}" placeholder="รายละเอียดถ้ามี">
                         </div>
                         <div class="form-group">
                             <label for="Pain">อาการปวด</label>
                             <select id="Pain" name="Pain" class="form-control" required>
-                                <option value="ไม่มี" {{ $caregiver->Pain == 'ไม่มี' ? 'selected' : '' }}>ไม่มี
+                                <option value="ไม่มี" {{ $oldToggle['Pain'] == 'ไม่มี' ? 'selected' : '' }}>ไม่มี
                                 </option>
-                                <option value="มี" {{ $caregiver->Pain != 'ไม่มี' && $caregiver->Pain != null ? 'selected' : '' }}>มี</option>
+                                <option value="มี" {{ $oldToggle['Pain'] != 'ไม่มี' && $oldToggle['Pain'] != null ? 'selected' : '' }}>มี</option>
                             </select>
                             <input style="display:none;" type="text" id="Pain_details" name="Pain_details" class="form-control"
-                                value="{{ $caregiver->Pain }}" placeholder="รายละเอียดถ้ามี">
+                                value="{{ $oldToggle['Pain'] }}" placeholder="รายละเอียดถ้ามี">
                         </div>
                         <div class="form-group">
                             <label for="Swelling">อาการบวม</label>
                             <select id="Swelling" name="Swelling" class="form-control" required>
-                                <option value="ไม่มี" {{ $caregiver->Swelling == 'ไม่มี' ? 'selected' : '' }}>ไม่มี
+                                <option value="ไม่มี" {{ $oldToggle['Swelling'] == 'ไม่มี' ? 'selected' : '' }}>ไม่มี
                                 </option>
-                                <option value="มี" {{ $caregiver->Swelling != 'ไม่มี' && $caregiver->Swelling != null ? 'selected' : '' }}>มี
+                                <option value="มี" {{ $oldToggle['Swelling'] != 'ไม่มี' && $oldToggle['Swelling'] != null ? 'selected' : '' }}>มี
                                 </option>
                             </select>
                             <input style="display:none;" type="text" id="Swelling_details" name="Swelling_details" class="form-control"
-                                value="{{ $caregiver->Swelling }}" placeholder="รายละเอียดถ้ามี">
+                                value="{{ $oldToggle['Swelling'] }}" placeholder="รายละเอียดถ้ามี">
                         </div>
                         <div class="form-group">
                             <label for="Itchy_rash">ผื่นคัน</label>
                             <select id="Itchy_rash" name="Itchy_rash" class="form-control" required>
-                                <option value="ไม่มี" {{ $caregiver->Itchy_rash == 'ไม่มี' ? 'selected' : '' }}>ไม่มี
+                                <option value="ไม่มี" {{ $oldToggle['Itchy_rash'] == 'ไม่มี' ? 'selected' : '' }}>ไม่มี
                                 </option>
-                                <option value="มี" {{ $caregiver->Itchy_rash != 'ไม่มี' && $caregiver->Itchy_rash != null ? 'selected' : '' }}>มี
+                                <option value="มี" {{ $oldToggle['Itchy_rash'] != 'ไม่มี' && $oldToggle['Itchy_rash'] != null ? 'selected' : '' }}>มี
                                 </option>
                             </select>
                             <input style="display:none;" type="text" id="Itchy_rash_details" name="Itchy_rash_details"
-                                class="form-control" value="{{ $caregiver->Itchy_rash }}"
+                                class="form-control" value="{{ $oldToggle['Itchy_rash'] }}"
                                 placeholder="รายละเอียดถ้ามี">
                         </div>
                         <div class="form-group">
                             <label for="Stiff_joints">ข้อติดแข็ง</label>
                             <select id="Stiff_joints" name="Stiff_joints" class="form-control" required>
-                                <option value="ไม่มี" {{ $caregiver->Stiff_joints == 'ไม่มี' ? 'selected' : '' }}>
+                                <option value="ไม่มี" {{ $oldToggle['Stiff_joints'] == 'ไม่มี' ? 'selected' : '' }}>
                                     ไม่มี</option>
-                                <option value="มี" {{ $caregiver->Stiff_joints != 'ไม่มี' && $caregiver->Stiff_joints != null ? 'selected' : '' }}>มี
+                                <option value="มี" {{ $oldToggle['Stiff_joints'] != 'ไม่มี' && $oldToggle['Stiff_joints'] != null ? 'selected' : '' }}>มี
                                 </option>
                             </select>
                             <input style="display:none;" type="text" id="Stiff_joints_details" name="Stiff_joints_details"
-                                class="form-control" value="{{ $caregiver->Stiff_joints }}"
+                                class="form-control" value="{{ $oldToggle['Stiff_joints'] }}"
                                 placeholder="รายละเอียดถ้ามี">
                         </div>
                         <div class="form-group">
                             <label for="Malnutrition">ทุพโภชนาการ</label>
                             <select id="Malnutrition" name="Malnutrition" class="form-control" required>
-                                <option value="ไม่มี" {{ $caregiver->Malnutrition == 'ไม่มี' ? 'selected' : '' }}>
+                                <option value="ไม่มี" {{ $oldToggle['Malnutrition'] == 'ไม่มี' ? 'selected' : '' }}>
                                     ไม่มี</option>
-                                <option value="มี" {{ $caregiver->Malnutrition != 'ไม่มี' && $caregiver->Malnutrition != null ? 'selected' : '' }}>มี
+                                <option value="มี" {{ $oldToggle['Malnutrition'] != 'ไม่มี' && $oldToggle['Malnutrition'] != null ? 'selected' : '' }}>มี
                                 </option>
                             </select>
                             <input style="display:none;" type="text" id="Malnutrition_details" name="Malnutrition_details"
-                                class="form-control" value="{{ $caregiver->Malnutrition }}"
+                                class="form-control" value="{{ $oldToggle['Malnutrition'] }}"
                                 placeholder="รายละเอียดถ้ามี">
                         </div>
                         <div class="form-group">
                             <label for="Eating">การรับประทานอาหาร</label>
                             <select id="Eating" name="Eating" class="form-control" required>
                                 <option value="ตักกินเองได้"
-                                    {{ $caregiver->Eating == 'ตักกินเองได้' ? 'selected' : '' }}>ตักกินเองได้</option>
+                                    {{ old('Eating', $caregiver->Eating) == 'ตักกินเองได้' ? 'selected' : '' }}>ตักกินเองได้</option>
                                 <option value="กินเองไม่ได้"
-                                    {{ $caregiver->Eating == 'กินเองไม่ได้' ? 'selected' : '' }}>กินเองไม่ได้</option>
+                                    {{ old('Eating', $caregiver->Eating) == 'กินเองไม่ได้' ? 'selected' : '' }}>กินเองไม่ได้</option>
                             </select>
                         </div>
                         <div class="form-group">
                             <label for="Swallowing">การกลืน</label>
                             <select id="Swallowing" name="Swallowing" class="form-control" required>
                                 <option value="กลืนได้ปกติ"
-                                    {{ $caregiver->Swallowing == 'กลืนได้ปกติ' ? 'selected' : '' }}>กลืนได้ปกติ
+                                    {{ old('Swallowing', $caregiver->Swallowing) == 'กลืนได้ปกติ' ? 'selected' : '' }}>กลืนได้ปกติ
                                 </option>
-                                <option value="สำลัก" {{ $caregiver->Swallowing == 'สำลัก' ? 'selected' : '' }}>สำลัก
+                                <option value="สำลัก" {{ old('Swallowing', $caregiver->Swallowing) == 'สำลัก' ? 'selected' : '' }}>สำลัก
                                 </option>
                             </select>
                         </div>
                         <div class="form-group">
                             <label for="Defecation">การขับถ่ายอุจจาระ</label>
                             <select id="Defecation" name="Defecation" class="form-control" required>
-                                <option value="กลั้นได้" {{ $caregiver->Defecation == 'กลั้นได้' ? 'selected' : '' }}>
+                                <option value="กลั้นได้" {{ old('Defecation', $caregiver->Defecation) == 'กลั้นได้' ? 'selected' : '' }}>
                                     กลั้นได้</option>
                                 <option value="กลั้นไม่ได้"
-                                    {{ $caregiver->Defecation == 'กลั้นไม่ได้' ? 'selected' : '' }}>กลั้นไม่ได้
+                                    {{ old('Defecation', $caregiver->Defecation) == 'กลั้นไม่ได้' ? 'selected' : '' }}>กลั้นไม่ได้
                                 </option>
                             </select>
                         </div>
@@ -451,10 +468,10 @@
                             <label for="Urinary_excretion">การขับถ่ายปัสสาวะ</label>
                             <select id="Urinary_excretion" name="Urinary_excretion" class="form-control" required>
                                 <option value="กลั้นได้"
-                                    {{ $caregiver->Urinary_excretion == 'กลั้นได้' ? 'selected' : '' }}>กลั้นได้
+                                    {{ old('Urinary_excretion', $caregiver->Urinary_excretion) == 'กลั้นได้' ? 'selected' : '' }}>กลั้นได้
                                 </option>
                                 <option value="กลั้นไม่ได้"
-                                    {{ $caregiver->Urinary_excretion == 'กลั้นไม่ได้' ? 'selected' : '' }}>กลั้นไม่ได้
+                                    {{ old('Urinary_excretion', $caregiver->Urinary_excretion) == 'กลั้นไม่ได้' ? 'selected' : '' }}>กลั้นไม่ได้
                                 </option>
                             </select>
                         </div>
@@ -462,66 +479,66 @@
                             <label for="Taking_medicine">การรับประทานยา</label>
                             <select id="Taking_medicine" name="Taking_medicine" class="form-control" required>
                                 <option value="กินสม่ำเสมอ"
-                                    {{ $caregiver->Taking_medicine == 'กินสม่ำเสมอ' ? 'selected' : '' }}>กินสม่ำเสมอ
+                                    {{ old('Taking_medicine', $caregiver->Taking_medicine) == 'กินสม่ำเสมอ' ? 'selected' : '' }}>กินสม่ำเสมอ
                                 </option>
-                                <option value="ขาดยา" {{ $caregiver->Taking_medicine == 'ขาดยา' ? 'selected' : '' }}>
+                                <option value="ขาดยา" {{ old('Taking_medicine', $caregiver->Taking_medicine) == 'ขาดยา' ? 'selected' : '' }}>
                                     ขาดยา</option>
                             </select>
                         </div>
                         <div class="form-group">
                             <label for="Emotional_state">สภาพอารมณ์</label>
                             <select id="Emotional_state" name="Emotional_state" class="form-control" required>
-                                <option value="ปกติ" {{ $caregiver->Emotional_state == 'ปกติ' ? 'selected' : '' }}>
+                                <option value="ปกติ" {{ old('Emotional_state', $caregiver->Emotional_state) == 'ปกติ' ? 'selected' : '' }}>
                                     ปกติ</option>
                                 <option value="ผิดปกติ"
-                                    {{ $caregiver->Emotional_state == 'ผิดปกติ' ? 'selected' : '' }}>ผิดปกติ</option>
+                                    {{ old('Emotional_state', $caregiver->Emotional_state) == 'ผิดปกติ' ? 'selected' : '' }}>ผิดปกติ</option>
                             </select>
                         </div>
                         <div class="form-group">
                             <label for="Economic_problems">ปัญหาเศรษฐกิจ</label>
                             <select id="Economic_problems" name="Economic_problems" class="form-control" required>
                                 <option value="ไม่มี"
-                                    {{ $caregiver->Economic_problems == 'ไม่มี' ? 'selected' : '' }}>ไม่มี</option>
-                                <option value="มี" {{ $caregiver->Economic_problems != 'ไม่มี' && $caregiver->Economic_problems != null ? 'selected' : '' }}>
+                                    {{ $oldToggle['Economic_problems'] == 'ไม่มี' ? 'selected' : '' }}>ไม่มี</option>
+                                <option value="มี" {{ $oldToggle['Economic_problems'] != 'ไม่มี' && $oldToggle['Economic_problems'] != null ? 'selected' : '' }}>
                                     มี</option>
                             </select>
                             <input style="display:none;" type="text" id="Economic_problems_details" name="Economic_problems_details"
-                                class="form-control" value="{{ $caregiver->Economic_problems }}"
+                                class="form-control" value="{{ $oldToggle['Economic_problems'] }}"
                                 placeholder="รายละเอียดถ้ามี">
                         </div>
                         <div class="form-group">
                             <label for="Social_problems">ปัญหาสังคม</label>
                             <select id="Social_problems" name="Social_problems" class="form-control" required>
-                                <option value="ไม่มี" {{ $caregiver->Social_problems == 'ไม่มี' ? 'selected' : '' }}>
+                                <option value="ไม่มี" {{ $oldToggle['Social_problems'] == 'ไม่มี' ? 'selected' : '' }}>
                                     ไม่มี</option>
-                                <option value="มี" {{ $caregiver->Social_problems != 'ไม่มี' && $caregiver->Social_problems != null ? 'selected' : '' }}>มี
+                                <option value="มี" {{ $oldToggle['Social_problems'] != 'ไม่มี' && $oldToggle['Social_problems'] != null ? 'selected' : '' }}>มี
                                 </option>
                             </select>
                             <input style="display:none;" type="text" id="Social_problems_details" name="Social_problems_details"
-                                class="form-control" value="{{ $caregiver->Social_problems }}"
+                                class="form-control" value="{{ $oldToggle['Social_problems'] }}"
                                 placeholder="รายละเอียดถ้ามี">
                         </div>
                         <div class="form-group">
                             <label for="Doctor_FU">แพทย์นัด F/U</label>
                             <select id="Doctor_FU" name="Doctor_FU" class="form-control" required>
-                                <option value="ไม่มี" {{ $caregiver->Doctor_FU == 'ไม่มี' ? 'selected' : '' }}>ไม่มี
+                                <option value="ไม่มี" {{ $oldToggle['Doctor_FU'] == 'ไม่มี' ? 'selected' : '' }}>ไม่มี
                                 </option>
-                                <option value="มี" {{ $caregiver->Doctor_FU != 'ไม่มี' && $caregiver->Doctor_FU != null ? 'selected' : '' }}>มี
+                                <option value="มี" {{ $oldToggle['Doctor_FU'] != 'ไม่มี' && $oldToggle['Doctor_FU'] != null ? 'selected' : '' }}>มี
                                 </option>
                             </select>
                             <input style="display:none;" type="text" id="Doctor_FU_details" name="Doctor_FU_details"
-                                class="form-control" value="{{ $caregiver->Doctor_FU }}"
+                                class="form-control" value="{{ $oldToggle['Doctor_FU'] }}"
                                 placeholder="รายละเอียดถ้ามี">
                         </div>
                         <div class="form-group">
                             <label for="Other_problems">ปัญหาอื่น ๆ</label>
                             <input type="text" id="Other_problems" name="Other_problems" class="form-control"
-                                value="{{ $caregiver->Other_problems }}">
+                                value="{{ old('Other_problems', $caregiver->Other_problems) }}">
                         </div>
                         <div class="form-group">
                             <label for="Assistance">การช่วยเหลือ</label>
                             <input type="text" id="Assistance" name="Assistance" class="form-control"
-                                value="{{ $caregiver->Assistance }}">
+                                value="{{ old('Assistance', $caregiver->Assistance) }}">
                         </div>
                         <div class="form-group">
                             <label for="Reporter">ผู้รายงาน</label>
@@ -683,6 +700,19 @@
     document.addEventListener('DOMContentLoaded', function () {
         const vitalText = document.getElementById('Vital_signs').value;
         populateVitalSignsFromText(vitalText);
+
+        @if ($errors->any())
+            @php
+                $caregiverFormFields = ['Name_CG', 'Related', 'Phone_CG', 'Weight', 'Height', 'Waist', 'Group_ADL', 'Rights'];
+                $hasCaregiverFormError = collect($caregiverFormFields)->contains(fn($f) => $errors->has($f));
+            @endphp
+            // หน้านี้ redisplay เพราะ validate ไม่ผ่าน -- ถ้าช่องที่ error ไม่ได้อยู่ในส่วนที่ 1
+            // (ข้อมูลผู้ดูแล/ผู้สูงอายุ) ให้เปิดส่วนที่ 2 (แบบประเมิน) ที่ผู้ใช้กำลังกรอกอยู่ให้เลย
+            // แทนที่จะย้อนกลับไปหน้าแรกโดยไม่มีสาเหตุ
+            @if (!$hasCaregiverFormError)
+                showAssessmentForm();
+            @endif
+        @endif
     });
 
     // เพิ่มการรวมค่าก่อน submit form

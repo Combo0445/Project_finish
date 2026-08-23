@@ -229,7 +229,7 @@ class CGController extends Controller
             return redirect()->route('cg.index')->with('success', 'อัปเดตข้อมูล Care Giver สำเร็จแล้ว!');
         } catch (\Exception $e) {
             \Log::error('CG Update Error: ' . $e->getMessage());
-            return redirect()->back()->with('error', 'เกิดข้อผิดพลาดในการแก้ไขข้อมูล กรุณาลองใหม่อีกครั้ง');
+            return redirect()->back()->withInput()->with('error', 'เกิดข้อผิดพลาดในการแก้ไขข้อมูล กรุณาลองใหม่อีกครั้ง');
         }
     }
 
