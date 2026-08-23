@@ -182,6 +182,10 @@
                                 </td>
                                 <td class="text-center">
                                     <div class="btn-group">
+                                        <a href="{{ route('elderly.profile', $elderly->ID_Elderly) }}"
+                                            class="btn btn-link text-primary p-0 me-3" title="ดูประวัติ">
+                                            <i class="fas fa-history"></i>
+                                        </a>
                                         <a href="{{ route('search-location', ['id' => $elderly->ID_Elderly]) }}" target="_blank"
                                             class="btn btn-link text-info p-0 me-3" title="ดูที่อยู่">
                                             <i class="fas fa-map-marker-alt"></i>

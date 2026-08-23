@@ -1,13 +1,8 @@
-<!DOCTYPE html>
-<html lang="en">
+@extends('layouts.app')
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Edit Care Giver</title>
-    <link href="{{ url('assets/css/argon-dashboard.css') }}" rel="stylesheet" />
-    <link href="{{ url('assets/css/nucleo-icons.css') }}" rel="stylesheet" />
-    <link href="{{ url('assets/css/nucleo-svg.css') }}" rel="stylesheet" />
+@section('title', 'Edit Care Giver')
+
+@push('styles')
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -81,73 +76,9 @@
             display: none;
         }
     </style>
-    <script>
+@endpush
 
-
-        function showAssessmentForm() {
-            document.getElementById('caregiver-form').classList.add('hidden');
-            document.getElementById('assessment-form').classList.remove('hidden');
-        }
-
-        // ก่อนสลับไปหน้าถัดไป ต้องเช็คว่ากรอกครบ (เช่น น้ำหนัก/ส่วนสูง/รอบเอว) ก่อน — เดิมปุ่ม
-        // "ถัดไป" เป็น type="button" จึงไม่เคยทริกเกอร์ HTML5 validation เลย ทำให้ข้ามช่องที่ยังไม่ได้
-        // กรอกไปได้โดยไม่มีการเตือน
-        function goToAssessmentForm() {
-            const form = document.getElementById('caregiver-form');
-            if (!form.checkValidity()) {
-                form.reportValidity();
-                return;
-            }
-            transferValues();
-            showAssessmentForm();
-        }
-
-        function showCareGiverForm() {
-            document.getElementById('assessment-form').classList.add('hidden');
-            document.getElementById('caregiver-form').classList.remove('hidden');
-        }
-
-        // ดึงน้ำหนัก/ส่วนสูง/รอบเอว/ความดัน จากรายงาน CG ครั้งก่อนหน้าของผู้สูงอายุคนนี้
-        // (ไม่นับรายงานที่กำลังแก้ไขอยู่นี้เอง) มาใส่แทนค่าปัจจุบันในฟอร์ม
-        function fillLatestVitals() {
-            const url = `{{ route('get-elderly-details', $caregiver->ID_ADL) }}?exclude={{ $caregiver->ID_CG }}`;
-            fetch(url)
-                .then(response => response.json())
-                .then(data => {
-                    if (!data.Latest) {
-                        alert('ไม่พบข้อมูลการประเมินครั้งก่อนหน้าของผู้สูงอายุคนนี้');
-                        return;
-                    }
-                    if (data.Latest.Weight) document.getElementById('Weight').value = data.Latest.Weight;
-                    if (data.Latest.Height) document.getElementById('Height').value = data.Latest.Height;
-                    if (data.Latest.Waist) document.getElementById('Waist').value = data.Latest.Waist;
-                    if (data.Latest.Vital_signs) populateVitalSignsFromText(data.Latest.Vital_signs);
-                })
-                .catch(error => console.error('Error:', error));
-        }
-
-        function transferValues() {
-            document.getElementById('Name_CG_hidden').value = document.getElementById('Name_CG').value;
-            document.getElementById('Related_hidden').value = document.getElementById('Related').value;
-            document.getElementById('Phone_CG_hidden').value = document.getElementById('Phone_CG').value;
-            document.getElementById('ID_Elderly_hidden').value = document.getElementById('ID_Elderly').value;
-            document.getElementById('Age_hidden').value = document.getElementById('Age').value;
-            document.getElementById('Address_hidden').value = document.getElementById('Address').value;
-            document.getElementById('Weight_hidden').value = document.getElementById('Weight').value;
-            document.getElementById('Height_hidden').value = document.getElementById('Height').value;
-            document.getElementById('Waist_hidden').value = document.getElementById('Waist').value;
-            document.getElementById('Group_ADL_hidden').value = document.getElementById('Group_ADL').value;
-            document.getElementById('Disease_hidden').value = document.getElementById('Disease').value;
-            document.getElementById('Disability_hidden').value = document.getElementById('Disability').value;
-            document.getElementById('Rights_hidden').value = document.getElementById('Rights').value;
-            document.getElementById('Name_Elderly_hidden').value = document.getElementById('Name_Elderly').value;
-        }
-    </script>
-</head>
-
-<body>
-    @include('layout.nav')
-
+@section('content')
     <div class="container mt-5">
         <div class="card">
             <div class="card-header">
@@ -601,8 +532,70 @@
             </div>
         </div>
     </div>
-</body>
-<script>
+@endsection
+
+@push('scripts')
+    <script>
+        function showAssessmentForm() {
+            document.getElementById('caregiver-form').classList.add('hidden');
+            document.getElementById('assessment-form').classList.remove('hidden');
+        }
+
+        // ก่อนสลับไปหน้าถัดไป ต้องเช็คว่ากรอกครบ (เช่น น้ำหนัก/ส่วนสูง/รอบเอว) ก่อน — เดิมปุ่ม
+        // "ถัดไป" เป็น type="button" จึงไม่เคยทริกเกอร์ HTML5 validation เลย ทำให้ข้ามช่องที่ยังไม่ได้
+        // กรอกไปได้โดยไม่มีการเตือน
+        function goToAssessmentForm() {
+            const form = document.getElementById('caregiver-form');
+            if (!form.checkValidity()) {
+                form.reportValidity();
+                return;
+            }
+            transferValues();
+            showAssessmentForm();
+        }
+
+        function showCareGiverForm() {
+            document.getElementById('assessment-form').classList.add('hidden');
+            document.getElementById('caregiver-form').classList.remove('hidden');
+        }
+
+        // ดึงน้ำหนัก/ส่วนสูง/รอบเอว/ความดัน จากรายงาน CG ครั้งก่อนหน้าของผู้สูงอายุคนนี้
+        // (ไม่นับรายงานที่กำลังแก้ไขอยู่นี้เอง) มาใส่แทนค่าปัจจุบันในฟอร์ม
+        function fillLatestVitals() {
+            const url = `{{ route('get-elderly-details', $caregiver->ID_ADL) }}?exclude={{ $caregiver->ID_CG }}`;
+            fetch(url)
+                .then(response => response.json())
+                .then(data => {
+                    if (!data.Latest) {
+                        alert('ไม่พบข้อมูลการประเมินครั้งก่อนหน้าของผู้สูงอายุคนนี้');
+                        return;
+                    }
+                    if (data.Latest.Weight) document.getElementById('Weight').value = data.Latest.Weight;
+                    if (data.Latest.Height) document.getElementById('Height').value = data.Latest.Height;
+                    if (data.Latest.Waist) document.getElementById('Waist').value = data.Latest.Waist;
+                    if (data.Latest.Vital_signs) populateVitalSignsFromText(data.Latest.Vital_signs);
+                })
+                .catch(error => console.error('Error:', error));
+        }
+
+        function transferValues() {
+            document.getElementById('Name_CG_hidden').value = document.getElementById('Name_CG').value;
+            document.getElementById('Related_hidden').value = document.getElementById('Related').value;
+            document.getElementById('Phone_CG_hidden').value = document.getElementById('Phone_CG').value;
+            document.getElementById('ID_Elderly_hidden').value = document.getElementById('ID_Elderly').value;
+            document.getElementById('Age_hidden').value = document.getElementById('Age').value;
+            document.getElementById('Address_hidden').value = document.getElementById('Address').value;
+            document.getElementById('Weight_hidden').value = document.getElementById('Weight').value;
+            document.getElementById('Height_hidden').value = document.getElementById('Height').value;
+            document.getElementById('Waist_hidden').value = document.getElementById('Waist').value;
+            document.getElementById('Group_ADL_hidden').value = document.getElementById('Group_ADL').value;
+            document.getElementById('Disease_hidden').value = document.getElementById('Disease').value;
+            document.getElementById('Disability_hidden').value = document.getElementById('Disability').value;
+            document.getElementById('Rights_hidden').value = document.getElementById('Rights').value;
+            document.getElementById('Name_Elderly_hidden').value = document.getElementById('Name_Elderly').value;
+        }
+    </script>
+    <script>
     document.addEventListener('DOMContentLoaded', function() {
       // รายชื่อฟิลด์ที่ต้องใช้ pattern เดียวกัน
       const fields = [
@@ -719,7 +712,5 @@
     document.getElementById('assessment-form').addEventListener('submit', function (event) {
         concatenateVitalSigns();
     });
-</script>
-
-
-</html>
+    </script>
+@endpush

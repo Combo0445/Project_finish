@@ -70,25 +70,20 @@ class DashboardController extends Controller
         /** @var \Illuminate\Pagination\LengthAwarePaginator $elderlies */
         $elderlies->withQueryString();
 
-        // Stats & Charts
+        // Stats & Charts (clone the already-filtered $query per bucket, same
+        // pattern as doctorDashboard()'s chartData, so these respect whatever
+        // search/adl_group/gender/age_range/created_date filter is active)
         $adlGroups = [
-            'กลุ่มติดสังคม' => BarthelAdl::where('Group_ADL', 'กลุ่มติดสังคม')->count(),
-            'กลุ่มติดบ้าน' => BarthelAdl::where('Group_ADL', 'กลุ่มติดบ้าน')->count(),
-            'กลุ่มติดเตียง' => BarthelAdl::where('Group_ADL', 'กลุ่มติดเตียง')->count(),
+            'กลุ่มติดสังคม' => (clone $query)->whereHas('barthel_adl', fn($q) => $q->where('Group_ADL', 'กลุ่มติดสังคม'))->count(),
+            'กลุ่มติดบ้าน' => (clone $query)->whereHas('barthel_adl', fn($q) => $q->where('Group_ADL', 'กลุ่มติดบ้าน'))->count(),
+            'กลุ่มติดเตียง' => (clone $query)->whereHas('barthel_adl', fn($q) => $q->where('Group_ADL', 'กลุ่มติดเตียง'))->count(),
         ];
 
-        $ageGroupsData = Elderly::selectRaw('
-            SUM(TIMESTAMPDIFF(YEAR, Birthday, CURDATE()) BETWEEN 60 AND 69) as age_60_69,
-            SUM(TIMESTAMPDIFF(YEAR, Birthday, CURDATE()) BETWEEN 70 AND 79) as age_70_79,
-            SUM(TIMESTAMPDIFF(YEAR, Birthday, CURDATE()) BETWEEN 80 AND 89) as age_80_89,
-            SUM(TIMESTAMPDIFF(YEAR, Birthday, CURDATE()) >= 90) as age_90_plus
-        ')->first();
-
         $ageGroups = [
-            'ช่วงอายุ 60-69' => (int) ($ageGroupsData->age_60_69 ?? 0),
-            'ช่วงอายุ 70-79' => (int) ($ageGroupsData->age_70_79 ?? 0),
-            'ช่วงอายุ 80-89' => (int) ($ageGroupsData->age_80_89 ?? 0),
-            'ช่วงอายุ 90+' => (int) ($ageGroupsData->age_90_plus ?? 0),
+            'ช่วงอายุ 60-69' => (clone $query)->whereRaw('TIMESTAMPDIFF(YEAR, Birthday, CURDATE()) BETWEEN 60 AND 69')->count(),
+            'ช่วงอายุ 70-79' => (clone $query)->whereRaw('TIMESTAMPDIFF(YEAR, Birthday, CURDATE()) BETWEEN 70 AND 79')->count(),
+            'ช่วงอายุ 80-89' => (clone $query)->whereRaw('TIMESTAMPDIFF(YEAR, Birthday, CURDATE()) BETWEEN 80 AND 89')->count(),
+            'ช่วงอายุ 90+' => (clone $query)->whereRaw('TIMESTAMPDIFF(YEAR, Birthday, CURDATE()) >= 90')->count(),
         ];
 
         $elderlyLocations = $this->getElderlyLocations($elderlies);

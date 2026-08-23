@@ -20,12 +20,24 @@ class ADLController extends Controller
     public function index(Request $request)
     {
         $search = $request->get('search');
-        $date = $request->get('date', now()->toDateString());
+        $dateFrom = $request->get('date_from');
+        $dateTo = $request->get('date_to');
 
         $query = BarthelAdl::with('elderly');
 
-        if ($date) {
-            $query->whereDate('created_at', $date);
+        if ($search) {
+            $query->where('Name_Elderly', 'LIKE', "%{$search}%");
+        }
+
+        if ($dateFrom || $dateTo) {
+            if ($dateFrom) {
+                $query->whereDate('created_at', '>=', $dateFrom);
+            }
+            if ($dateTo) {
+                $query->whereDate('created_at', '<=', $dateTo);
+            }
+        } else {
+            $query->whereDate('created_at', now()->toDateString());
         }
 
         $adls = $query->paginate(20);

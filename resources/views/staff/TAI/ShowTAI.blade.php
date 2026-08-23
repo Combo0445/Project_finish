@@ -15,10 +15,16 @@
                 class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center gap-3 w-100">
                 <h4 class="mb-0">รายงานผลการประเมินผู้สูงอายุ (TAI)</h4>
                 <div class="d-flex flex-wrap gap-2 align-items-center">
-                    <form action="{{ route('tai.index') }}" method="GET" class="d-flex gap-2 align-items-center me-2">
-                        <input type="date" name="date" class="form-control form-control-sm" value="{{ request('date') }}">
+                    <form action="{{ route('tai.index') }}" method="GET" class="d-flex flex-wrap gap-2 align-items-center me-2">
+                        <input type="text" name="search" class="form-control form-control-sm"
+                            placeholder="ชื่อผู้สูงอายุ" style="max-width: 180px;" value="{{ request('search') }}">
+                        <div class="input-group input-group-sm" style="max-width: 260px;">
+                            <input type="date" name="date_from" class="form-control form-control-sm" value="{{ request('date_from') }}">
+                            <span class="input-group-text">ถึง</span>
+                            <input type="date" name="date_to" class="form-control form-control-sm" value="{{ request('date_to') }}">
+                        </div>
                         <button type="submit" class="btn btn-sm btn-dark mb-0">ค้นหา</button>
-                        @if(request('date'))
+                        @if(request()->hasAny(['search', 'date_from', 'date_to']))
                             <a href="{{ route('tai.index') }}" class="btn btn-sm btn-link mb-0 text-secondary">ล้าง</a>
                         @endif
                     </form>
@@ -48,7 +54,13 @@
                             <td class="text-center">
                                 {{ \Carbon\Carbon::parse($item->updated_at)->locale('th')->translatedFormat('d F Y') }}
                             </td>
-                            <td class="text-center">{{ $item->elderly->Name_Elderly ?? 'ยังไม่ได้ประเมิน' }}</td>
+                            <td class="text-center">
+                                @if ($item->elderly)
+                                    <a href="{{ route('elderly.profile', $item->elderly->ID_Elderly) }}">{{ $item->elderly->Name_Elderly }}</a>
+                                @else
+                                    ยังไม่ได้ประเมิน
+                                @endif
+                            </td>
                             <td class="text-center">{{ $item->user->Name_User ?? 'ยังไม่ได้ประเมิน' }}</td>
                             <td class="text-center">{{ $item->group ?? 'ยังไม่ได้ประเมิน' }}</td>
                             <td class="text-center">

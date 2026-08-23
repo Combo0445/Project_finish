@@ -14,11 +14,25 @@ class TAIController extends Controller
 {
     public function index(Request $request)
     {
+        $search = $request->get('search');
+        $dateFrom = $request->get('date_from');
+        $dateTo = $request->get('date_to');
+
         $query = ScoreTAI::with(['elderly', 'user']);
 
-        $date = $request->get('date', now()->toDateString());
-        if ($date) {
-            $query->whereDate('updated_at', $date);
+        if ($search) {
+            $query->whereHas('elderly', fn($q) => $q->where('Name_Elderly', 'LIKE', "%{$search}%"));
+        }
+
+        if ($dateFrom || $dateTo) {
+            if ($dateFrom) {
+                $query->whereDate('updated_at', '>=', $dateFrom);
+            }
+            if ($dateTo) {
+                $query->whereDate('updated_at', '<=', $dateTo);
+            }
+        } else {
+            $query->whereDate('updated_at', now()->toDateString());
         }
 
         $tai = $query->paginate(20);

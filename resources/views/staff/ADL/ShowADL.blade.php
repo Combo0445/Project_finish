@@ -17,10 +17,16 @@
                 class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center gap-3 w-100">
                 <h4 class="mb-0">ประเมินความสามารถในการดำเนินชีวิตประจำวัน (ADL)</h4>
                 <div class="d-flex flex-wrap gap-2 align-items-center">
-                    <form action="{{ route('adl.index') }}" method="GET" class="d-flex gap-2 align-items-center me-2">
-                        <input type="date" name="date" class="form-control form-control-sm" value="{{ request('date') }}">
+                    <form action="{{ route('adl.index') }}" method="GET" class="d-flex flex-wrap gap-2 align-items-center me-2">
+                        <input type="text" name="search" class="form-control form-control-sm"
+                            placeholder="ชื่อผู้สูงอายุ" style="max-width: 180px;" value="{{ request('search') }}">
+                        <div class="input-group input-group-sm" style="max-width: 260px;">
+                            <input type="date" name="date_from" class="form-control form-control-sm" value="{{ request('date_from') }}">
+                            <span class="input-group-text">ถึง</span>
+                            <input type="date" name="date_to" class="form-control form-control-sm" value="{{ request('date_to') }}">
+                        </div>
                         <button type="submit" class="btn btn-sm btn-dark mb-0">ค้นหา</button>
-                        @if(request('date'))
+                        @if(request()->hasAny(['search', 'date_from', 'date_to']))
                             <a href="{{ route('adl.index') }}" class="btn btn-sm btn-link mb-0 text-secondary">ล้าง</a>
                         @endif
                     </form>
@@ -51,7 +57,9 @@
                     @foreach ($adls as $adl)
                         <tr>
                             <td class="text-center">{{ $adl->created_at ? $adl->created_at->format('Y-m-d') : '' }}</td>
-                            <td class="text-center">{{ $adl->Name_Elderly }}</td>
+                            <td class="text-center">
+                                <a href="{{ route('elderly.profile', $adl->ID_Elderly) }}">{{ $adl->Name_Elderly }}</a>
+                            </td>
                             <td class="text-center">{{ $adl->Name_User }}</td>
                             <td class="text-center">{{ $adl->Score_ADL }}</td>
                             <td class="text-center">{{ $adl->Group_ADL }}</td>
