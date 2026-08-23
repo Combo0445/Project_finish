@@ -91,7 +91,48 @@
                         </div>
                     </x-slot>
 
-                    <x-data-table id="elderlyTable" :headers="[
+                    <form method="GET" action="{{ route('dashboard') }}" class="row g-2 align-items-end px-3 pt-3 pb-2">
+                        <div class="col-md-3">
+                            <label class="text-xs text-secondary mb-1">ค้นหาชื่อ</label>
+                            <input type="text" name="search" class="form-control form-control-sm"
+                                placeholder="ชื่อ-นามสกุล" value="{{ request('search') }}">
+                        </div>
+                        <div class="col-md-3">
+                            <label class="text-xs text-secondary mb-1">กลุ่ม ADL</label>
+                            <select name="adl_group" class="form-control form-control-sm">
+                                <option value="">ทั้งหมด</option>
+                                <option value="กลุ่มติดสังคม" {{ request('adl_group') == 'กลุ่มติดสังคม' ? 'selected' : '' }}>ติดสังคม</option>
+                                <option value="กลุ่มติดบ้าน" {{ request('adl_group') == 'กลุ่มติดบ้าน' ? 'selected' : '' }}>ติดบ้าน</option>
+                                <option value="กลุ่มติดเตียง" {{ request('adl_group') == 'กลุ่มติดเตียง' ? 'selected' : '' }}>ติดเตียง</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="text-xs text-secondary mb-1">เพศ</label>
+                            <select name="gender" class="form-control form-control-sm">
+                                <option value="">ทั้งหมด</option>
+                                <option value="ชาย" {{ request('gender') == 'ชาย' ? 'selected' : '' }}>ชาย</option>
+                                <option value="หญิง" {{ request('gender') == 'หญิง' ? 'selected' : '' }}>หญิง</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="text-xs text-secondary mb-1">ช่วงอายุ</label>
+                            <select name="age_range" class="form-control form-control-sm">
+                                <option value="">ทั้งหมด</option>
+                                <option value="60-69" {{ request('age_range') == '60-69' ? 'selected' : '' }}>60-69 ปี</option>
+                                <option value="70-79" {{ request('age_range') == '70-79' ? 'selected' : '' }}>70-79 ปี</option>
+                                <option value="80-89" {{ request('age_range') == '80-89' ? 'selected' : '' }}>80-89 ปี</option>
+                                <option value="90+" {{ request('age_range') == '90+' ? 'selected' : '' }}>90 ปีขึ้นไป</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2 d-flex gap-2">
+                            <button type="submit" class="btn btn-sm btn-dark mb-0">กรอง</button>
+                            @if(request()->hasAny(['search', 'adl_group', 'gender', 'age_range']))
+                                <a href="{{ route('dashboard') }}" class="btn btn-sm btn-outline-secondary mb-0">ล้าง</a>
+                            @endif
+                        </div>
+                    </form>
+
+                    <x-data-table id="elderlyTable" :useDataTable="false" :headers="[
                     ['label' => 'รูป', 'class' => 'text-center'],
                     ['label' => 'ชื่อ-นามสกุล', 'class' => 'text-center'],
                     ['label' => 'อายุ', 'class' => 'text-center'],
@@ -100,7 +141,7 @@
                     ['label' => 'CG', 'class' => 'text-center'],
                     ['label' => 'Actions', 'class' => 'text-center']
                 ]">
-                        @foreach ($elderlies as $elderly)
+                        @forelse ($elderlies as $elderly)
                             <tr>
                                 <td class="text-center">
                                     <img src="{{ $elderly->image_url }}" alt="Elderly Image"
@@ -148,8 +189,15 @@
                                     </div>
                                 </td>
                             </tr>
-                        @endforeach
+                        @empty
+                            <tr>
+                                <td colspan="7" class="text-center text-muted py-4">ไม่พบผู้สูงอายุที่ตรงกับเงื่อนไขที่กรอง</td>
+                            </tr>
+                        @endforelse
                     </x-data-table>
+                    <div class="px-3 pb-3">
+                        {{ $elderlies->links() }}
+                    </div>
                 </x-card>
             </div>
         </div>
@@ -216,7 +264,26 @@
                 </div>
             </x-slot>
 
-            <x-data-table id="doctorTable" :headers="[
+            <form method="GET" action="{{ route('dashboard') }}" class="row g-2 align-items-end px-3 pt-3 pb-2">
+                <div class="col-md-3">
+                    <label class="text-xs text-secondary mb-1">ช่วงอายุ</label>
+                    <select name="age_range" class="form-control form-control-sm">
+                        <option value="">ทั้งหมด</option>
+                        <option value="60-69" {{ request('age_range') == '60-69' ? 'selected' : '' }}>60-69 ปี</option>
+                        <option value="70-79" {{ request('age_range') == '70-79' ? 'selected' : '' }}>70-79 ปี</option>
+                        <option value="80-89" {{ request('age_range') == '80-89' ? 'selected' : '' }}>80-89 ปี</option>
+                        <option value="90+" {{ request('age_range') == '90+' ? 'selected' : '' }}>90 ปีขึ้นไป</option>
+                    </select>
+                </div>
+                <div class="col-md-3 d-flex gap-2">
+                    <button type="submit" class="btn btn-sm btn-dark mb-0">กรอง</button>
+                    @if(request()->hasAny(['age_range']))
+                        <a href="{{ route('dashboard') }}" class="btn btn-sm btn-outline-secondary mb-0">ล้าง</a>
+                    @endif
+                </div>
+            </form>
+
+            <x-data-table id="doctorTable" :useDataTable="false" :headers="[
                     ['label' => 'รูป', 'class' => 'text-center'],
                     ['label' => 'ชื่อ-นามสกุล', 'class' => 'text-center'],
                     ['label' => 'อายุ', 'class' => 'text-center'],
@@ -226,7 +293,7 @@
                     ['label' => 'สถานะคำแนะนำ', 'class' => 'text-center'],
                     ['label' => 'การจัดการ', 'class' => 'text-center']
                 ]">
-                @foreach ($elderlys as $elderly)
+                @forelse ($elderlys as $elderly)
                     <tr>
                         <td class="text-center">
                             <img src="{{ $elderly->image_url }}" alt="Elderly" class="avatar avatar-sm rounded-circle">
@@ -301,8 +368,15 @@
                             </div>
                         </td>
                     </tr>
-                @endforeach
+                @empty
+                    <tr>
+                        <td colspan="8" class="text-center text-muted py-4">ไม่พบผู้สูงอายุที่ตรงกับเงื่อนไขที่กรอง</td>
+                    </tr>
+                @endforelse
             </x-data-table>
+            <div class="px-3 pb-3">
+                {{ $elderlys->links() }}
+            </div>
         </x-card>
 
         @push('modals')
