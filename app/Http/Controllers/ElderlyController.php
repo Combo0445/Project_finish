@@ -34,8 +34,8 @@ class ElderlyController extends Controller
             $addressElderly = new AddressElderly();
             $addressElderly->ID_Elderly = $elderly->ID_Elderly;
             $addressElderly->Name_Elderly = $elderly->Name_Elderly;
-            $addressElderly->Latitude_position = $request->input('Latitude_position');
-            $addressElderly->Longitude_position = $request->input('Longitude_position');
+            $addressElderly->Latitude_position = $request->input('Lat');
+            $addressElderly->Longitude_position = $request->input('Lng');
             $addressElderly->save();
         });
 
@@ -70,8 +70,8 @@ class ElderlyController extends Controller
                 $addressElderly = new AddressElderly();
                 $addressElderly->ID_Elderly = $id;
             }
-            $addressElderly->Latitude_position = $request->input('Latitude_position');
-            $addressElderly->Longitude_position = $request->input('Longitude_position');
+            $addressElderly->Latitude_position = $request->input('Lat');
+            $addressElderly->Longitude_position = $request->input('Lng');
             $addressElderly->save();
         });
 
