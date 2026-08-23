@@ -60,6 +60,13 @@
                             </div>
 
                             <div class="form-group mb-3">
+                                <label for="ID_Card">เลขบัตรประชาชน:</label>
+                                <input type="text" id="ID_Card" name="ID_Card" class="form-control" maxlength="13"
+                                    inputmode="numeric" pattern="\d{13}" placeholder="13 หลัก"
+                                    value="{{ old('ID_Card', $elderly->ID_Card) }}">
+                            </div>
+
+                            <div class="form-group mb-3">
                                 <label for="Gender">เพศ:</label>
                                 <select id="Gender" name="Gender" class="form-control" required>
                                     <option value="">เลือกเพศ</option>
@@ -68,6 +75,12 @@
                                     <option value="หญิง" {{ old('Gender', $elderly->Gender) == 'หญิง' ? 'selected' : '' }}>
                                         หญิง</option>
                                 </select>
+                            </div>
+
+                            <div class="form-group mb-3">
+                                <label for="Age_input">อายุ (ปี) — กรอกแทนวันเกิดได้ถ้าไม่ทราบวันที่แน่นอน:</label>
+                                <input type="number" id="Age_input" class="form-control" min="0" max="150"
+                                    placeholder="เช่น 75" oninput="calculateBirthdayFromAge()">
                             </div>
 
                             <div class="form-group mb-3">
@@ -123,6 +136,20 @@
 
 @push('scripts')
     <script>
+        // ผู้สูงอายุหลายคนไม่ทราบวันเกิดที่แน่นอน แต่ทราบอายุ -- ใช้ปีปัจจุบันลบด้วย
+        // อายุที่กรอก (คงเดือน/วันเป็นวันนี้) เป็นวันเกิดโดยประมาณ ให้ผลลัพธ์อายุตรงกับ
+        // ที่กรอกไว้พอดีถ้าคำนวณอายุใหม่จากวันเกิดนี้ในวันเดียวกัน
+        function calculateBirthdayFromAge() {
+            const age = parseInt(document.getElementById('Age_input').value, 10);
+            if (isNaN(age) || age < 0) return;
+
+            const today = new Date();
+            const year = today.getFullYear() - age;
+            const month = String(today.getMonth() + 1).padStart(2, '0');
+            const day = String(today.getDate()).padStart(2, '0');
+            document.getElementById('Birthday').value = `${year}-${month}-${day}`;
+        }
+
         function previewImage(event) {
             var reader = new FileReader();
             reader.onload = function () {

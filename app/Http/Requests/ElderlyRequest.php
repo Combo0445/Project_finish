@@ -25,6 +25,7 @@ class ElderlyRequest extends FormRequest
     {
         return [
             'Name_Elderly' => 'required|string|max:255',
+            'ID_Card' => 'nullable|digits:13',
             'Gender' => 'required|string',
             'Birthday' => 'required|date',
             'Address' => 'required|string',
@@ -42,6 +43,7 @@ class ElderlyRequest extends FormRequest
     {
         return [
             'Name_Elderly.required' => 'กรุณากรอกชื่อ-นามสกุล',
+            'ID_Card.digits' => 'เลขบัตรประชาชนต้องมี 13 หลัก',
             'Gender.required' => 'กรุณาเลือกเพศ',
             'Birthday.required' => 'กรุณากรอกวันเกิด',
             'Address.required' => 'กรุณากรอกที่อยู่',

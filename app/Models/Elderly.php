@@ -16,6 +16,7 @@ class Elderly extends Model
 
     protected $fillable = [
         'Name_Elderly',
+        'ID_Card',
         'Gender',
         'Birthday',
         'Address',

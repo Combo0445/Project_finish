@@ -25,7 +25,7 @@ class ElderlyController extends Controller
 
         DB::transaction(function () use ($request) {
             $elderly = new Elderly();
-            $elderly->fill($request->only(['Name_Elderly', 'Gender', 'Birthday', 'Address', 'Phone_Elderly']));
+            $elderly->fill($request->only(['Name_Elderly', 'ID_Card', 'Gender', 'Birthday', 'Address', 'Phone_Elderly']));
             $imageService = app(\App\Services\ImageUploadService::class);
             $elderly->Image_Elderly = $imageService->handleSingleUpload($request->file('Image_Elderly'), 'elderly_images');
 
@@ -55,7 +55,7 @@ class ElderlyController extends Controller
     {
         DB::transaction(function () use ($request, $id) {
             $elderly = Elderly::findOrFail($id);
-            $elderly->fill($request->only(['Name_Elderly', 'Gender', 'Birthday', 'Address', 'Phone_Elderly']));
+            $elderly->fill($request->only(['Name_Elderly', 'ID_Card', 'Gender', 'Birthday', 'Address', 'Phone_Elderly']));
             $imageService = app(\App\Services\ImageUploadService::class);
             $elderly->Image_Elderly = $imageService->handleSingleUpload(
                 $request->file('Image_Elderly'),
