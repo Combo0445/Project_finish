@@ -25,7 +25,7 @@ class StaffWorkflowController extends Controller
         if ($missingAdl) {
             // Found someone missing ADL, send staff there. Typically the staff goes to elderly profile or ADL index,
             // Let's redirect to ADL index for now as that's where they usually search.
-            return redirect()->route('staff.ADL')
+            return redirect()->route('adl.index')
                 ->with('info', 'มีผู้สูงอายุที่ยังไม่ได้ประเมิน ADL (กรุณาประเมินคลิกปุ่มรายชื่อด้านล่าง)');
         }
 
@@ -33,7 +33,7 @@ class StaffWorkflowController extends Controller
         // TAI is assessed alongside ADL. We check if an elderly lacks TAI.
         $missingTai = Elderly::doesntHave('score_tai')->first();
         if ($missingTai) {
-            return redirect()->route('staff.TAI')
+            return redirect()->route('tai.index')
                 ->with('info', 'มีผู้สูงอายุที่ยังไม่ได้ประเมิน TAI (กรุณาประเมินคลิกปุ่มรายชื่อด้านล่าง)');
         }
 
