@@ -125,13 +125,18 @@
                             </select>
                         </div>
                         <div class="col-md-2">
-                            <label class="text-xs text-secondary mb-1">วันที่เพิ่มข้อมูล</label>
-                            <input type="date" name="created_date" class="form-control form-control-sm"
-                                value="{{ request('created_date') }}">
+                            <label class="text-xs text-secondary mb-1">เพิ่มข้อมูลตั้งแต่วันที่</label>
+                            <input type="date" name="created_date_from" class="form-control form-control-sm"
+                                value="{{ request('created_date_from') }}">
+                        </div>
+                        <div class="col-md-2">
+                            <label class="text-xs text-secondary mb-1">ถึงวันที่</label>
+                            <input type="date" name="created_date_to" class="form-control form-control-sm"
+                                value="{{ request('created_date_to') }}">
                         </div>
                         <div class="col-md-12 d-flex gap-2">
                             <button type="submit" class="btn btn-sm btn-dark mb-0">กรอง</button>
-                            @if(request()->hasAny(['search', 'adl_group', 'gender', 'age_range', 'created_date']))
+                            @if(request()->hasAny(['search', 'adl_group', 'gender', 'age_range', 'created_date_from', 'created_date_to']))
                                 <a href="{{ route('dashboard') }}" class="btn btn-sm btn-outline-secondary mb-0">ล้าง</a>
                             @endif
                         </div>
