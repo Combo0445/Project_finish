@@ -91,56 +91,72 @@
                         </div>
                     </x-slot>
 
-                    <form method="GET" action="{{ route('dashboard') }}" class="row g-2 align-items-end px-3 pt-3 pb-2">
-                        <div class="col-md-3">
-                            <label class="text-xs text-secondary mb-1">ค้นหาชื่อ</label>
-                            <input type="text" name="search" class="form-control form-control-sm"
-                                placeholder="ชื่อ-นามสกุล" value="{{ request('search') }}">
-                        </div>
-                        <div class="col-md-3">
-                            <label class="text-xs text-secondary mb-1">กลุ่ม ADL</label>
-                            <select name="adl_group" class="form-control form-control-sm">
-                                <option value="">ทั้งหมด</option>
-                                <option value="กลุ่มติดสังคม" {{ request('adl_group') == 'กลุ่มติดสังคม' ? 'selected' : '' }}>ติดสังคม</option>
-                                <option value="กลุ่มติดบ้าน" {{ request('adl_group') == 'กลุ่มติดบ้าน' ? 'selected' : '' }}>ติดบ้าน</option>
-                                <option value="กลุ่มติดเตียง" {{ request('adl_group') == 'กลุ่มติดเตียง' ? 'selected' : '' }}>ติดเตียง</option>
-                            </select>
-                        </div>
-                        <div class="col-md-2">
-                            <label class="text-xs text-secondary mb-1">เพศ</label>
-                            <select name="gender" class="form-control form-control-sm">
-                                <option value="">ทั้งหมด</option>
-                                <option value="ชาย" {{ request('gender') == 'ชาย' ? 'selected' : '' }}>ชาย</option>
-                                <option value="หญิง" {{ request('gender') == 'หญิง' ? 'selected' : '' }}>หญิง</option>
-                            </select>
-                        </div>
-                        <div class="col-md-2">
-                            <label class="text-xs text-secondary mb-1">ช่วงอายุ</label>
-                            <select name="age_range" class="form-control form-control-sm">
-                                <option value="">ทั้งหมด</option>
-                                <option value="60-69" {{ request('age_range') == '60-69' ? 'selected' : '' }}>60-69 ปี</option>
-                                <option value="70-79" {{ request('age_range') == '70-79' ? 'selected' : '' }}>70-79 ปี</option>
-                                <option value="80-89" {{ request('age_range') == '80-89' ? 'selected' : '' }}>80-89 ปี</option>
-                                <option value="90+" {{ request('age_range') == '90+' ? 'selected' : '' }}>90 ปีขึ้นไป</option>
-                            </select>
-                        </div>
-                        <div class="col-md-4">
-                            <label class="text-xs text-secondary mb-1">วันที่เพิ่มข้อมูล (ช่วงวัน)</label>
-                            <div class="input-group input-group-sm">
-                                <input type="date" name="created_date_from" class="form-control form-control-sm"
-                                    value="{{ request('created_date_from') }}">
-                                <span class="input-group-text">ถึง</span>
-                                <input type="date" name="created_date_to" class="form-control form-control-sm"
-                                    value="{{ request('created_date_to') }}">
+                    <div class="bg-light rounded-lg mb-4">
+                        <form method="GET" action="{{ route('dashboard') }}" class="row g-3 align-items-end p-4">
+                            <div class="col-6 col-md-3">
+                                <label class="text-xs text-uppercase text-secondary font-weight-bold mb-1">ค้นหาชื่อ</label>
+                                <div class="input-group input-group-sm">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text bg-white border-right-0">
+                                            <i class="fas fa-search text-secondary"></i>
+                                        </span>
+                                    </div>
+                                    <input type="text" name="search" class="form-control border-left-0 pl-0"
+                                        placeholder="ชื่อ-นามสกุล" value="{{ request('search') }}">
+                                </div>
                             </div>
-                        </div>
-                        <div class="col-md-12 d-flex gap-2">
-                            <button type="submit" class="btn btn-sm btn-dark mb-0">กรอง</button>
-                            @if(request()->hasAny(['search', 'adl_group', 'gender', 'age_range', 'created_date_from', 'created_date_to']))
-                                <a href="{{ route('dashboard') }}" class="btn btn-sm btn-outline-secondary mb-0">ล้าง</a>
-                            @endif
-                        </div>
-                    </form>
+                            <div class="col-6 col-md-3">
+                                <label class="text-xs text-uppercase text-secondary font-weight-bold mb-1">กลุ่ม ADL</label>
+                                <select name="adl_group" class="custom-select custom-select-sm">
+                                    <option value="">ทั้งหมด</option>
+                                    <option value="กลุ่มติดสังคม" {{ request('adl_group') == 'กลุ่มติดสังคม' ? 'selected' : '' }}>ติดสังคม</option>
+                                    <option value="กลุ่มติดบ้าน" {{ request('adl_group') == 'กลุ่มติดบ้าน' ? 'selected' : '' }}>ติดบ้าน</option>
+                                    <option value="กลุ่มติดเตียง" {{ request('adl_group') == 'กลุ่มติดเตียง' ? 'selected' : '' }}>ติดเตียง</option>
+                                </select>
+                            </div>
+                            <div class="col-6 col-md-2">
+                                <label class="text-xs text-uppercase text-secondary font-weight-bold mb-1">เพศ</label>
+                                <select name="gender" class="custom-select custom-select-sm">
+                                    <option value="">ทั้งหมด</option>
+                                    <option value="ชาย" {{ request('gender') == 'ชาย' ? 'selected' : '' }}>ชาย</option>
+                                    <option value="หญิง" {{ request('gender') == 'หญิง' ? 'selected' : '' }}>หญิง</option>
+                                </select>
+                            </div>
+                            <div class="col-6 col-md-2">
+                                <label class="text-xs text-uppercase text-secondary font-weight-bold mb-1">ช่วงอายุ</label>
+                                <select name="age_range" class="custom-select custom-select-sm">
+                                    <option value="">ทั้งหมด</option>
+                                    <option value="60-69" {{ request('age_range') == '60-69' ? 'selected' : '' }}>60-69 ปี</option>
+                                    <option value="70-79" {{ request('age_range') == '70-79' ? 'selected' : '' }}>70-79 ปี</option>
+                                    <option value="80-89" {{ request('age_range') == '80-89' ? 'selected' : '' }}>80-89 ปี</option>
+                                    <option value="90+" {{ request('age_range') == '90+' ? 'selected' : '' }}>90 ปีขึ้นไป</option>
+                                </select>
+                            </div>
+                            <div class="col-12 col-md-4">
+                                <label class="text-xs text-uppercase text-secondary font-weight-bold mb-1">วันที่เพิ่มข้อมูล
+                                    (ช่วงวัน)</label>
+                                <div class="input-group input-group-sm">
+                                    <input type="date" name="created_date_from" class="form-control"
+                                        value="{{ request('created_date_from') }}">
+                                    <div class="input-group-prepend input-group-append">
+                                        <span class="input-group-text bg-white text-secondary">ถึง</span>
+                                    </div>
+                                    <input type="date" name="created_date_to" class="form-control"
+                                        value="{{ request('created_date_to') }}">
+                                </div>
+                            </div>
+                            <div class="col-12 d-flex gap-2 mt-2">
+                                <button type="submit" class="btn btn-dark btn-sm px-4 mb-0 rounded-pill">
+                                    <i class="fas fa-filter me-1"></i> กรอง
+                                </button>
+                                @if(request()->hasAny(['search', 'adl_group', 'gender', 'age_range', 'created_date_from', 'created_date_to']))
+                                    <a href="{{ route('dashboard') }}" class="btn btn-link btn-sm text-secondary mb-0">
+                                        <i class="fas fa-times me-1"></i> ล้างตัวกรอง
+                                    </a>
+                                @endif
+                            </div>
+                        </form>
+                    </div>
 
                     <x-data-table id="elderlyTable" :useDataTable="false" :headers="[
                     ['label' => 'รูป', 'class' => 'text-center'],
