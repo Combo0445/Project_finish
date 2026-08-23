@@ -181,31 +181,15 @@
 
 @include('layout.nav-content')
 
+{{--
+    Sidebar must be the very last thing this partial renders (nothing --
+    not even a <script>/<style> -- after its closing </aside>), because
+    Argon Dashboard's desktop layout relies on the CSS sibling selector
+    ".sidenav.fixed-start + .main-content" to push page content over.
+    toggleDropdown()/toggleNotificationDropdown()/window.onclick above
+    used to be duplicated here too; removed since layout.nav-content
+    already defines the identical functions.
+--}}
 @if (Auth::check())
     @include('layout.sidebar')
 @endif
-
-<script>
-    function toggleDropdown() {
-        var dropdown = document.getElementById("userDropdown");
-        if (dropdown) dropdown.style.display = dropdown.style.display === "block" ? "none" : "block";
-    }
-
-    function toggleNotificationDropdown() {
-        var dropdown = document.getElementById("notificationDropdown");
-        if (dropdown) dropdown.style.display = dropdown.style.display === "block" ? "none" : "block";
-    }
-
-    window.onclick = function (event) {
-        if (!event.target.matches('.user-info img') && !event.target.matches('.user-info span') && !event.target
-            .matches('.fa-cog') && !event.target.matches('.fa-bell')) {
-            var dropdowns = document.getElementsByClassName("dropdown");
-            for (var i = 0; i < dropdowns.length; i++) {
-                var openDropdown = dropdowns[i];
-                if (openDropdown.style.display === "block") {
-                    openDropdown.style.display = "none";
-                }
-            }
-        }
-    }
-</script>

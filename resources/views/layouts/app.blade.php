@@ -89,10 +89,17 @@
 </head>
 
 @php
-    $bodyClass = '';
-    if (auth()->check() && auth()->user()->Type_Personnel === 'Staff') {
-        $bodyClass = 'staff-accessible';
+    $bodyClasses = [];
+    if (auth()->check()) {
+        // Enables Argon Dashboard's sidenav layout system: on desktop the
+        // sidebar docks permanently and pushes .main-content over; on
+        // smaller screens it starts hidden and the toggle button reveals it
+        $bodyClasses[] = 'g-sidenav-show';
     }
+    if (auth()->check() && auth()->user()->Type_Personnel === 'Staff') {
+        $bodyClasses[] = 'staff-accessible';
+    }
+    $bodyClass = implode(' ', $bodyClasses);
 @endphp
 
 <body class="{{ $bodyClass }}">

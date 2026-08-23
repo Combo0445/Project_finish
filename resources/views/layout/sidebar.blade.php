@@ -15,12 +15,79 @@
 <link href="{{ url('assets/css/nucleo-icons.css') }}" rel="stylesheet" />
 <link href="{{ url('assets/css/nucleo-svg.css') }}" rel="stylesheet" />
 
+<style>
+    /* top/height account for the fixed 80px navbar above the sidebar --
+       Argon's own sidenav assumes no separate top bar, so these override
+       its defaults rather than fighting them with a hardcoded width */
+    #sidenav-main {
+        top: 80px;
+        height: calc(100vh - 80px);
+    }
+
+    #sidenav-main .nav-link {
+        border-radius: 0.5rem;
+        margin: 2px 10px;
+        transition: background-color 0.15s ease;
+    }
+
+    #sidenav-main .nav-link:not(.active):hover {
+        background-color: rgba(255, 255, 255, 0.08);
+    }
+
+    #sidenav-main .nav-link.active {
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.18);
+    }
+
+    #sidenav-main .nav-item h6 {
+        letter-spacing: 0.06em;
+    }
+
+    /* Only meaningful on narrower screens: on desktop the sidebar is
+       always docked (Argon's own CSS), so hide the toggle there */
+    .sidebar-toggle-btn {
+        display: none;
+        position: fixed;
+        top: 96px;
+        left: 16px;
+        z-index: 1051;
+        width: 40px;
+        height: 40px;
+        border: none;
+        border-radius: 50%;
+        background-color: #355e3b;
+        color: #fff;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+        align-items: center;
+        justify-content: center;
+    }
+
+    @media only screen and (max-width: 1199.98px) {
+        .sidebar-toggle-btn {
+            display: flex;
+        }
+
+        #sidenav-main {
+            top: 80px;
+            height: calc(100vh - 80px);
+        }
+    }
+
+    @media only screen and (max-width: 767px) {
+        #sidenav-main {
+            top: 60px;
+            height: calc(100vh - 60px);
+        }
+
+        .sidebar-toggle-btn {
+            top: 70px;
+        }
+    }
+</style>
+
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <aside class="sidenav navbar navbar-vertical navbar-expand-xs border-0 border-radius-xl my-3 fixed-start ms-3"
     id="sidenav-main" style="background-color: #355e3b;">
     <div class="sidenav-header">
-        <i class="fas fa-times p-3 text-white opacity-5 position-absolute end-0 top-0 d-none d-xl-none"
-            aria-hidden="true" id="iconSidenav"></i>
         <a class="navbar-brand m-0" href="javascript:void(0)" style="text-align: center;">
             <h6 class="ms-1 font-weight-bold text-white">เมนูของ{{ $currentRoleName }}</h6>
         </a>
@@ -168,61 +235,28 @@
             @endif
         </ul>
     </div>
+
+    {{--
+        Toggle button and script deliberately live INSIDE <aside>, not
+        after it. Argon's desktop layout depends on the CSS sibling
+        selector ".sidenav.fixed-start + .main-content" (see
+        argon-dashboard.css) to push page content over -- anything
+        rendered as a sibling between </aside> and <main class="main-content">
+        breaks that rule and makes the sidebar overlap the page instead
+        of docking beside it, which is what was happening before.
+    --}}
+    <button class="sidebar-toggle-btn" id="sidebar-toggle-btn" type="button" onclick="toggleSidebar()"
+        title="เปิด/ปิดเมนู" aria-label="เปิด/ปิดเมนู">
+        <i class="fas fa-bars"></i>
+    </button>
+
+    <script>
+        // Uses Argon Dashboard's own sidenav toggle mechanism (the
+        // g-sidenav-pinned body class) instead of a separate ad hoc
+        // collapsed/transform system, so it doesn't fight the framework's
+        // built-in responsive behavior.
+        function toggleSidebar() {
+            document.body.classList.toggle('g-sidenav-pinned');
+        }
+    </script>
 </aside>
-
-<button class="sidebar-toggle-btn text-white" id="sidebar-toggle-btn" onclick="toggleSidebar()">☰</button>
-
-<script>
-    function toggleSidebar() {
-        var sidebar = document.getElementById('sidenav-main');
-        var toggleBtn = document.getElementById('sidebar-toggle-btn');
-        sidebar.classList.toggle('collapsed');
-        toggleBtn.style.left = sidebar.classList.contains('collapsed') ? '10px' : '260px';
-    }
-</script>
-
-<style>
-    #sidenav-main {
-        top: 80px;
-        width: 250px;
-        height: 80%;
-        z-index: 1050;
-    }
-
-    .sidenav.collapsed {
-        transform: translateX(-260px);
-        transition: transform 0.3s ease;
-    }
-
-    .sidebar-toggle-btn {
-        position: fixed;
-        top: 130px;
-        left: 260px;
-        z-index: 1100;
-        background-color: #355e3b;
-        border: none;
-        color: white;
-        cursor: pointer;
-        padding: 10px;
-        border-radius: 4px;
-        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-        transition: left 0.3s ease;
-    }
-
-    @media only screen and (max-width: 767px) {
-        #sidenav-main {
-            top: 150px;
-            width: 60%;
-            height: 65%;
-        }
-
-        .sidebar-toggle-btn {
-            top: 200px;
-            left: 10px;
-        }
-
-        .sidenav.collapsed {
-            transform: translateX(-100%);
-        }
-    }
-</style>
